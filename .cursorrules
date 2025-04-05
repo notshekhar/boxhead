@@ -1,39 +1,13 @@
-/** @type {import('tailwindcss').Config} \*/
-module.exports = {
-content: [
-"./src/pages/**/_.{js,ts,jsx,tsx,mdx}",
-"./src/components/\*\*/_.{js,ts,jsx,tsx,mdx}",
-"./src/app/\*_/_.{js,ts,jsx,tsx,mdx}",
-],
-theme: {
-extend: {
-colors: {
-// Primary colors (based on the white background and orange accents)
-primary: {
-light: '#FFFFFF', // Light mode background
-dark: '#1A1A1A', // Dark mode background
-},
-secondary: {
-light: '#FF6B00', // Orange accent (light mode)
-dark: '#FF8C00', // Slightly adjusted orange for dark mode contrast
-},
-text: {
-light: '#000000', // Black text for light mode
-dark: '#FFFFFF', // White text for dark mode
-},
-gray: {
-light: '#F5F5F5', // Light gray for borders/sidebars (light mode)
-dark: '#2D2D2D', // Dark gray for borders/sidebars (dark mode)
-},
-accent: {
-green: '#10B981', // Green for buttons/icons (e.g., "New chat" icon)
-},
-},
-},
-},
-darkMode: 'class', // Enables dark mode via a class (e.g., `dark`)
-}
+Project Name: `cursor.chat`
+Description: `cursor.chat` is a chat application that allows you to chat with ai with a modern and beautiful UI.
 
-USE THESE TAILWIND CONFIG
+Instructions: 
+1. Make sure to use the tailwind config file
+2. Make sure to use the theme inline
+3. Make sure to use the dark mode and light mode
+4. Make sure to make it mobile friendly and responsive
+5. Make sure to make it accessible
+6. Make sure to make it consistent
+7. Make sure to make it beautiful and modern
+8. Instead of the shadow, use background difference 
 
-RULES: MAKE EVERYTHING RESPONSIVE, ACCESSIBLE, CONSISTENT AND DARK MODE ONLY AND BEAUTIFUL AND MODERN
