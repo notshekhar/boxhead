@@ -1,103 +1,158 @@
-import Image from "next/image";
+"use client";
+
+import { ThemeToggleButton } from "@/components/theme-toggle-button";
+import { ChatMessage } from "@/components/chat-message";
+import { ChatInput } from "@/components/chat-input";
+import { Sidebar } from "@/components/sidebar";
+import { ChatHeader } from "@/components/chat-header";
+import { EmptyState } from "@/components/empty-state";
+import { HeaderControls } from "@/components/header-controls";
+import { useState } from "react";
+
+interface Message {
+  id: string;
+  content: string;
+  type: 'user' | 'ai';
+}
+
+interface Chat {
+  id: string;
+  title: string;
+  messages: Message[];
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [chats, setChats] = useState<Chat[]>([
+    {
+      id: "1",
+      title: "Generate Image",
+      messages: [
+        {
+          id: "1",
+          content: "can you generate image?",
+          type: "user",
+        },
+        {
+          id: "2",
+          content: "No, I cannot directly generate images. However, I can help you create descriptions, ideas, or instructions for generating images using tools like DALL-E, MidJourney, or other image-generation platforms. If you need assistance with designing or describing an image, feel free to ask!",
+          type: "ai",
+        },
+      ],
+    },
+  ]);
+  const [activeChat, setActiveChat] = useState<string>("1");
+  const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleToggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
+  const handleNewChat = () => {
+    const newChat: Chat = {
+      id: Date.now().toString(),
+      title: "New Chat",
+      messages: [],
+    };
+    setChats([...chats, newChat]);
+    setActiveChat(newChat.id);
+  };
+
+  const handleSelectChat = (chatId: string) => {
+    setActiveChat(chatId);
+  };
+
+  const handleSendMessage = (message: string) => {
+    // Find the current active chat
+    const currentChat = chats.find((chat) => chat.id === activeChat);
+    if (!currentChat) return;
+
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: message,
+      type: "user",
+    };
+
+    // In a real app, here you'd make an API call to get the AI response
+    // For now we'll simulate it
+    const aiMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: "This is a simulated AI response. In a real app, you would make an API call to get the response.",
+      type: "ai",
+    };
+
+    // Update the chat with new messages
+    const updatedChats = chats.map((chat) => {
+      if (chat.id === activeChat) {
+        return {
+          ...chat,
+          messages: [...chat.messages, userMessage, aiMessage],
+          // If it's the first message, update the chat title
+          title: chat.messages.length === 0 ? message.substring(0, 20) : chat.title,
+        };
+      }
+      return chat;
+    });
+
+    setChats(updatedChats);
+  };
+
+  // Get the current active chat
+  const currentChat = chats.find((chat) => chat.id === activeChat);
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-primary-light dark:bg-primary-dark text-text-light dark:text-text-dark">
+      {/* Sidebar - rendered conditionally based on sidebarVisible state */}
+      {sidebarVisible && (
+        <Sidebar 
+          chats={chats} 
+          onNewChat={handleNewChat} 
+          onSelectChat={handleSelectChat}
+          onToggleSidebar={handleToggleSidebar}
+        />
+      )}
+
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header area - show either HeaderControls or ChatHeader */}
+        {!sidebarVisible ? (
+          <div className="relative">
+            <HeaderControls 
+              onToggleSidebar={handleToggleSidebar} 
+              onNewChat={handleNewChat} 
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <div className="absolute top-0 right-4 h-14 flex items-center">
+              <ThemeToggleButton />
+            </div>
+          </div>
+        ) : (
+          <div className="relative">
+            {currentChat && <ChatHeader title={currentChat.title} />}
+            <div className="absolute top-0 right-4 h-14 flex items-center">
+              <ThemeToggleButton />
+            </div>
+          </div>
+        )}
+
+        {/* Messages container */}
+        <div className="flex-1 overflow-y-auto">
+          {currentChat?.messages.length === 0 ? (
+            <EmptyState username="Amélie" />
+          ) : (
+            <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
+              {currentChat?.messages.map((message) => (
+                <ChatMessage
+                  key={message.id}
+                  content={message.content}
+                  type={message.type}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <ChatInput onSendMessage={handleSendMessage} />
+      </div>
     </div>
   );
 }

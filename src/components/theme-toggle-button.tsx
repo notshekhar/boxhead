@@ -68,13 +68,13 @@ export function ThemeToggleButton() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-md bg-gray-light dark:bg-gray-dark text-text-light dark:text-text-dark hover:bg-opacity-80 transition-colors duration-200"
+      className="p-1.5 rounded-md bg-gray-light dark:bg-gray-dark text-text-light dark:text-text-dark hover:bg-opacity-80 transition-colors duration-200"
       aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
     >
       {theme === 'light' ? (
-        <MoonIcon className="w-6 h-6" />
+        <MoonIcon className="w-5 h-5" />
       ) : (
-        <SunIcon className="w-6 h-6" />
+        <SunIcon className="w-5 h-5" />
       )}
     </button>
   );
