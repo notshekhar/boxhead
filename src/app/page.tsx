@@ -121,37 +121,38 @@ export default function Home() {
         recentChats={recentChats}
       />
 
-      {/* Sidebar - rendered conditionally based on sidebarVisible state */}
-      {sidebarVisible && (
-        <Sidebar
-          chats={chats}
-          onNewChat={handleNewChat}
-          onSelectChat={handleSelectChat}
-          onToggleSidebar={handleToggleSidebar}
-          onOpenSearch={() => setShowSearchPopup(true)}
-        />
-      )}
+      {/* Sidebar - always rendered but positioned off-screen when not visible */}
+      <Sidebar
+        chats={chats}
+        onNewChat={handleNewChat}
+        onSelectChat={handleSelectChat}
+        onToggleSidebar={handleToggleSidebar}
+        onOpenSearch={() => setShowSearchPopup(true)}
+        isOpen={sidebarVisible}
+      />
 
       {/* Main chat area */}
-      <div className="flex-1 flex flex-col backdrop-blur-[2px] z-10">
-        {/* Header area - show either HeaderControls or ChatHeader */}
+      <div className={`flex-1 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${sidebarVisible ? 'ml-[260px]' : 'ml-0'}`}>
+        {/* Floating controls when sidebar is closed */}
         {!sidebarVisible ? (
-          <div className="relative">
-            <HeaderControls
-              onToggleSidebar={handleToggleSidebar}
-              onNewChat={handleNewChat}
-            />
-            <div className="absolute top-0 right-4 h-14 flex items-center">
+          <>
+            <div className="absolute top-4 left-4 z-20">
+              <HeaderControls
+                onToggleSidebar={handleToggleSidebar}
+                onNewChat={handleNewChat}
+                onOpenSearch={() => setShowSearchPopup(true)}
+              />
+            </div>
+            <div className="absolute top-4 right-4 z-20">
               <ThemeToggleButton />
             </div>
-          </div>
+          </>
         ) : (
-          <div className="relative border-b border-white/10 dark:border-gray-700/20 bg-white/50 dark:bg-gray-dark/50 backdrop-blur-sm">
-            {currentChat && <ChatHeader title={currentChat.title} />}
-            <div className="absolute top-0 right-4 h-14 flex items-center">
+          <>
+            <div className="absolute top-4 right-4 z-20">
               <ThemeToggleButton />
             </div>
-          </div>
+          </>
         )}
 
         {/* Messages container */}

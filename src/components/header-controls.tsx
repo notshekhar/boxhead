@@ -3,15 +3,16 @@ import React from 'react';
 interface HeaderControlsProps {
   onToggleSidebar: () => void;
   onNewChat: () => void;
+  onOpenSearch?: () => void;
 }
 
-export const HeaderControls: React.FC<HeaderControlsProps> = ({ onToggleSidebar, onNewChat }) => {
+export const HeaderControls: React.FC<HeaderControlsProps> = ({ onToggleSidebar, onNewChat, onOpenSearch }) => {
   return (
-    <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 dark:border-gray-700/20 bg-white/50 dark:bg-gray-dark/50 backdrop-blur-sm">
-      <div className="flex items-center gap-3 rounded-lg">
+    <div className="bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5">
+      <div className="flex items-center gap-0.5">
         <button
           onClick={onToggleSidebar}
-          className="p-1.5 rounded-full text-text-muted-light dark:text-text-muted-dark hover:text-accent-blue dark:hover:text-accent-blue hover:bg-white/50 dark:hover:bg-gray-darker/50 transition-all duration-300 border border-white/10 dark:border-gray-700/30"
+          className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
           aria-label="Toggle sidebar"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,7 +20,8 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({ onToggleSidebar,
           </svg>
         </button>
         <button
-          className="p-1.5 rounded-full text-text-muted-light dark:text-text-muted-dark hover:text-accent-blue dark:hover:text-accent-blue hover:bg-white/50 dark:hover:bg-gray-darker/50 transition-all duration-300 border border-white/10 dark:border-gray-700/30"
+          onClick={onOpenSearch}
+          className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
           aria-label="Search"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,7 +30,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({ onToggleSidebar,
         </button>
         <button
           onClick={onNewChat}
-          className="p-1.5 rounded-full text-white bg-gradient-to-r from-gradient-start to-gradient-end hover:shadow-glow-red transition-all duration-300 transform hover:scale-105 active:scale-95"
+          className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
           aria-label="New chat"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div
-      className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#1E1F25] transition-all duration-300 ease-in-out ${isOpen ? 'w-[260px] opacity-100 translate-x-0' : 'w-0 opacity-0 -translate-x-full overflow-hidden'}`}
+      className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#1E1F25] fixed top-0 bottom-0 left-0 z-30 w-[260px] transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       {/* App title with sidebar toggle */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-light dark:border-gray-700/30">
@@ -79,19 +79,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Search input */}
       <div className="px-4 py-2 relative">
         <div className="relative">
-          <div className="flex items-center bg-white dark:bg-[#2A2B36] border border-gray-light dark:border-gray-700/30 rounded-lg px-2 py-1.5 cursor-pointer" onClick={handleSearchClick}>
+          <div className="flex items-center bg-white dark:bg-[#2A2B36] border border-gray-light dark:border-gray-700/30 rounded-lg px-2 py-2 cursor-pointer" onClick={handleSearchClick}>
             <div className="flex items-center gap-1 mr-1 self-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-medium text-gray-500 dark:text-gray-400 flex-shrink-0 mx-0.5">/</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <span className="text-base font-medium text-gray-500 dark:text-gray-400 flex-shrink-0 mx-0.5">/</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
             </div>
             <input
               type="text"
-              className="flex-1 bg-transparent border-0 outline-none text-xs placeholder-gray-400 dark:placeholder-gray-500 focus:ring-0 cursor-pointer"
+              className="flex-1 bg-transparent border-0 outline-none text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:ring-0 cursor-pointer"
               placeholder="Search your threads..."
               onClick={handleSearchClick}
               readOnly
@@ -166,6 +166,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             transform: translateY(0);
           }
         }
+
+
       `}</style>
     </div>
   );

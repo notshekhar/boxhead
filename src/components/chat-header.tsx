@@ -6,7 +6,7 @@ interface ChatHeaderProps {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({ title }) => {
   return (
-    <div className="h-14 flex items-center px-4 sm:px-6">
+    <div>
       <div className="flex items-center">
         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-blue/10 to-accent-indigo/10 dark:from-accent-blue/5 dark:to-accent-indigo/5 flex items-center justify-center mr-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-accent-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

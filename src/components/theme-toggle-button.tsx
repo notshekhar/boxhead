@@ -66,16 +66,18 @@ export function ThemeToggleButton() {
   };
 
   return (
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-full bg-white/70 dark:bg-gray-darker/70 text-text-light dark:text-text-dark hover:bg-white/90 dark:hover:bg-gray-darker/90 transition-all duration-300 shadow-sm hover:shadow-md border border-white/20 dark:border-gray-700/30 backdrop-blur-sm"
-      aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-    >
+    <div className="bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5">
+      <button
+        onClick={toggleTheme}
+        className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+        aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      >
       {theme === 'light' ? (
-        <MoonIcon className="w-4 h-4 text-accent-indigo" />
+        <MoonIcon className="w-4 h-4" />
       ) : (
-        <SunIcon className="w-4 h-4 text-accent-yellow" />
+        <SunIcon className="w-4 h-4" />
       )}
-    </button>
+      </button>
+    </div>
   );
 }
