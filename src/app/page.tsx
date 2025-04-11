@@ -8,6 +8,7 @@ import { ChatHeader } from "@/components/chat-header";
 import { EmptyState } from "@/components/empty-state";
 import { HeaderControls } from "@/components/header-controls";
 import { useState } from "react";
+import { SearchPopup } from "@/components/search-popup";
 
 interface Message {
   id: string;
@@ -42,6 +43,16 @@ export default function Home() {
   ]);
   const [activeChat, setActiveChat] = useState<string>("1");
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
+  const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false);
+
+  // Recent chats for search popup
+  const recentChats = [
+    { id: '1', title: 'Generate Image' },
+    { id: '2', title: 'New Thread' },
+    { id: '3', title: 'Greeting' },
+    { id: '4', title: 'Snake game in HTML, CSS, and JS' },
+    { id: '5', title: 'Setup Next.js app' },
+  ];
 
   const handleToggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
@@ -101,32 +112,41 @@ export default function Home() {
   const currentChat = chats.find((chat) => chat.id === activeChat);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-primary-light dark:bg-primary-dark text-text-light dark:text-text-dark">
+    <div className="flex h-screen overflow-hidden bg-[#F0F1F3] dark:bg-[#17171F] text-text-light dark:text-text-dark relative">
+      {/* Search Popup */}
+      <SearchPopup
+        isOpen={showSearchPopup}
+        onClose={() => setShowSearchPopup(false)}
+        onSelectChat={handleSelectChat}
+        recentChats={recentChats}
+      />
+
       {/* Sidebar - rendered conditionally based on sidebarVisible state */}
       {sidebarVisible && (
-        <Sidebar 
-          chats={chats} 
-          onNewChat={handleNewChat} 
+        <Sidebar
+          chats={chats}
+          onNewChat={handleNewChat}
           onSelectChat={handleSelectChat}
           onToggleSidebar={handleToggleSidebar}
+          onOpenSearch={() => setShowSearchPopup(true)}
         />
       )}
 
       {/* Main chat area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col backdrop-blur-[2px] z-10">
         {/* Header area - show either HeaderControls or ChatHeader */}
         {!sidebarVisible ? (
           <div className="relative">
-            <HeaderControls 
-              onToggleSidebar={handleToggleSidebar} 
-              onNewChat={handleNewChat} 
+            <HeaderControls
+              onToggleSidebar={handleToggleSidebar}
+              onNewChat={handleNewChat}
             />
             <div className="absolute top-0 right-4 h-14 flex items-center">
               <ThemeToggleButton />
             </div>
           </div>
         ) : (
-          <div className="relative">
+          <div className="relative border-b border-white/10 dark:border-gray-700/20 bg-white/50 dark:bg-gray-dark/50 backdrop-blur-sm">
             {currentChat && <ChatHeader title={currentChat.title} />}
             <div className="absolute top-0 right-4 h-14 flex items-center">
               <ThemeToggleButton />
@@ -135,7 +155,7 @@ export default function Home() {
         )}
 
         {/* Messages container */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded">
           {currentChat?.messages.length === 0 ? (
             <EmptyState username="Amélie" />
           ) : (

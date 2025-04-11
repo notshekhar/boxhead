@@ -7,7 +7,6 @@ interface ChatInputProps {
 export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
 
   // Auto-resize textarea based on content
   useEffect(() => {
@@ -34,81 +33,56 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   };
 
   return (
-    <div className="px-4 sm:px-8 md:px-16 py-4 mb-4 mx-auto w-full max-w-[850px]">
-      <div className="overflow-hidden border border-gray-300/80 dark:border-gray-700/40 rounded-lg">
-        {/* Input field - lighter background */}
-        <div className="px-4 py-3 relative bg-primary-light dark:bg-primary-dark">
-          <div className="relative">
-            <div className="pr-10">
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask me anything..."
-                className="w-full bg-transparent border-0 focus:ring-0 outline-none text-base py-1 resize-none overflow-y-auto"
-                rows={1}
-                style={{ minHeight: '24px', maxHeight: '150px' }}
-                aria-label="Message input"
-              />
-            </div>
-            
-            {/* Send button - positioned absolutely to remain fixed at initial vertical center */}
-            <div className="absolute right-0 top-0 h-[38px] flex items-center">
-              <button 
-                onClick={handleSendMessage}
-                disabled={!message.trim()}
-                className={`p-1.5 bg-secondary-light dark:bg-secondary-dark text-white rounded-lg hover:bg-opacity-90 transition-all duration-200 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                aria-label="Send message"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
-            </div>
-          </div>
+    <div className="px-4 sm:px-8 md:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
+      {/* Glass effect around the input - only in light mode */}
+      <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
+      <div className="relative overflow-hidden border border-gray-300/30 dark:border-gray-700/30 rounded-xl bg-white dark:bg-[#1E1F25] transition-all duration-300">
+        {/* Input field section */}
+        <div className="px-4 py-3 relative">
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message here..."
+            className="w-full bg-transparent border-0 focus:ring-0 outline-none text-base py-1 resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
+            rows={1}
+            style={{ minHeight: '24px', maxHeight: '150px' }}
+            aria-label="Message input"
+          />
         </div>
 
-        {/* Bottom bar with model selector and buttons - darker background */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200/60 dark:border-gray-700/40 bg-gray-light dark:bg-gray-dark">
-          {/* Version selector */}
-          <div className="flex items-center gap-1">
-            <button className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-              <span className="font-medium">UUI v6.0</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-3">
-            {/* Shortcuts button */}
-            <button 
-              className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-              aria-label="Shortcuts"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2zM9 9h1m4 0h1m-7 4h1m4 0h1m-7 4h6" />
-              </svg>
-              <span className="text-sm font-medium">Shortcuts</span>
+        {/* Bottom bar with buttons */}
+        <div className="flex items-center justify-between px-4 py-2 border-t border-gray-light dark:border-gray-700/30">
+          {/* Left aligned tools */}
+          <div className="flex items-center space-x-4">
+            {/* Model selector */}
+            <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2D7FF9] mr-1.5"></div>
+              <span>UUI v6.0</span>
             </button>
 
-            {/* Attach button */}
-            <button 
-              className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-              onClick={() => setIsAttachMenuOpen(!isAttachMenuOpen)}
-              aria-label="Attach file"
-              aria-expanded={isAttachMenuOpen}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            {/* File icon */}
+            <button className="p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              <span className="text-sm font-medium">Attach</span>
             </button>
           </div>
+
+          {/* Send button */}
+          <button
+            onClick={handleSendMessage}
+            disabled={!message.trim()}
+            className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+            aria-label="Send message"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
   );
-}; 
+};
