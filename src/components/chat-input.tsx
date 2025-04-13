@@ -36,9 +36,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     <div className="px-4 sm:px-8 md:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
       {/* Glass effect around the input - only in light mode */}
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
-      <div className="relative overflow-hidden border border-gray-300/30 dark:border-gray-700/30 rounded-xl bg-white dark:bg-[#1E1F25] transition-all duration-300">
+      <div className="relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl">
         {/* Input field section */}
-        <div className="px-4 py-3 relative flex items-center">
+        <div className="m-2 px-4 py-3 relative flex rounded-xl bg-white dark:bg-[#1E1F25]">
           <textarea
             ref={textareaRef}
             value={message}
@@ -54,7 +54,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
           <button
             onClick={handleSendMessage}
             disabled={!message.trim()}
-            className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ml-2 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ml-2 self-start mt-1 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             aria-label="Send message"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -64,7 +64,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
         </div>
 
         {/* Bottom bar with buttons */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-gray-light dark:border-gray-700/30">
+        <div className="flex items-center justify-between px-4 py-2 bg-gray-200 dark:bg-[#2A2A30] rounded-b-xl">
           {/* Left aligned tools */}
           <div className="flex items-center space-x-4">
             {/* Model selector */}
