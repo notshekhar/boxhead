@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, DragEvent } from 'react';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -73,11 +73,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
               <span>UUI v6.0</span>
             </button>
 
-            {/* File icon */}
-            <button className="p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
+            {/* File icon with text */}
+            <button className="flex items-center gap-1 p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
+              <span className="text-xs font-medium">Attach the file</span>
             </button>
           </div>
         </div>
