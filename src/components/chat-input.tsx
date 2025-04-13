@@ -38,18 +38,29 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
       <div className="relative overflow-hidden border border-gray-300/30 dark:border-gray-700/30 rounded-xl bg-white dark:bg-[#1E1F25] transition-all duration-300">
         {/* Input field section */}
-        <div className="px-4 py-3 relative">
+        <div className="px-4 py-3 relative flex items-center">
           <textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message here..."
-            className="w-full bg-transparent border-0 focus:ring-0 outline-none text-base py-1 resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
+            className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
             rows={1}
             style={{ minHeight: '24px', maxHeight: '150px' }}
             aria-label="Message input"
           />
+          {/* Send button */}
+          <button
+            onClick={handleSendMessage}
+            disabled={!message.trim()}
+            className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ml-2 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+            aria-label="Send message"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
         {/* Bottom bar with buttons */}
@@ -69,18 +80,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
               </svg>
             </button>
           </div>
-
-          {/* Send button */}
-          <button
-            onClick={handleSendMessage}
-            disabled={!message.trim()}
-            className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ${!message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-            aria-label="Send message"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       </div>
     </div>
