@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 interface HeaderControlsProps {
     onToggleSidebar: () => void
@@ -11,12 +11,26 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
     onNewChat,
     onOpenSearch,
 }) => {
+    // State to control animation
+    const [isVisible, setIsVisible] = useState(false)
+
+    // Trigger animation when component mounts
+    useEffect(() => {
+        setIsVisible(true)
+    }, [])
+
     return (
-        <div className="bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5">
+        <div
+            className={`bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5 ${
+                isVisible ? "animate-scale-in" : "opacity-0"
+            }`}
+        >
             <div className="flex items-center gap-0.5">
                 <button
                     onClick={onToggleSidebar}
-                    className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                        isVisible ? "animate-fade-in" : "opacity-0"
+                    }`}
                     aria-label="Toggle sidebar"
                 >
                     <svg
@@ -35,7 +49,9 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
                 </button>
                 <button
                     onClick={onOpenSearch}
-                    className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                        isVisible ? "animate-fade-in" : "opacity-0"
+                    }`}
                     aria-label="Search"
                 >
                     <svg
@@ -55,7 +71,9 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
                 </button>
                 <button
                     onClick={onNewChat}
-                    className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                        isVisible ? "animate-fade-in" : "opacity-0"
+                    }`}
                     aria-label="New chat"
                 >
                     <svg

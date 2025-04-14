@@ -147,6 +147,7 @@ export default function Home() {
                     <>
                         <div className="absolute top-4 left-4 z-20">
                             <HeaderControls
+                                key={`header-controls-${sidebarVisible}`}
                                 onToggleSidebar={handleToggleSidebar}
                                 onNewChat={handleNewChat}
                                 onOpenSearch={() => setShowSearchPopup(true)}
