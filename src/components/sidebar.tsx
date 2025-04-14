@@ -60,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* New Chat button */}
                 <button
                     onClick={onNewChat}
-                    className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm"
+                    className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center hover:bg-gray-lighter dark:hover:bg-[#1E1F25] rounded-md cursor-pointer"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
 
                 {/* Libraries */}
-                <button className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center justify-between hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm">
+                <button className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center justify-between hover:bg-gray-lighter dark:hover:bg-[#1E1F25] rounded-md cursor-pointer">
                     <div className="flex items-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="px-3 py-1">
                 <button
                     onClick={handleSearchClick}
-                    className="w-full py-2 px-3 text-gray-500 dark:text-gray-400 text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm"
+                    className="w-full py-2 px-3 text-gray-500 dark:text-gray-400 text-sm font-medium text-left flex items-center hover:bg-gray-lighter dark:hover:bg-[#1E1F25] rounded-md cursor-pointer"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Upgrade button */}
             <div className="px-3 py-1">
-                <button className="w-full py-2 px-3 text-accent-blue text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm">
+                <button className="w-full py-2 px-3 text-accent-blue text-sm font-medium text-left flex items-center hover:bg-gray-lighter dark:hover:bg-[#1E1F25] rounded-md cursor-pointer">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4 mr-3"
@@ -156,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="flex items-center justify-between px-2 py-1">
                         <button
                             onClick={() => setTodayExpanded(!todayExpanded)}
-                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <div className="space-y-0.5 mt-1">
                             <button
                                 onClick={() => onSelectChat("1")}
-                                className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm"
+                                className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer"
                             >
                                 Wordle Game Canvas
                             </button>
@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             onClick={() =>
                                 setPreviousExpanded(!previousExpanded)
                             }
-                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -225,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                     {previousExpanded && (
                         <div className="space-y-0.5 mt-1">
-                            <button className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm">
+                            <button className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
                                 Snake Game Creation
                             </button>
                         </div>
@@ -237,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="flex items-center justify-between px-2 py-1">
                         <button
                             onClick={() => setOlderExpanded(!olderExpanded)}
-                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                            className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +282,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             ].map((title, index) => (
                                 <button
                                     key={index}
-                                    className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm"
+                                    className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer"
                                 >
                                     {title}
                                 </button>

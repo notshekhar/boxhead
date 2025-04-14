@@ -166,7 +166,7 @@ export default function Home() {
                         >
                             <button
                                 onClick={handleToggleSidebar}
-                                className="text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+                                className="text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
                                 style={{ transform: "translateX(-50%)" }}
                             >
                                 <svg

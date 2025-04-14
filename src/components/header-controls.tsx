@@ -28,7 +28,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
             <div className="flex items-center gap-0.5">
                 <button
                     onClick={onToggleSidebar}
-                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer ${
                         isVisible ? "animate-fade-in" : "opacity-0"
                     }`}
                     aria-label="Toggle sidebar"
@@ -47,7 +47,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
                 </button>
                 <button
                     onClick={onOpenSearch}
-                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer ${
                         isVisible ? "animate-fade-in" : "opacity-0"
                     }`}
                     aria-label="Search"
@@ -69,7 +69,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
                 </button>
                 <button
                     onClick={onNewChat}
-                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 ${
+                    className={`p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer ${
                         isVisible ? "animate-fade-in" : "opacity-0"
                     }`}
                     aria-label="New chat"

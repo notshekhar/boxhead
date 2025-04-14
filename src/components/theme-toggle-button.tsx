@@ -68,11 +68,11 @@ export function ThemeToggleButton() {
   return (
     <button
       onClick={toggleTheme}
-      className="bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5 focus:outline-none"
+      className="bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-gray-700 px-2 py-1.5 focus:outline-none cursor-pointer"
       aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
     >
       <div className="flex items-center gap-0.5">
-        <div className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
+        <div className="p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer">
           {theme === 'light' ? (
             <MoonIcon className="w-4 h-4" />
           ) : (

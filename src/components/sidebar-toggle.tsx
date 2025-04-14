@@ -9,7 +9,7 @@ export const SidebarToggle: React.FC<SidebarToggleProps> = ({ onToggleSidebar })
     <div className="fixed top-4 left-[260px] z-40">
       <button
         onClick={onToggleSidebar}
-        className="bg-white dark:bg-[#27272A] rounded-full border border-gray-100 dark:border-gray-700 p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 shadow-sm translate-x-[-50%]"
+        className="bg-white dark:bg-[#27272A] rounded-full border border-gray-100 dark:border-gray-700 p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 shadow-sm translate-x-[-50%] cursor-pointer"
         aria-label="Toggle sidebar"
       >
         {/* Document/page icon */}

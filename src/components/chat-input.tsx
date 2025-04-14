@@ -185,7 +185,7 @@ const SendButton: React.FC<{
     <button
         onClick={onClick}
         disabled={disabled}
-        className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 ${
+        className={`p-2 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 cursor-pointer ${
             isExpanded ? "self-start" : "self-center"
         } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         aria-label="Send message"
@@ -208,7 +208,7 @@ const SendButton: React.FC<{
 )
 
 const ModelSelector: React.FC = () => (
-    <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200">
+    <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer">
         <div className="w-2.5 h-2.5 rounded-full bg-[#2D7FF9] mr-1.5"></div>
         <span>UUI v6.0</span>
     </button>
@@ -218,7 +218,7 @@ const FileAttachButton: React.FC<{
     onClick: () => void
 }> = ({ onClick }) => (
     <button
-        className="flex items-center gap-1 p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
+        className="flex items-center gap-1 p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
         onClick={onClick}
     >
         <svg
@@ -292,7 +292,7 @@ const FilePreviewItem: React.FC<{
             </div>
             <button
                 onClick={() => onRemove(index)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-red-600"
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-red-600 cursor-pointer"
                 aria-label="Remove file"
             >
                 <svg
@@ -396,7 +396,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                     {/* Send button */}
                     <SendButton
                         onClick={handleSendMessage}
-                        disabled={!message.trim() && attachedFiles.length === 0}
+                        disabled={!(message.trim() || attachedFiles.length > 0)}
                         isExpanded={isExpanded}
                     />
                 </div>
