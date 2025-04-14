@@ -84,17 +84,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="flex items-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 mr-3"
-                            fill="none"
                             viewBox="0 0 24 24"
+                            fill="none"
                             stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="h-4 w-4 mr-3"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                            />
+                            <path d="m16 6 4 14"></path>
+                            <path d="M12 6v14"></path>
+                            <path d="M8 8v12"></path>
+                            <path d="M4 4v16"></path>
                         </svg>
                         Libraries
                     </div>
@@ -112,17 +113,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-3"
-                        fill="none"
                         viewBox="0 0 24 24"
+                        fill="none"
                         stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        className="h-4 w-4 mr-3"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
                     </svg>
                     Search
                 </button>
