@@ -8,6 +8,7 @@ interface ChatInputProps {
 interface FilePreview {
     file: File
     preview: string
+    isRemoving?: boolean
 }
 
 // Custom hook for chat input logic
@@ -61,12 +62,13 @@ function useChatInput(
 
     // File handling methods
     const handleFiles = (files: File[]) => {
-        const newFiles = files.map((file) => {
-            const preview = URL.createObjectURL(file)
-            return { file, preview }
-        })
-
-        setAttachedFiles((prev) => [...prev, ...newFiles])
+        // Process files one by one with a slight delay for staggered animation
+        Array.from(files).forEach((file, index) => {
+            setTimeout(() => {
+                const preview = URL.createObjectURL(file);
+                setAttachedFiles((prev) => [...prev, { file, preview }]);
+            }, index * 80); // Stagger the appearance of each file
+        });
     }
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,12 +78,34 @@ function useChatInput(
     }
 
     const removeFile = (index: number) => {
+        // Mark the file as being removed in the state
+        // This approach avoids direct DOM manipulation which can cause glitches
         setAttachedFiles((prev) => {
-            const newFiles = [...prev]
-            URL.revokeObjectURL(newFiles[index].preview)
-            newFiles.splice(index, 1)
-            return newFiles
-        })
+            const newFiles = prev.map((file, i) => {
+                if (i === index) {
+                    // Mark this file for removal animation
+                    return { ...file, isRemoving: true };
+                }
+                return file;
+            });
+            return newFiles;
+        });
+
+        // After animation completes, actually remove the file
+        setTimeout(() => {
+            setAttachedFiles((prev) => {
+                // Filter out the file that was marked for removal
+                const newFiles = prev.filter((file, i) => {
+                    if (i === index) {
+                        // Clean up the object URL before removing
+                        URL.revokeObjectURL(file.preview);
+                        return false; // Remove this file
+                    }
+                    return true; // Keep other files
+                });
+                return newFiles;
+            });
+        }, 350); // Match with animation duration
     }
 
     // Drag and drop handlers
@@ -219,67 +243,97 @@ const FilePreviewItem: React.FC<{
     file: FilePreview
     index: number
     onRemove: (index: number) => void
-}> = ({ file, index, onRemove }) => (
-    <div className="relative group">
-        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center">
-            {file.file.type.startsWith("image/") ? (
-                <img
-                    src={file.preview}
-                    alt={file.file.name}
-                    className="w-full h-full object-cover"
-                />
-            ) : (
-                <div className="text-xs text-center text-gray-500 dark:text-gray-400 p-1">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 mx-auto mb-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                    </svg>
-                    {file.file.name.length > 10
-                        ? `${file.file.name.substring(0, 7)}...`
-                        : file.file.name}
-                </div>
-            )}
-        </div>
-        <button
-            onClick={() => onRemove(index)}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            aria-label="Remove file"
+}> = ({ file, index, onRemove }) => {
+    // Animation delay based on index for staggered appearance
+    const animationDelay = `${index * 100}ms`;
+
+    // Determine which animation class to use based on file state
+    const animationClass = file.isRemoving
+        ? 'animate-scale-out'
+        : 'animate-scale-in';
+
+    return (
+        <div
+            className={`relative group ${animationClass}`}
+            style={{
+                animationDelay,
+                animationFillMode: 'both',
+                animationDuration: file.isRemoving ? '350ms' : '400ms'
+            }}
         >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+            <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center transition-all duration-300 hover:shadow-md hover:scale-105">
+                {file.file.type.startsWith("image/") ? (
+                    <img
+                        src={file.preview}
+                        alt={file.file.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="text-xs text-center text-gray-500 dark:text-gray-400 p-1">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 mx-auto mb-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                        </svg>
+                        {file.file.name.length > 10
+                            ? `${file.file.name.substring(0, 7)}...`
+                            : file.file.name}
+                    </div>
+                )}
+            </div>
+            <button
+                onClick={() => onRemove(index)}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-red-600"
+                aria-label="Remove file"
             >
-                <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                />
-            </svg>
-        </button>
-    </div>
-)
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                >
+                    <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                    />
+                </svg>
+            </button>
+        </div>
+    );
+}
 
 const DragOverlay: React.FC = () => (
-    <div className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 backdrop-blur-sm flex items-center justify-center rounded-xl z-10 border-2 border-dashed border-blue-500">
-        <div className="text-blue-600 dark:text-blue-400 font-medium flex flex-col items-center">
+    <div
+        className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 backdrop-blur-sm flex items-center justify-center rounded-xl z-10 border-2 border-dashed border-blue-500"
+        style={{
+            animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+        }}
+    >
+        <div
+            className="text-blue-600 dark:text-blue-400 font-medium flex flex-col items-center"
+            style={{
+                animation: 'float 3s ease-in-out infinite'
+            }}
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-10 w-10 mb-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                style={{
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
             >
                 <path
                     strokeLinecap="round"
@@ -319,7 +373,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
             <div
                 className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
                     isDragging
-                        ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20"
+                        ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20 shadow-glow-blue"
                         : ""
                 }`}
                 onDragOver={handleDragOver}
@@ -348,7 +402,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                 </div>
 
                 {/* Bottom section with tools and file previews */}
-                <div className="bg-gray-200 dark:bg-[#2A2A30] rounded-b-xl transition-all duration-300">
+                <div className="bg-gray-200 dark:bg-[#2A2A30] rounded-b-xl transition-all duration-300 overflow-hidden">
                     {/* Tools bar */}
                     <div className="flex items-center justify-between px-4 py-2">
                         {/* Left aligned tools */}
@@ -372,9 +426,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                         </div>
                     </div>
 
-                    {/* File preview section */}
+                    {/* File preview section - only render when there are files */}
                     {attachedFiles.length > 0 && (
-                        <div className="px-4 py-3 border-t border-gray-300 dark:border-gray-700">
+                        <div
+                            className="px-4 py-3 border-t border-gray-300 dark:border-gray-700 transition-all animate-scale-in"
+                            style={{
+                                transformOrigin: 'top center',
+                                animationDuration: '0.3s'
+                            }}
+                        >
+
                             <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                                 Attached files:
                             </div>
