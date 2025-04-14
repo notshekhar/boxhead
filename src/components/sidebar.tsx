@@ -1,5 +1,4 @@
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 
 interface ChatItem {
   id: string;
@@ -23,7 +22,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenSearch,
   isOpen = true
 }) => {
-
+  const [todayExpanded, setTodayExpanded] = useState(true);
+  const [previousExpanded, setPreviousExpanded] = useState(true);
+  const [olderExpanded, setOlderExpanded] = useState(true);
 
   const handleSearchClick = () => {
     if (onOpenSearch) {
@@ -31,124 +32,190 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const recentChats = [
-    { id: '1', title: 'Generate Image' },
-    { id: '2', title: 'New Thread' },
-    { id: '3', title: 'Greeting' },
-    { id: '4', title: 'Snake game in HTML, CSS, and JS' },
-    { id: '5', title: 'Snake game in HTML, CSS, and JS' },
-    { id: '6', title: 'Setup Next.js app' },
-  ];
+  // We don't need to group chats as we're using static content for the demo
 
   return (
     <div
-      className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#1E1F25] fixed top-0 bottom-0 left-0 z-30 w-[260px] transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#0F0F0F] fixed top-0 bottom-0 left-0 z-30 w-[260px] transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
-      {/* App title with sidebar toggle */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-light dark:border-gray-700/30">
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[#2D7FF9] mr-2 border border-[#2D7FF9]/20">
-            <span className="font-bold text-sm">AI</span>
+      {/* Header with user info */}
+      <div className="px-4 py-3">
+        <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-700 text-white mr-2">
+            <span className="font-medium text-sm">N</span>
           </div>
-          <h1 className="text-lg font-semibold whitespace-nowrap text-gray-800 dark:text-white">cursor.chat</h1>
+          <div>
+            <h2 className="text-sm font-medium text-gray-800 dark:text-white">Personal</h2>
+            <p className="text-xs text-gray-400">Le Chat Free</p>
+          </div>
         </div>
-        <button
-          onClick={onToggleSidebar}
-          className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200"
-          aria-label="Close sidebar"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
       </div>
 
-      {/* New Chat button */}
-      <div className="p-4">
+      {/* Navigation items */}
+      <div className="px-3 py-2 space-y-1">
+        {/* New Chat button */}
         <button
           onClick={onNewChat}
-          className="w-full py-2.5 px-4 bg-[#2D7FF9] text-white rounded-lg transition-all duration-200 active:scale-[0.98] text-sm font-medium whitespace-nowrap flex items-center justify-center"
+          className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          New Chat
+          New chat
+        </button>
+
+        {/* Libraries */}
+        <button className="w-full py-2 px-3 text-gray-800 dark:text-white text-sm font-medium text-left flex items-center justify-between hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Libraries
+          </div>
+          <span className="text-xs px-1.5 py-0.5 bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-neutral-300 rounded">Beta</span>
         </button>
       </div>
 
       {/* Search input */}
-      <div className="px-4 py-2 relative">
-        <div className="relative">
-          <div className="flex items-center bg-white dark:bg-[#2A2B36] border border-gray-light dark:border-gray-700/30 rounded-lg px-2 py-2 cursor-pointer" onClick={handleSearchClick}>
-            <div className="flex items-center gap-1 mr-1 self-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-              </svg>
-              <span className="text-base font-medium text-gray-500 dark:text-gray-400 flex-shrink-0 mx-0.5">/</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              className="flex-1 bg-transparent border-0 outline-none text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:ring-0 cursor-pointer"
-              placeholder="Search your threads..."
-              onClick={handleSearchClick}
-              readOnly
-            />
-          </div>
-        </div>
+      <div className="px-3 py-1">
+        <button
+          onClick={handleSearchClick}
+          className="w-full py-2 px-3 text-gray-500 dark:text-gray-400 text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search
+        </button>
+      </div>
 
-
+      {/* Upgrade button */}
+      <div className="px-3 py-1">
+        <button className="w-full py-2 px-3 text-accent-blue text-sm font-medium text-left flex items-center hover:bg-white dark:hover:bg-[#1E1F25] rounded-md transition-colors duration-200 hover:shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Upgrade to Le Chat Pro
+        </button>
       </div>
 
       {/* Chat list */}
-      <div className="flex-1 overflow-y-auto py-2">
-        <div className="px-4">
-          <h2 className="text-xs uppercase tracking-wider text-text-muted-light/70 dark:text-text-muted-dark/70 px-2 py-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Today
-          </h2>
-          <div className="mt-1 space-y-1">
-            {chats.map((chat, index) => (
-              <button
-                key={chat.id}
-                onClick={() => onSelectChat(chat.id)}
-                className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2A2B36] transition-all duration-200 text-sm flex items-center animate-fadeIn whitespace-nowrap group"
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                  animation: 'fadeIn 0.2s ease-out forwards'
-                }}
+      <div className="flex-1 overflow-y-auto py-2 mt-2">
+        {/* Today section */}
+        <div className="px-3 mb-2">
+          <div className="flex items-center justify-between px-2 py-1">
+            <button
+              onClick={() => setTodayExpanded(!todayExpanded)}
+              className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-3 w-3 mr-1 transition-transform duration-200 ${todayExpanded ? 'transform rotate-0' : 'transform -rotate-90'}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center mr-2 text-[#2D7FF9] border border-[#2D7FF9]/20 group-hover:text-[#2D7FF9] transition-all duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                </div>
-                <span className="group-hover:text-[#2D7FF9] transition-colors duration-200">{chat.title}</span>
-              </button>
-            ))}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              Today
+            </button>
           </div>
+
+          {todayExpanded && (
+            <div className="space-y-0.5 mt-1">
+              <button
+                onClick={() => onSelectChat('1')}
+                className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm"
+              >
+                Wordle Game Canvas
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Previous 30 days section */}
+        <div className="px-3 mb-2">
+          <div className="flex items-center justify-between px-2 py-1">
+            <button
+              onClick={() => setPreviousExpanded(!previousExpanded)}
+              className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-3 w-3 mr-1 transition-transform duration-200 ${previousExpanded ? 'transform rotate-0' : 'transform -rotate-90'}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              Previous 30 days
+            </button>
+          </div>
+
+          {previousExpanded && (
+            <div className="space-y-0.5 mt-1">
+              <button
+                className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm"
+              >
+                Snake Game Creation
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Older section */}
+        <div className="px-3">
+          <div className="flex items-center justify-between px-2 py-1">
+            <button
+              onClick={() => setOlderExpanded(!olderExpanded)}
+              className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-3 w-3 mr-1 transition-transform duration-200 ${olderExpanded ? 'transform rotate-0' : 'transform -rotate-90'}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              Older
+            </button>
+          </div>
+
+          {olderExpanded && (
+            <div className="space-y-0.5 mt-1">
+              {[
+                'Snake Game Tutorial',
+                'Chat Interface',
+                'Mistral Chat Interface',
+                'Random Text Inquiry',
+                'Random Text Inquiry',
+                'Random Text Assistance',
+                'Corrected Input',
+                'Random Text Inquiry',
+                'Random Text Inquiry',
+                'Random Text Inquiry',
+                'Correction Request',
+                'Random Text Inquiry',
+                'Invalid Input',
+                'Clarify Request',
+                'Typo Clarification'
+              ].map((title, index) => (
+                <button
+                  key={index}
+                  className="w-full text-left px-2 py-2 rounded hover:bg-white dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm transition-colors duration-200 hover:shadow-sm"
+                >
+                  {title}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* User profile */}
-      <div className="p-3 border-t border-gray-light dark:border-gray-700/30 flex items-center">
-        <Link href="/settings" className="flex items-center w-full hover:bg-gray-100 dark:hover:bg-[#2A2B36] rounded-lg p-2 transition-all duration-200 group">
-          <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#2A2B36] overflow-hidden mr-3 flex items-center justify-center text-sm font-medium text-[#2D7FF9] dark:text-[#2D7FF9] border border-[#2D7FF9]/20 dark:border-[#2D7FF9]/20">
-            NS
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium whitespace-nowrap">notshekhar</p>
-            <p className="text-xs text-gray-500">Pro</p>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 transform group-hover:rotate-45 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-          </svg>
-        </Link>
-      </div>
+      {/* We're removing the user profile section as it's not in the reference image */}
 
       <style jsx global>{`
         @keyframes fadeIn {

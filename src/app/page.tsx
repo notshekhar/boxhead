@@ -112,7 +112,7 @@ export default function Home() {
   const currentChat = chats.find((chat) => chat.id === activeChat);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F0F1F3] dark:bg-[#17171F] text-text-light dark:text-text-dark relative">
+    <div className="flex h-screen overflow-hidden bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark relative">
       {/* Search Popup */}
       <SearchPopup
         isOpen={showSearchPopup}
@@ -149,6 +149,19 @@ export default function Home() {
           </>
         ) : (
           <>
+            {/* Sidebar toggle button positioned at the edge of the sidebar */}
+            <div className="fixed top-4 z-50" style={{ left: '259px' }}>
+              <button
+                onClick={handleToggleSidebar}
+                className="bg-white dark:bg-[#1E1F25] rounded-full border border-gray-200 dark:border-gray-700/30 p-1 text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 shadow-sm"
+                style={{ transform: 'translateX(-50%)' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="5" y="3" width="14" height="18" rx="1" />
+                  <line x1="9" y1="3" x2="9" y2="21" />
+                </svg>
+              </button>
+            </div>
             <div className="absolute top-4 right-4 z-20">
               <ThemeToggleButton />
             </div>
