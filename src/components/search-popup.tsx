@@ -74,9 +74,6 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
                                 className="lucide lucide-search ml-px !size-4"
                             >
                                 <circle cx="11" cy="11" r="8"></circle>
@@ -89,9 +86,6 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
                                 className="lucide lucide-slash ml-[3px] !size-4 skew-x-[30deg] opacity-20"
                             >
                                 <path d="M22 2 2 22"></path>
@@ -103,9 +97,6 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
                                 className="lucide lucide-plus mr-3 !size-4"
                             >
                                 <path d="M5 12h14"></path>

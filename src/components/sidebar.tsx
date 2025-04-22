@@ -87,9 +87,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
                             className="h-4 w-4 mr-3"
                         >
                             <path d="m16 6 4 14"></path>
@@ -116,9 +113,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
                         className="h-4 w-4 mr-3"
                     >
                         <circle cx="11" cy="11" r="8"></circle>
