@@ -381,13 +381,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                 onDrop={handleDrop}
             >
                 {/* Input field section */}
-                <div className="m-2 px-4 py-3 relative flex items-center rounded-xl bg-white dark:bg-[#1E1F25]">
+                <div className="m-2 px-4 py-3 relative flex items-center rounded-lg bg-white dark:bg-[#1E1F25]">
                     <textarea
                         ref={textareaRef}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type your message here..."
+                        placeholder="Type your query here..."
                         className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 my-auto resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
                         rows={1}
                         style={{ minHeight: "24px", maxHeight: "150px" }}
