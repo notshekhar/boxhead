@@ -134,7 +134,7 @@ export default function Home() {
                 )}
 
                 {/* Messages container */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded h-full">
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded">
                     {messages.length === 0 ? (
                         <EmptyState username="Shekhar" />
                     ) : (
