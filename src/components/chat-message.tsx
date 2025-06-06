@@ -193,7 +193,7 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                                 }
                             }
                         }}
-                        className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors ${
+                        className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors cursor-pointer ${
                             isCopied
                                 ? "text-green-600 dark:text-green-400"
                                 : "text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark"
@@ -210,6 +210,7 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                 <SyntaxHighlighter
                     style={isDarkMode ? oneDark : oneLight}
                     language={language}
+                    showLineNumbers={true}
                     PreTag="div"
                     customStyle={{
                         margin: 0,
@@ -219,6 +220,10 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                         lineHeight: "1.5",
                         borderRadius: 0,
                         border: "none",
+                        userSelect: "text",
+                        WebkitUserSelect: "text",
+                        MozUserSelect: "text",
+                        msUserSelect: "text",
                     }}
                     {...props}
                 >
@@ -240,17 +245,13 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                     onClick={async () => {
                         try {
                             // Extract text content properly, handling React children
-                            const textContent = React.Children.toArray(
-                                children
-                            )
+                            const textContent = React.Children.toArray(children)
                                 .map((child) =>
                                     typeof child === "string"
                                         ? child
                                         : React.isValidElement(child) &&
                                           (child.props as any)?.children
-                                        ? String(
-                                              (child.props as any).children
-                                          )
+                                        ? String((child.props as any).children)
                                         : String(child)
                                 )
                                 .join("")
@@ -278,8 +279,7 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                                             : React.isValidElement(child) &&
                                               (child.props as any)?.children
                                             ? String(
-                                                  (child.props as any)
-                                                      .children
+                                                  (child.props as any).children
                                               )
                                             : String(child)
                                     )
@@ -306,7 +306,7 @@ const CodeBlock = ({ children, className, ...props }: any) => {
                             }
                         }
                     }}
-                    className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors ${
+                    className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors cursor-pointer ${
                         isCopied
                             ? "text-green-600 dark:text-green-400"
                             : "text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark"
