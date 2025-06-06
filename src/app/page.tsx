@@ -83,7 +83,7 @@ export default function Home() {
 
             {/* Main chat area */}
             <div
-                className={`flex-1 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
+                className={`relative flex-1 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
                     sidebarVisible ? "ml-[260px]" : "ml-0"
                 }`}
             >
@@ -134,24 +134,26 @@ export default function Home() {
                 )}
 
                 {/* Messages container */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded">
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
                     {messages.length === 0 ? (
                         <EmptyState username="Shekhar" />
                     ) : (
                         <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
                             {messages.map((message) => (
-                                <ChatMessage message={message} />
+                                <ChatMessage key={message.id} message={message} />
                             ))}
                             {isLoading && "Thinking..."}
                         </div>
                     )}
                 </div>
-                <ChatInput
-                    input={input}
-                    setInput={setInput}
-                    onSendMessage={handleSubmit}
-                    isLoading={isLoading}
-                />
+                <div className="absolute bottom-0 left-0 right-0 bg-transparent">
+                    <ChatInput
+                        input={input}
+                        setInput={setInput}
+                        onSendMessage={handleSubmit}
+                        isLoading={isLoading}
+                    />
+                </div>
             </div>
         </div>
     )
