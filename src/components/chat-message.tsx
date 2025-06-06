@@ -567,7 +567,7 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = ({
         </div> */}
 
                 {/* Message bubble - no border */}
-                <div className="max-w-[85%] px-1">
+                <div className="px-1">
                     <div className="text-sm text-text-light dark:text-text-dark leading-relaxed">
                         <ReactMarkdown
                             components={MarkdownComponents}
