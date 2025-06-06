@@ -112,7 +112,14 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     const isDarkMode = theme === "dark" || resolvedTheme === "dark"
 
     if (isInline) {
-        return <code {...props}>{children}</code>
+        return (
+            <code
+                className="px-1.5 py-0.5 text-xs bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark rounded border border-gray-light dark:border-gray-dark font-mono"
+                {...props}
+            >
+                {children}
+            </code>
+        )
     }
 
     if (language) {
@@ -426,7 +433,7 @@ const MarkdownComponents = {
     // Code
     code: CodeBlock,
 
-    pre: CodeBlock,
+    pre: ({ children, ...props }: any) => <pre {...props}>{children}</pre>,
 
     // Links
     a: ({ children, href, ...props }: any) => (
