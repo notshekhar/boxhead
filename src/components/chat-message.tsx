@@ -117,9 +117,9 @@ const CodeBlock = ({ children, className, ...props }: any) => {
 
     if (language) {
         return (
-            <div className="mb-4 rounded-lg overflow-hidden border border-gray-light dark:border-gray-dark">
+            <div className="mb-4 rounded-lg border border-gray-light dark:border-gray-dark">
                 {/* Language header */}
-                <div className="flex items-center justify-between px-4 py-2 bg-gray-lighter dark:bg-gray-darker border-b border-gray-light dark:border-gray-dark">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
                     <span className="text-xs font-semibold text-text-light dark:text-text-dark">
                         {getLanguageDisplayName(language)}
                     </span>
