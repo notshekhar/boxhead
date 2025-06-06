@@ -134,9 +134,9 @@ export default function Home() {
                 )}
 
                 {/* Messages container */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded">
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded h-full">
                     {messages.length === 0 ? (
-                        <EmptyState username="Amélie" />
+                        <EmptyState username="Shekhar" />
                     ) : (
                         <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
                             {messages.map((message) => (
@@ -146,7 +146,6 @@ export default function Home() {
                         </div>
                     )}
                 </div>
-                {input}
                 <ChatInput
                     input={input}
                     setInput={setInput}
