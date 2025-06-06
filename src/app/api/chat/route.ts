@@ -1,4 +1,4 @@
-import { CoreMessage, streamText } from "ai"
+import { CoreMessage, smoothStream, streamText } from "ai"
 import { calculator } from "../tools/calculator"
 import { assistantPrompt } from "../prompts/assistant"
 import {
@@ -40,6 +40,10 @@ export async function POST(request: Request) {
         messages,
         maxSteps: 5,
         maxRetries: 3,
+        experimental_transform: smoothStream({
+            delayInMs: 20,
+            chunking: "line",
+        }),
     })
 
     return stream.toDataStreamResponse()

@@ -10,6 +10,7 @@ import { HeaderControls } from "@/components/header-controls"
 import { useState, useEffect } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "ai/react"
+import { errorToast } from "@/hooks/error-toast"
 
 interface Message {
     id: string
@@ -45,7 +46,9 @@ export default function Home() {
                 messages,
             }
         },
-
+        onError: (error) => {
+            errorToast(error)
+        },
         credentials: "include",
     })
 
@@ -140,7 +143,10 @@ export default function Home() {
                     ) : (
                         <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
                             {messages.map((message) => (
-                                <ChatMessage key={message.id} message={message} />
+                                <ChatMessage
+                                    key={message.id}
+                                    message={message}
+                                />
                             ))}
                             {isLoading && "Thinking..."}
                         </div>
