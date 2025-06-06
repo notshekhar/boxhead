@@ -29,7 +29,7 @@ const CopyIcon = ({ className }: { className?: string }) => (
 )
 
 // Check icon component for copied state
-const CheckIcon = ({ className }: { className?: string }) => (
+const CheckIcon = React.memo(({ className }: { className?: string }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="14"
@@ -44,7 +44,7 @@ const CheckIcon = ({ className }: { className?: string }) => (
     >
         <polyline points="20,6 9,17 4,12" />
     </svg>
-)
+))
 
 // Function to get display name for programming languages
 const getLanguageDisplayName = (language: string): string => {
@@ -101,7 +101,7 @@ const getLanguageDisplayName = (language: string): string => {
 }
 
 // Custom code block component with syntax highlighting
-const CodeBlock = ({ children, className, ...props }: any) => {
+const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     const { theme, resolvedTheme } = useTheme()
     const [isCopied, setIsCopied] = useState(false)
     const match = /language-(\w+)/.exec(className || "")
@@ -337,7 +337,7 @@ const CodeBlock = ({ children, className, ...props }: any) => {
             </pre>
         </div>
     )
-}
+})
 
 const MarkdownComponents = {
     // Headings
@@ -534,53 +534,51 @@ const MarkdownComponents = {
     ),
 }
 
-export const ChatMessage: React.FC<{ message: UIMessage }> = ({
-    message,
-}: {
-    message: UIMessage
-}) => {
-    // User message component
-    if (message.role === "user") {
-        return (
-            <div className="flex justify-end mb-6 items-end">
-                {/* Message bubble */}
-                <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2">
-                    <div className="text-sm text-text-light dark:text-text-dark">
-                        <ReactMarkdown
-                            components={MarkdownComponents}
-                            remarkPlugins={[remarkGfm]}
-                        >
-                            {message.content}
-                        </ReactMarkdown>
+export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
+    ({ message }: { message: UIMessage }) => {
+        // User message component
+        if (message.role === "user") {
+            return (
+                <div className="flex justify-end mb-6 items-end">
+                    {/* Message bubble */}
+                    <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2">
+                        <div className="text-sm text-text-light dark:text-text-dark">
+                            <ReactMarkdown
+                                components={MarkdownComponents}
+                                remarkPlugins={[remarkGfm]}
+                            >
+                                {message.content}
+                            </ReactMarkdown>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
-    }
-    // AI message component
-    else {
-        return (
-            <div className="flex mb-6 items-start">
-                {/* AI avatar */}
-                {/* <div className="flex-shrink-0 mr-3 w-8 h-8 rounded-lg bg-white dark:bg-[#1E1F25] flex items-center justify-center text-[#2D7FF9] dark:text-accent-blue font-bold border border-[#2D7FF9]/20 dark:border-gray-dark">
+            )
+        }
+        // AI message component
+        else {
+            return (
+                <div className="flex mb-6 items-start">
+                    {/* AI avatar */}
+                    {/* <div className="flex-shrink-0 mr-3 w-8 h-8 rounded-lg bg-white dark:bg-[#1E1F25] flex items-center justify-center text-[#2D7FF9] dark:text-accent-blue font-bold border border-[#2D7FF9]/20 dark:border-gray-dark">
           <span className="font-bold text-sm">AI</span>
         </div> */}
 
-                {/* Message bubble - no border */}
-                <div className="max-w-[100%] px-1">
-                    <div className="text-sm text-text-light dark:text-text-dark leading-relaxed">
-                        <ReactMarkdown
-                            components={MarkdownComponents}
-                            remarkPlugins={[remarkGfm]}
-                        >
-                            {message.content}
-                        </ReactMarkdown>
-                    </div>
+                    {/* Message bubble - no border */}
+                    <div className="max-w-[100%] px-1">
+                        <div className="text-sm text-text-light dark:text-text-dark leading-relaxed">
+                            <ReactMarkdown
+                                components={MarkdownComponents}
+                                remarkPlugins={[remarkGfm]}
+                            >
+                                {message.content}
+                            </ReactMarkdown>
+                        </div>
 
-                    {/* Uncomment this to show typing animation when needed */}
-                    {/* <TypingAnimation /> */}
+                        {/* Uncomment this to show typing animation when needed */}
+                        {/* <TypingAnimation /> */}
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        }
     }
-}
+)
