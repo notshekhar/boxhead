@@ -148,7 +148,7 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
         return (
             <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                 {/* Language header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
+                <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
                     <span className="text-xs font-semibold text-text-light dark:text-text-dark">
                         {getLanguageDisplayName(language)}
                     </span>
