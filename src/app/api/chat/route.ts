@@ -1,5 +1,4 @@
 import { CoreMessage, streamText } from "ai"
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { calculator } from "../tools/calculator"
 import { assistantPrompt } from "../prompts/assistant"
 import {
@@ -39,9 +38,6 @@ export async function POST(request: Request) {
     const stream = streamText({
         model: modelProviders[model_provider](model_name),
         messages,
-        tools: {
-            calculator,
-        },
         maxSteps: 5,
         maxRetries: 3,
     })

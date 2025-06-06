@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from "react"
 
 // Type definitions
 interface ChatInputProps {
-    onSendMessage: (message: string, files?: File[]) => void
+    onSendMessage: () => void
+    input: string
+    setInput: (input: string) => void
+    isLoading?: boolean
 }
 
 interface FilePreview {
@@ -13,10 +16,11 @@ interface FilePreview {
 
 // Custom hook for chat input logic
 function useChatInput(
-    onSendMessage: (message: string, files?: File[]) => void
+    onSendMessage: (message: string, files?: File[]) => void,
+    input: string,
+    setInput: (input: string) => void
 ) {
     // State
-    const [message, setMessage] = useState("")
     const [isDragging, setIsDragging] = useState(false)
     const [attachedFiles, setAttachedFiles] = useState<FilePreview[]>([])
 
@@ -51,7 +55,7 @@ function useChatInput(
             // Restore the scroll position to prevent page jump
             window.scrollTo(0, scrollPos)
         }
-    }, [message])
+    }, [input])
 
     // Clean up object URLs when component unmounts
     useEffect(() => {
@@ -65,10 +69,10 @@ function useChatInput(
         // Process files one by one with a slight delay for staggered animation
         Array.from(files).forEach((file, index) => {
             setTimeout(() => {
-                const preview = URL.createObjectURL(file);
-                setAttachedFiles((prev) => [...prev, { file, preview }]);
-            }, index * 80); // Stagger the appearance of each file
-        });
+                const preview = URL.createObjectURL(file)
+                setAttachedFiles((prev) => [...prev, { file, preview }])
+            }, index * 80) // Stagger the appearance of each file
+        })
     }
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,12 +88,12 @@ function useChatInput(
             const newFiles = prev.map((file, i) => {
                 if (i === index) {
                     // Mark this file for removal animation
-                    return { ...file, isRemoving: true };
+                    return { ...file, isRemoving: true }
                 }
-                return file;
-            });
-            return newFiles;
-        });
+                return file
+            })
+            return newFiles
+        })
 
         // After animation completes, actually remove the file
         setTimeout(() => {
@@ -98,14 +102,14 @@ function useChatInput(
                 const newFiles = prev.filter((file, i) => {
                     if (i === index) {
                         // Clean up the object URL before removing
-                        URL.revokeObjectURL(file.preview);
-                        return false; // Remove this file
+                        URL.revokeObjectURL(file.preview)
+                        return false // Remove this file
                     }
-                    return true; // Keep other files
-                });
-                return newFiles;
-            });
-        }, 350); // Match with animation duration
+                    return true // Keep other files
+                })
+                return newFiles
+            })
+        }, 350) // Match with animation duration
     }
 
     // Drag and drop handlers
@@ -133,12 +137,12 @@ function useChatInput(
 
     // Message handling
     const handleSendMessage = () => {
-        if (message.trim() || attachedFiles.length > 0) {
+        if (input.trim() || attachedFiles.length > 0) {
             onSendMessage(
-                message,
+                input,
                 attachedFiles.map((f) => f.file)
             )
-            setMessage("")
+            setInput("")
             // Clean up previews and reset files
             attachedFiles.forEach((file) => URL.revokeObjectURL(file.preview))
             setAttachedFiles([])
@@ -155,7 +159,6 @@ function useChatInput(
     // Return all the state and handlers needed by the UI
     return {
         // State
-        message,
         isDragging,
         attachedFiles,
         isExpanded,
@@ -165,7 +168,6 @@ function useChatInput(
         fileInputRef,
 
         // Handlers
-        setMessage,
         handleFileSelect,
         handleDragOver,
         handleDragLeave,
@@ -245,20 +247,20 @@ const FilePreviewItem: React.FC<{
     onRemove: (index: number) => void
 }> = ({ file, index, onRemove }) => {
     // Animation delay based on index for staggered appearance
-    const animationDelay = `${index * 100}ms`;
+    const animationDelay = `${index * 100}ms`
 
     // Determine which animation class to use based on file state
     const animationClass = file.isRemoving
-        ? 'animate-scale-out'
-        : 'animate-scale-in';
+        ? "animate-scale-out"
+        : "animate-scale-in"
 
     return (
         <div
             className={`relative group ${animationClass}`}
             style={{
                 animationDelay,
-                animationFillMode: 'both',
-                animationDuration: file.isRemoving ? '350ms' : '400ms'
+                animationFillMode: "both",
+                animationDuration: file.isRemoving ? "350ms" : "400ms",
             }}
         >
             <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center transition-all duration-300 hover:shadow-md hover:scale-105">
@@ -309,20 +311,20 @@ const FilePreviewItem: React.FC<{
                 </svg>
             </button>
         </div>
-    );
+    )
 }
 
 const DragOverlay: React.FC = () => (
     <div
         className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 backdrop-blur-sm flex items-center justify-center rounded-xl z-10 border-2 border-dashed border-blue-500"
         style={{
-            animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+            animation: "fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         }}
     >
         <div
             className="text-blue-600 dark:text-blue-400 font-medium flex flex-col items-center"
             style={{
-                animation: 'float 3s ease-in-out infinite'
+                animation: "float 3s ease-in-out infinite",
             }}
         >
             <svg
@@ -332,7 +334,7 @@ const DragOverlay: React.FC = () => (
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 style={{
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                 }}
             >
                 <path
@@ -348,15 +350,18 @@ const DragOverlay: React.FC = () => (
 )
 
 // Main component
-export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({
+    onSendMessage,
+    input,
+    setInput,
+    isLoading = false,
+}) => {
     const {
-        message,
         isDragging,
         attachedFiles,
         isExpanded,
         textareaRef,
         fileInputRef,
-        setMessage,
         handleFileSelect,
         handleDragOver,
         handleDragLeave,
@@ -364,7 +369,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
         removeFile,
         handleSendMessage,
         handleKeyDown,
-    } = useChatInput(onSendMessage)
+    } = useChatInput(onSendMessage, input, setInput)
 
     return (
         <div className="px-4 sm:px-8 md:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
@@ -384,8 +389,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                 <div className="m-2 px-4 py-3 relative flex items-center rounded-lg bg-white dark:bg-[#1E1F25]">
                     <textarea
                         ref={textareaRef}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Type your query here..."
                         className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 my-auto resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
@@ -396,7 +401,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                     {/* Send button */}
                     <SendButton
                         onClick={handleSendMessage}
-                        disabled={!(message.trim() || attachedFiles.length > 0)}
+                        disabled={
+                            !(input.trim() || attachedFiles.length > 0) ||
+                            isLoading
+                        }
                         isExpanded={isExpanded}
                     />
                 </div>
@@ -431,11 +439,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
                         <div
                             className="px-4 py-3 border-t border-gray-300 dark:border-gray-700 transition-all animate-scale-in"
                             style={{
-                                transformOrigin: 'top center',
-                                animationDuration: '0.3s'
+                                transformOrigin: "top center",
+                                animationDuration: "0.3s",
                             }}
                         >
-
                             <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                                 Attached files:
                             </div>

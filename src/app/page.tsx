@@ -7,8 +7,9 @@ import { Sidebar } from "@/components/sidebar"
 import { ChatHeader } from "@/components/chat-header"
 import { EmptyState } from "@/components/empty-state"
 import { HeaderControls } from "@/components/header-controls"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { SearchPopup } from "@/components/search-popup"
+import { useChat } from "ai/react"
 
 interface Message {
     id: string
@@ -22,38 +23,31 @@ interface Chat {
     messages: Message[]
 }
 
+const chats = [
+    {
+        id: "1",
+        title: "Generate Image",
+        messages: [],
+    },
+]
+
 export default function Home() {
-    const [chats, setChats] = useState<Chat[]>([
-        {
-            id: "1",
-            title: "Generate Image",
-            messages: [
-                {
-                    id: "1",
-                    content: "can you generate image?",
-                    type: "user",
-                },
-                {
-                    id: "2",
-                    content:
-                        "No, I cannot directly generate images. However, I can help you create descriptions, ideas, or instructions for generating images using tools like DALL-E, MidJourney, or other image-generation platforms. If you need assistance with designing or describing an image, feel free to ask!",
-                    type: "ai",
-                },
-            ],
-        },
-    ])
-    const [activeChat, setActiveChat] = useState<string>("1")
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(true)
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
 
-    // Recent chats for search popup
-    const recentChats = [
-        { id: "1", title: "Generate Image" },
-        { id: "2", title: "New Thread" },
-        { id: "3", title: "Greeting" },
-        { id: "4", title: "Snake game in HTML, CSS, and JS" },
-        { id: "5", title: "Setup Next.js app" },
-    ]
+    // useChat hook for API integration
+    const { messages, input, setInput, handleSubmit, isLoading } = useChat({
+        api: "/api/chat",
+        experimental_prepareRequestBody: ({ messages }) => {
+            return {
+                model_provider: "google",
+                model_name: "gemini-2.0-flash-lite",
+                messages,
+            }
+        },
+
+        credentials: "include",
+    })
 
     const handleToggleSidebar = () => {
         setSidebarVisible(!sidebarVisible)
@@ -65,56 +59,7 @@ export default function Home() {
             title: "New Chat",
             messages: [],
         }
-        setChats([...chats, newChat])
-        setActiveChat(newChat.id)
     }
-
-    const handleSelectChat = (chatId: string) => {
-        setActiveChat(chatId)
-    }
-
-    const handleSendMessage = (message: string) => {
-        // Find the current active chat
-        const currentChat = chats.find((chat) => chat.id === activeChat)
-        if (!currentChat) return
-
-        // Add user message
-        const userMessage: Message = {
-            id: Date.now().toString(),
-            content: message,
-            type: "user",
-        }
-
-        // In a real app, here you'd make an API call to get the AI response
-        // For now we'll simulate it
-        const aiMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            content:
-                "This is a simulated AI response. In a real app, you would make an API call to get the response.",
-            type: "ai",
-        }
-
-        // Update the chat with new messages
-        const updatedChats = chats.map((chat) => {
-            if (chat.id === activeChat) {
-                return {
-                    ...chat,
-                    messages: [...chat.messages, userMessage, aiMessage],
-                    // If it's the first message, update the chat title
-                    title:
-                        chat.messages.length === 0
-                            ? message.substring(0, 20)
-                            : chat.title,
-                }
-            }
-            return chat
-        })
-
-        setChats(updatedChats)
-    }
-
-    // Get the current active chat
-    const currentChat = chats.find((chat) => chat.id === activeChat)
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark relative">
@@ -122,15 +67,15 @@ export default function Home() {
             <SearchPopup
                 isOpen={showSearchPopup}
                 onClose={() => setShowSearchPopup(false)}
-                onSelectChat={handleSelectChat}
-                recentChats={recentChats}
+                onSelectChat={() => {}}
+                recentChats={chats}
             />
 
             {/* Sidebar - always rendered but positioned off-screen when not visible */}
             <Sidebar
                 chats={chats}
                 onNewChat={handleNewChat}
-                onSelectChat={handleSelectChat}
+                onSelectChat={() => {}}
                 onToggleSidebar={handleToggleSidebar}
                 onOpenSearch={() => setShowSearchPopup(true)}
                 isOpen={sidebarVisible}
@@ -190,22 +135,24 @@ export default function Home() {
 
                 {/* Messages container */}
                 <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded">
-                    {currentChat?.messages.length === 0 ? (
+                    {messages.length === 0 ? (
                         <EmptyState username="Amélie" />
                     ) : (
                         <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
-                            {currentChat?.messages.map((message) => (
-                                <ChatMessage
-                                    key={message.id}
-                                    content={message.content}
-                                    type={message.type}
-                                />
+                            {messages.map((message) => (
+                                <ChatMessage message={message} />
                             ))}
+                            {isLoading && "Thinking..."}
                         </div>
                     )}
                 </div>
-
-                <ChatInput onSendMessage={handleSendMessage} />
+                {input}
+                <ChatInput
+                    input={input}
+                    setInput={setInput}
+                    onSendMessage={handleSubmit}
+                    isLoading={isLoading}
+                />
             </div>
         </div>
     )
