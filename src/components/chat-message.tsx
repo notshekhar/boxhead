@@ -116,8 +116,30 @@ const CodeBlock = ({ children, className, ...props }: any) => {
     }
 
     if (language) {
+        const syntaxTheme = isDarkMode ? oneDark : oneLight
+
+        // Create a custom theme to override the background
+        const customSyntaxTheme = {
+            ...syntaxTheme,
+            'pre[class*="language-"]': {
+                ...(syntaxTheme['pre[class*="language-"]'] || {}),
+                background: "transparent", // remove theme background
+                margin: 0,
+                padding: "1rem",
+                fontSize: "0.75rem",
+                lineHeight: "1.5",
+                userSelect: "text",
+                WebkitUserSelect: "text",
+                MozUserSelect: "text",
+                msUserSelect: "text",
+            },
+            'code[class*="language-"]': {
+                ...(syntaxTheme['code[class*="language-"]'] || {}),
+                background: "transparent", // remove theme background
+            },
+        }
         return (
-            <div className="mb-4 rounded-lg border border-gray-light dark:border-gray-dark">
+            <div className="mb-4 rounded-lg border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                 {/* Language header */}
                 <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
                     <span className="text-xs font-semibold text-text-light dark:text-text-dark">
@@ -208,23 +230,10 @@ const CodeBlock = ({ children, className, ...props }: any) => {
 
                 {/* Code content with syntax highlighting */}
                 <SyntaxHighlighter
-                    style={isDarkMode ? oneDark : oneLight}
+                    style={customSyntaxTheme}
                     language={language}
                     showLineNumbers={true}
                     PreTag="div"
-                    customStyle={{
-                        margin: 0,
-                        padding: "1rem",
-                        background: "transparent",
-                        fontSize: "0.75rem",
-                        lineHeight: "1.5",
-                        borderRadius: 0,
-                        border: "none",
-                        userSelect: "text",
-                        WebkitUserSelect: "text",
-                        MozUserSelect: "text",
-                        msUserSelect: "text",
-                    }}
                     {...props}
                 >
                     {String(children).replace(/\n$/, "")}
