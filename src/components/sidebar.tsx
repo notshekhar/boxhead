@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useAuth } from "./auth-context"
 
 interface ChatItem {
     id: string
@@ -22,6 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onOpenSearch,
     isOpen = true,
 }) => {
+    const { user, isLoading, openAuthPopup } = useAuth()
     const [todayExpanded, setTodayExpanded] = useState(true)
     const [previousExpanded, setPreviousExpanded] = useState(true)
     const [olderExpanded, setOlderExpanded] = useState(true)
@@ -40,19 +42,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 isOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
-            {/* Header with user info */}
+            {/* Header with user info or sign in button */}
             <div className="px-4 py-3">
-                <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-700 text-white mr-2">
-                        <span className="font-medium text-sm">N</span>
+                {isLoading ? (
+                    <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
+                        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse mr-2"></div>
+                        <div className="flex-1">
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1"></div>
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-12"></div>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-sm font-medium text-gray-800 dark:text-white">
-                            Personal
-                        </h2>
-                        <p className="text-xs text-gray-400">Free</p>
+                ) : user ? (
+                    <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white mr-2">
+                            <span className="font-medium text-sm">{user.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-medium text-gray-800 dark:text-white">
+                                {user.name}
+                            </h2>
+                            <p className="text-xs text-gray-400">Free</p>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <button
+                        onClick={openAuthPopup}
+                        className="flex items-center justify-center p-3 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        <svg
+                            className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-800 dark:text-white">
+                            Sign In
+                        </span>
+                    </button>
+                )}
             </div>
 
             {/* Navigation items */}

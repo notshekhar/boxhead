@@ -33,9 +33,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, type }) => {
     return (
       <div className="flex mb-6 items-start">
         {/* AI avatar */}
-        <div className="flex-shrink-0 mr-3 w-8 h-8 rounded-lg bg-white dark:bg-[#1E1F25] flex items-center justify-center text-[#2D7FF9] dark:text-accent-blue font-bold border border-[#2D7FF9]/20 dark:border-gray-dark">
+        {/* <div className="flex-shrink-0 mr-3 w-8 h-8 rounded-lg bg-white dark:bg-[#1E1F25] flex items-center justify-center text-[#2D7FF9] dark:text-accent-blue font-bold border border-[#2D7FF9]/20 dark:border-gray-dark">
           <span className="font-bold text-sm">AI</span>
-        </div>
+        </div> */}
 
         {/* Message bubble - no border */}
         <div className="max-w-[85%] px-1">
