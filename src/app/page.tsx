@@ -7,7 +7,8 @@ import { Sidebar } from "@/components/sidebar"
 import { ChatHeader } from "@/components/chat-header"
 import { EmptyState } from "@/components/empty-state"
 import { HeaderControls } from "@/components/header-controls"
-import { useState, useEffect } from "react"
+import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
+import { useState, useEffect, useRef } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
@@ -35,6 +36,8 @@ const chats = [
 export default function Home() {
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(true)
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
+    const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
 
     // useChat hook for API integration
     const { messages, input, setInput, handleSubmit, isLoading } = useChat({
@@ -63,6 +66,46 @@ export default function Home() {
             messages: [],
         }
     }
+
+    const scrollToBottom = () => {
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTo({
+                top: messagesContainerRef.current.scrollHeight,
+                behavior: "smooth",
+            })
+        }
+    }
+
+    const handleScroll = () => {
+        if (messagesContainerRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
+            const isScrollable = scrollHeight > clientHeight
+            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50 // 50px threshold
+            setShowScrollToBottom(isScrollable && !isAtBottom)
+        }
+    }
+
+    // Auto-scroll to bottom when new messages arrive
+    useEffect(() => {
+        if (messagesContainerRef.current && messages.length > 0) {
+            const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
+            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50
+            
+            if (isAtBottom) {
+                scrollToBottom()
+            }
+        }
+    }, [messages])
+
+    useEffect(() => {
+        const container = messagesContainerRef.current
+        if (container) {
+            container.addEventListener("scroll", handleScroll)
+            // Check initial scroll position
+            handleScroll()
+            return () => container.removeEventListener("scroll", handleScroll)
+        }
+    }, [messages]) // Re-run when messages change to ensure listener is attached
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark relative">
@@ -137,7 +180,10 @@ export default function Home() {
                 )}
 
                 {/* Messages container */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
+                <div 
+                    ref={messagesContainerRef}
+                    className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32"
+                >
                     {messages.length === 0 ? (
                         <EmptyState username="Shekhar" />
                     ) : (
@@ -152,7 +198,14 @@ export default function Home() {
                         </div>
                     )}
                 </div>
+
                 <div className="absolute bottom-0 left-0 right-0 bg-transparent">
+                    <div className="px-4 sm:px-8 md:px-16 max-w-[850px] mx-auto w-full">
+                        <ScrollToBottomButton
+                            onClick={scrollToBottom}
+                            isVisible={showScrollToBottom}
+                        />
+                    </div>
                     <ChatInput
                         input={input}
                         setInput={setInput}
