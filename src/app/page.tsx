@@ -106,7 +106,7 @@ export default function Home() {
     }, [messages.length]) // Re-run when messages change
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark relative">
+        <div className="fixed inset-0 bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark">
             {/* Search Popup */}
             <SearchPopup
                 isOpen={showSearchPopup}
@@ -127,8 +127,8 @@ export default function Home() {
 
             {/* Main chat area */}
             <div
-                className={`relative flex-1 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
-                    sidebarVisible ? "ml-[260px]" : "ml-0"
+                className={`fixed inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
+                    sidebarVisible ? "left-[260px]" : "left-0"
                 }`}
             >
                 {/* Floating controls when sidebar is closed */}
