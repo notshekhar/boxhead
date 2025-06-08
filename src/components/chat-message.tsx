@@ -440,8 +440,8 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
     ({ message }: { message: UIMessage }) => {
         if (message.role === "user") {
             return (
-                <div className="flex justify-end mb-6 items-end">
-                    <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2 overflow-hidden">
+                <div className="flex flex-col items-end mb-6">
+                    <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2 overflow-x-scroll">
                         <div className="text-base text-text-light dark:text-text-dark break-words overflow-wrap-anywhere">
                             <ReactMarkdown
                                 components={MarkdownComponents}
@@ -450,6 +450,9 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
                                 {message.content}
                             </ReactMarkdown>
                         </div>
+                    </div>
+                    <div className="flex justify-end mt-3 mr-2">
+                        <CopyButton text={message.content} label="Copy" />
                     </div>
                 </div>
             )
@@ -467,10 +470,7 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
                         </ReactMarkdown>
                     </div>
                     <div className="flex justify-start mt-3">
-                        <CopyButton 
-                            text={message.content} 
-                            label="Copy"
-                        />
+                        <CopyButton text={message.content} label="Copy" />
                     </div>
                 </div>
             </div>
