@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/empty-state"
 import { HeaderControls } from "@/components/header-controls"
 import { useState, useEffect } from "react"
 import { SearchPopup } from "@/components/search-popup"
-import { useChat } from "ai/react"
+import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 
 interface Message {
