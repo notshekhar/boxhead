@@ -45,7 +45,7 @@ export default function Home() {
         const handleResize = () => {
             const mobile = window.innerWidth < 768 // md breakpoint
             setIsMobile(mobile)
-            
+
             if (!mobile) {
                 setSidebarVisible(true)
             } else {
@@ -55,9 +55,9 @@ export default function Home() {
 
         // Set initial state
         handleResize()
-        
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
+
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
     }, [])
 
     // useChat hook for API integration
@@ -210,6 +210,7 @@ export default function Home() {
                         <EmptyState username="Shekhar" />
                     ) : (
                         <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
+                            <div className="h-[50px]" />
                             {messages.map((message) => (
                                 <ChatMessage
                                     key={message.id}
