@@ -372,7 +372,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     } = useChatInput(onSendMessage, input, setInput)
 
     return (
-        <div className="z-50 px-4 sm:px-8 md:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
+        <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
             {/* Glass effect around the input - only in light mode */}
             <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
             <div

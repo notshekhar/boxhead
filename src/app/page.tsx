@@ -34,10 +34,31 @@ const chats = [
 ]
 
 export default function Home() {
-    const [sidebarVisible, setSidebarVisible] = useState<boolean>(true)
+    const [sidebarVisible, setSidebarVisible] = useState<boolean>(false) // Hidden by default on mobile
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
     const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
+    const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
     const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    // Set sidebar visibility and mobile state based on screen size
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth < 768 // md breakpoint
+            setIsMobile(mobile)
+            
+            if (!mobile) {
+                setSidebarVisible(true)
+            } else {
+                setSidebarVisible(false)
+            }
+        }
+
+        // Set initial state
+        handleResize()
+        
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     // useChat hook for API integration
     const { messages, input, setInput, handleSubmit, isLoading } = useChat({
@@ -57,6 +78,13 @@ export default function Home() {
 
     const handleToggleSidebar = () => {
         setSidebarVisible(!sidebarVisible)
+    }
+
+    // Close sidebar when clicking outside on mobile
+    const handleBackdropClick = () => {
+        if (isMobile) {
+            setSidebarVisible(false)
+        }
     }
 
     const handleNewChat = () => {
@@ -128,11 +156,11 @@ export default function Home() {
             {/* Main chat area */}
             <div
                 className={`fixed inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
-                    sidebarVisible ? "left-[260px]" : "left-0"
+                    sidebarVisible ? "md:left-[260px] left-0" : "left-0"
                 }`}
             >
-                {/* Floating controls when sidebar is closed */}
-                {!sidebarVisible ? (
+                {/* Header controls - always show on mobile, conditional on desktop */}
+                {!sidebarVisible || isMobile ? (
                     <>
                         <div className="absolute top-4 left-4 z-20">
                             <HeaderControls
@@ -148,9 +176,9 @@ export default function Home() {
                     </>
                 ) : (
                     <>
-                        {/* Sidebar toggle button positioned at the edge of the sidebar */}
+                        {/* Sidebar toggle button positioned at the edge of the sidebar - desktop only */}
                         <div
-                            className="fixed top-4 z-50"
+                            className="fixed top-4 z-50 hidden md:block"
                             style={{ left: "25px", top: "25px" }}
                         >
                             <button
@@ -181,7 +209,7 @@ export default function Home() {
                     {messages.length === 0 ? (
                         <EmptyState username="Shekhar" />
                     ) : (
-                        <div className="px-4 sm:px-8 md:px-16 py-6 max-w-[850px] mx-auto w-full">
+                        <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
                             {messages.map((message) => (
                                 <ChatMessage
                                     key={message.id}
@@ -196,7 +224,7 @@ export default function Home() {
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 bg-transparent z-50">
-                    <div className="px-4 sm:px-8 md:px-16 max-w-[850px] mx-auto w-full">
+                    <div className="px-3 sm:px-4 md:px-8 lg:px-16 max-w-[850px] mx-auto w-full">
                         <ScrollToBottomButton
                             onClick={scrollToBottom}
                             isVisible={showScrollToBottom}
