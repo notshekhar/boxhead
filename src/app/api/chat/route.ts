@@ -5,7 +5,7 @@ import {
     ModelProvider,
     modelProviders,
     modelValidator,
-} from "./schema"
+} from "./models"
 
 export async function GET() {
     try {

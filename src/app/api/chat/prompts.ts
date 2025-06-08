@@ -1,4 +1,4 @@
-import { ModelName, ModelProvider } from "./schema"
+import { ModelName, ModelProvider } from "./models"
 
 export const assistantPrompt = ({
     modelProvider,
