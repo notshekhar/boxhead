@@ -37,7 +37,7 @@ export default function Home() {
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(true)
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
     const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
-    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
 
     // useChat hook for API integration
     const { messages, input, setInput, handleSubmit, isLoading } = useChat({
@@ -68,44 +68,36 @@ export default function Home() {
     }
 
     const scrollToBottom = () => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTo({
-                top: messagesContainerRef.current.scrollHeight,
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({
                 behavior: "smooth",
             })
         }
     }
 
-    const handleScroll = () => {
-        if (messagesContainerRef.current) {
-            const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
-            const isScrollable = scrollHeight > clientHeight
-            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50 // 50px threshold
-            setShowScrollToBottom(isScrollable && !isAtBottom)
-        }
-    }
-
-    // Auto-scroll to bottom when new messages arrive
+    // Monitor when the messages end div is in view
     useEffect(() => {
-        if (messagesContainerRef.current && messages.length > 0) {
-            const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
-            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50
-            
-            if (isAtBottom) {
-                scrollToBottom()
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // Show scroll-to-bottom button when the end div is NOT in view
+                setShowScrollToBottom(!entry.isIntersecting)
+            },
+            {
+                threshold: 0.1, // Trigger when at least 10% is visible
+                rootMargin: "0px 0px -50px 0px", // Add some margin to trigger earlier
+            }
+        )
+
+        if (messagesEndRef.current) {
+            observer.observe(messagesEndRef.current)
+        }
+
+        return () => {
+            if (messagesEndRef.current) {
+                observer.unobserve(messagesEndRef.current)
             }
         }
-    }, [messages])
-
-    useEffect(() => {
-        const container = messagesContainerRef.current
-        if (container) {
-            container.addEventListener("scroll", handleScroll)
-            // Check initial scroll position
-            handleScroll()
-            return () => container.removeEventListener("scroll", handleScroll)
-        }
-    }, [messages]) // Re-run when messages change to ensure listener is attached
+    }, [messages.length]) // Re-run when messages change
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark relative">
@@ -180,10 +172,7 @@ export default function Home() {
                 )}
 
                 {/* Messages container */}
-                <div 
-                    ref={messagesContainerRef}
-                    className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32"
-                >
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
                     {messages.length === 0 ? (
                         <EmptyState username="Shekhar" />
                     ) : (
@@ -195,6 +184,7 @@ export default function Home() {
                                 />
                             ))}
                             {isLoading && "Thinking..."}
+                            <div ref={messagesEndRef} />
                         </div>
                     )}
                 </div>
