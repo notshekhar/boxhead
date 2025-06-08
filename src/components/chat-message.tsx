@@ -128,11 +128,14 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                 } catch (error) {
                     console.error("Error highlighting code:", error)
                     // Fallback to plain text if highlighting fails
-                    setHighlightedCode(`<pre><code>${codeContent}</code></pre>`)
+                    setHighlightedCode(`<pre class="p-4 text-xs leading-relaxed m-0 bg-transparent"><code class="bg-transparent">${codeContent}</code></pre>`)
                 }
             }
 
             highlightCode()
+        } else if (language) {
+            // If we have a language but no content, set empty
+            setHighlightedCode(`<pre class="p-4 text-xs leading-relaxed m-0 bg-transparent"><code class="bg-transparent"></code></pre>`)
         }
     }, [language, codeContent, isDarkMode])
 
@@ -209,12 +212,18 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
 
                 {/* Code content with syntax highlighting */}
                 <div className="overflow-x-auto">
-                    <div
-                        className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-xs [&_pre]:leading-relaxed [&_code]:!bg-transparent"
-                        dangerouslySetInnerHTML={{
-                            __html: highlightedCode,
-                        }}
-                    />
+                    {highlightedCode ? (
+                        <div
+                            className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-xs [&_pre]:leading-relaxed [&_code]:!bg-transparent"
+                            dangerouslySetInnerHTML={{
+                                __html: highlightedCode,
+                            }}
+                        />
+                    ) : (
+                        <pre className="bg-transparent text-text-light dark:text-text-dark p-4 text-xs font-mono overflow-x-auto m-0">
+                            <code className="bg-transparent">{codeContent}</code>
+                        </pre>
+                    )}
                 </div>
             </div>
         )
@@ -381,7 +390,7 @@ const MarkdownComponents = {
     // Lists
     ul: ({ children, ...props }: any) => (
         <ul
-            className="list-disc list-inside text-sm text-text-light dark:text-text-dark mb-4 space-y-1 ml-2"
+            className="list-disc list-outside text-sm text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
             {...props}
         >
             {children}
@@ -389,14 +398,14 @@ const MarkdownComponents = {
     ),
     ol: ({ children, ...props }: any) => (
         <ol
-            className="list-decimal list-inside text-sm text-text-light dark:text-text-dark mb-4 space-y-1 ml-2"
+            className="list-decimal list-outside text-sm text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
             {...props}
         >
             {children}
         </ol>
     ),
     li: ({ children, ...props }: any) => (
-        <li className="text-sm text-text-light dark:text-text-dark" {...props}>
+        <li className="text-sm text-text-light dark:text-text-dark leading-relaxed" {...props}>
             {children}
         </li>
     ),
