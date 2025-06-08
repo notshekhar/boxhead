@@ -466,6 +466,12 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
                             {message.content}
                         </ReactMarkdown>
                     </div>
+                    <div className="flex justify-start mt-3">
+                        <CopyButton 
+                            text={message.content} 
+                            label="Copy"
+                        />
+                    </div>
                 </div>
             </div>
         )
