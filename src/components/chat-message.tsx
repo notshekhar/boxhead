@@ -386,7 +386,7 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
 
         return (
             <div className="flex mb-6 items-start">
-                <div className="max-w-[100%] px-1 min-w-0 overflow-hidden">
+                <div className="max-w-[100%] px-1 min-w-0">
                     <div className="text-sm text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
                         <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
                             {message.content}

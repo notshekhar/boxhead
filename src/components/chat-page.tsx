@@ -75,7 +75,7 @@ export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
         experimental_prepareRequestBody: ({ messages }) => {
             return {
                 model_provider: "google",
-                model_name: "gemini-2.0-flash-lite",
+                model_name: "gemini-2.5-flash-preview-05-20",
                 messages,
             }
         },
@@ -164,7 +164,7 @@ export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
 
             {/* Main chat area */}
             <div
-                className={`fixed inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
+                className={`fixed h-full inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
                     sidebarVisible ? "md:left-[260px] left-0" : "left-0"
                 }`}
             >
