@@ -75,6 +75,12 @@ export default function Home() {
         }
     }
 
+    useEffect(() => {
+        if (isLoading) {
+            scrollToBottom()
+        }
+    }, [isLoading])
+
     // Monitor when the messages end div is in view
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -170,7 +176,6 @@ export default function Home() {
                         </div>
                     </>
                 )}
-
                 {/* Messages container */}
                 <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
                     {messages.length === 0 ? (
@@ -185,11 +190,12 @@ export default function Home() {
                             ))}
                             {isLoading && "Thinking..."}
                             <div ref={messagesEndRef} />
+                            <div className="h-[100px]" />
                         </div>
                     )}
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 bg-transparent">
+                <div className="absolute bottom-0 left-0 right-0 bg-transparent z-50">
                     <div className="px-4 sm:px-8 md:px-16 max-w-[850px] mx-auto w-full">
                         <ScrollToBottomButton
                             onClick={scrollToBottom}
