@@ -1,12 +1,8 @@
 import { UIMessage } from "ai"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import {
-    oneDark,
-    oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism"
+import { codeToHtml } from "shiki"
 import { useTheme } from "next-themes"
 
 // Copy icon component
@@ -104,12 +100,41 @@ const getLanguageDisplayName = (language: string): string => {
 const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     const { theme, resolvedTheme } = useTheme()
     const [isCopied, setIsCopied] = useState(false)
+    const [highlightedCode, setHighlightedCode] = useState<string>("")
     const match = /language-(\w+)/.exec(className || "")
     const language = match ? match[1] : ""
     const isInline = !className?.includes("language-")
 
     // Determine if we're in dark mode
     const isDarkMode = theme === "dark" || resolvedTheme === "dark"
+
+    // Get the code content as string
+    const codeContent = String(children).replace(/\n$/, "")
+
+    useEffect(() => {
+        if (language && codeContent) {
+            const highlightCode = async () => {
+                try {
+                    const shikiTheme = isDarkMode
+                        ? "vitesse-dark"
+                        : "vitesse-light"
+
+                    const html = await codeToHtml(codeContent, {
+                        lang: language,
+                        theme: shikiTheme,
+                    })
+
+                    setHighlightedCode(html)
+                } catch (error) {
+                    console.error("Error highlighting code:", error)
+                    // Fallback to plain text if highlighting fails
+                    setHighlightedCode(`<pre><code>${codeContent}</code></pre>`)
+                }
+            }
+
+            highlightCode()
+        }
+    }, [language, codeContent, isDarkMode])
 
     if (isInline) {
         return (
@@ -123,28 +148,6 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     }
 
     if (language) {
-        const syntaxTheme = isDarkMode ? oneDark : oneLight
-
-        // Create a custom theme to override the background
-        const customSyntaxTheme = {
-            ...syntaxTheme,
-            'pre[class*="language-"]': {
-                ...(syntaxTheme['pre[class*="language-"]'] || {}),
-                background: "transparent", // remove theme background
-                margin: 0,
-                padding: "1rem",
-                fontSize: "0.75rem",
-                lineHeight: "1.5",
-                userSelect: "text",
-                WebkitUserSelect: "text",
-                MozUserSelect: "text",
-                msUserSelect: "text",
-            },
-            'code[class*="language-"]': {
-                ...(syntaxTheme['code[class*="language-"]'] || {}),
-                background: "transparent", // remove theme background
-            },
-        }
         return (
             <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                 {/* Language header */}
@@ -155,23 +158,7 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                     <button
                         onClick={async () => {
                             try {
-                                // Extract text content properly, handling React children
-                                const textContent = React.Children.toArray(
-                                    children
-                                )
-                                    .map((child) =>
-                                        typeof child === "string"
-                                            ? child
-                                            : React.isValidElement(child) &&
-                                              (child.props as any)?.children
-                                            ? String(
-                                                  (child.props as any).children
-                                              )
-                                            : String(child)
-                                    )
-                                    .join("")
-
-                                await navigator.clipboard.writeText(textContent)
+                                await navigator.clipboard.writeText(codeContent)
                                 setIsCopied(true)
                                 console.log("Code copied to clipboard")
 
@@ -185,22 +172,7 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                                 try {
                                     const textArea =
                                         document.createElement("textarea")
-                                    const textContent = React.Children.toArray(
-                                        children
-                                    )
-                                        .map((child) =>
-                                            typeof child === "string"
-                                                ? child
-                                                : React.isValidElement(child) &&
-                                                  (child.props as any)?.children
-                                                ? String(
-                                                      (child.props as any)
-                                                          .children
-                                                  )
-                                                : String(child)
-                                        )
-                                        .join("")
-                                    textArea.value = textContent
+                                    textArea.value = codeContent
                                     document.body.appendChild(textArea)
                                     textArea.select()
                                     document.execCommand("copy")
@@ -236,15 +208,14 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                 </div>
 
                 {/* Code content with syntax highlighting */}
-                <SyntaxHighlighter
-                    style={customSyntaxTheme}
-                    language={language}
-                    showLineNumbers={true}
-                    PreTag="div"
-                    {...props}
-                >
-                    {String(children).replace(/\n$/, "")}
-                </SyntaxHighlighter>
+                <div className="overflow-x-auto">
+                    <div
+                        className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-xs [&_pre]:leading-relaxed [&_code]:!bg-transparent"
+                        dangerouslySetInnerHTML={{
+                            __html: highlightedCode,
+                        }}
+                    />
+                </div>
             </div>
         )
     }
