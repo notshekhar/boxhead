@@ -66,7 +66,7 @@ export default function Home() {
         experimental_prepareRequestBody: ({ messages }) => {
             return {
                 model_provider: "google",
-                model_name: "gemini-2.0-flash-lite",
+                model_name: "gemini-2.0-flash",
                 messages,
             }
         },

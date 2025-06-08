@@ -276,7 +276,7 @@ const MarkdownComponents = {
         </h6>
     ),
     p: ({ children, ...props }: any) => (
-        <p className="text-sm text-text-light dark:text-text-dark mb-4 last:mb-0 leading-relaxed" {...props}>
+        <p className="text-sm text-text-light dark:text-text-dark mb-4 last:mb-0 leading-relaxed break-words overflow-wrap-anywhere" {...props}>
             {children}
         </p>
     ),
@@ -373,8 +373,8 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
         if (message.role === "user") {
             return (
                 <div className="flex justify-end mb-6 items-end">
-                    <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2">
-                        <div className="text-sm text-text-light dark:text-text-dark">
+                    <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2 overflow-hidden">
+                        <div className="text-sm text-text-light dark:text-text-dark break-words overflow-wrap-anywhere">
                             <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
                                 {message.content}
                             </ReactMarkdown>
@@ -386,8 +386,8 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
 
         return (
             <div className="flex mb-6 items-start">
-                <div className="max-w-[100%] px-1">
-                    <div className="text-sm text-text-light dark:text-text-dark leading-relaxed">
+                <div className="max-w-[100%] px-1 min-w-0 overflow-hidden">
+                    <div className="text-sm text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
                         <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
                             {message.content}
                         </ReactMarkdown>

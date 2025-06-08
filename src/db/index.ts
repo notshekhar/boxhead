@@ -1,9 +1,10 @@
 import "dotenv/config"
-import { drizzle } from "drizzle-orm/libsql"
+
+import { neon } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-http"
+
+const sql = neon(process.env.PG_DB_URL!)
 
 export const db = drizzle({
-    connection: {
-        url: process.env.TURSO_DATABASE_URL!,
-        authToken: process.env.TURSO_AUTH_TOKEN!,
-    },
+    client: sql,
 })

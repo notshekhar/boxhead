@@ -1,17 +1,15 @@
 import { CoreMessage, smoothStream, streamText } from "ai"
-import { calculator } from "../tools/calculator"
-import { assistantPrompt } from "../prompts/assistant"
+import { assistantPrompt } from "./prompts"
 import {
     ModelName,
     ModelProvider,
     modelProviders,
     modelValidator,
-} from "../schema/models"
+} from "./schema"
 
 export async function GET() {
     try {
         // create a new chat
-        
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })

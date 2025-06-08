@@ -1,26 +1,40 @@
 import { sql } from "drizzle-orm"
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core"
+import { date, integer, jsonb, pgTable, varchar } from "drizzle-orm/pg-core"
 
-export const users = sqliteTable("users", {
-    id: int().primaryKey({ autoIncrement: true }),
-    name: text("name").notNull(),
-    email: text("email").notNull().unique(),
-    password: text("password"),
-    createdAt: int("created_at")
+export const users = pgTable("users", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).notNull().unique(),
+    password: varchar({ length: 255 }),
+    createdAt: date()
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: int("updated_at")
+    updatedAt: date()
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+})
+export const chats = pgTable("chats", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer().references(() => users.id),
+    createdAt: date()
+        .notNull()
+        .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: date()
         .notNull()
         .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
 })
 
-export const messages = sqliteTable("messages", {
-    id: int().primaryKey({ autoIncrement: true }),
-    userId: int("user_id").references(() => users.id),
-    createdAt: int("created_at")
+export const messages = pgTable("messages", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    chatId: integer().references(() => chats.id),
+    userId: integer().references(() => users.id),
+    role: varchar({ length: 255 }).notNull(),
+    parts: jsonb("parts").notNull(),
+    attachments: jsonb("attachments"),
+    createdAt: date()
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: int("updated_at")
+    updatedAt: date()
         .notNull()
         .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
 })
