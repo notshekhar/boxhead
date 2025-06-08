@@ -5,6 +5,11 @@ import remarkGfm from "remark-gfm"
 import { codeToHtml } from "shiki"
 import { useTheme } from "next-themes"
 
+/**
+ * I have converted text-sm to text-base
+ * and text-xs to text-sm
+ */
+
 // Copy icon component
 const CopyIcon = ({ className }: { className?: string }) => (
     <svg
@@ -126,13 +131,19 @@ const getLanguageDisplayName = (language: string): string => {
 }
 
 // Copy button component
-const CopyButton = ({ text, label = "Copy" }: { text: string; label?: string }) => {
+const CopyButton = ({
+    text,
+    label = "Copy",
+}: {
+    text: string
+    label?: string
+}) => {
     const { isCopied, copyToClipboard } = useCopyToClipboard()
 
     return (
         <button
             onClick={() => copyToClipboard(text)}
-            className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer ${
                 isCopied
                     ? "text-green-600 dark:text-green-400"
                     : "text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark"
@@ -170,7 +181,9 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                 setHighlightedCode(html)
             } catch (error) {
                 console.error("Error highlighting code:", error)
-                setHighlightedCode(`<pre class="p-4 text-xs leading-relaxed m-0 bg-transparent"><code class="bg-transparent">${codeContent}</code></pre>`)
+                setHighlightedCode(
+                    `<pre class="p-4 text-sm leading-relaxed m-0 bg-transparent"><code class="bg-transparent">${codeContent}</code></pre>`
+                )
             }
         }
 
@@ -181,7 +194,7 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     if (isInline) {
         return (
             <code
-                className="px-1.5 py-0.5 text-xs bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark rounded border border-gray-light dark:border-gray-dark font-mono"
+                className="px-1.5 py-0.5 text-sm bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark rounded border border-gray-light dark:border-gray-dark font-mono"
                 {...props}
             >
                 {children}
@@ -194,7 +207,7 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
         return (
             <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                 <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
-                    <span className="text-xs font-semibold text-text-light dark:text-text-dark">
+                    <span className="text-sm font-semibold text-text-light dark:text-text-dark">
                         {getLanguageDisplayName(language)}
                     </span>
                     <CopyButton text={codeContent} />
@@ -202,12 +215,16 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
                 <div className="overflow-x-auto">
                     {highlightedCode ? (
                         <div
-                            className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-xs [&_pre]:leading-relaxed [&_code]:!bg-transparent"
-                            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+                            className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-sm [&_pre]:leading-relaxed [&_code]:!bg-transparent"
+                            dangerouslySetInnerHTML={{
+                                __html: highlightedCode,
+                            }}
                         />
                     ) : (
-                        <pre className="bg-transparent text-text-light dark:text-text-dark p-4 text-xs font-mono overflow-x-auto m-0">
-                            <code className="bg-transparent">{codeContent}</code>
+                        <pre className="bg-transparent text-text-light dark:text-text-dark p-4 text-sm font-mono overflow-x-auto m-0">
+                            <code className="bg-transparent">
+                                {codeContent}
+                            </code>
                         </pre>
                     )}
                 </div>
@@ -229,13 +246,13 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     return (
         <div className="mb-4 rounded-lg overflow-hidden border border-gray-light dark:border-gray-dark">
             <div className="flex items-center justify-between px-4 py-2 bg-gray-lighter dark:bg-gray-darker border-b border-gray-light dark:border-gray-dark">
-                <span className="text-xs font-semibold text-text-light dark:text-text-dark">
+                <span className="text-sm font-semibold text-text-light dark:text-text-dark">
                     Code
                 </span>
                 <CopyButton text={textContent} />
             </div>
             <pre
-                className="bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark p-4 text-xs font-mono overflow-x-auto m-0 border-0"
+                className="bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark p-4 text-sm font-mono overflow-x-auto m-0 border-0"
                 {...props}
             >
                 <code>{children}</code>
@@ -246,52 +263,82 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
 
 const MarkdownComponents = {
     h1: ({ children, ...props }: any) => (
-        <h1 className="text-2xl font-bold text-text-light dark:text-text-dark mb-4 mt-6 first:mt-0" {...props}>
+        <h1
+            className="text-2xl font-bold text-text-light dark:text-text-dark mb-4 mt-6 first:mt-0"
+            {...props}
+        >
             {children}
         </h1>
     ),
     h2: ({ children, ...props }: any) => (
-        <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-3 mt-5 first:mt-0" {...props}>
+        <h2
+            className="text-xl font-bold text-text-light dark:text-text-dark mb-3 mt-5 first:mt-0"
+            {...props}
+        >
             {children}
         </h2>
     ),
     h3: ({ children, ...props }: any) => (
-        <h3 className="text-lg font-semibold text-text-light dark:text-text-dark mb-2 mt-4 first:mt-0" {...props}>
+        <h3
+            className="text-lg font-semibold text-text-light dark:text-text-dark mb-2 mt-4 first:mt-0"
+            {...props}
+        >
             {children}
         </h3>
     ),
     h4: ({ children, ...props }: any) => (
-        <h4 className="text-base font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0" {...props}>
+        <h4
+            className="text-base font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
+            {...props}
+        >
             {children}
         </h4>
     ),
     h5: ({ children, ...props }: any) => (
-        <h5 className="text-sm font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0" {...props}>
+        <h5
+            className="text-base font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
+            {...props}
+        >
             {children}
         </h5>
     ),
     h6: ({ children, ...props }: any) => (
-        <h6 className="text-xs font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0" {...props}>
+        <h6
+            className="text-sm font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
+            {...props}
+        >
             {children}
         </h6>
     ),
     p: ({ children, ...props }: any) => (
-        <p className="text-sm text-text-light dark:text-text-dark mb-4 last:mb-0 leading-relaxed break-words overflow-wrap-anywhere" {...props}>
+        <p
+            className="text-base text-text-light dark:text-text-dark mb-4 last:mb-0 leading-relaxed break-words overflow-wrap-anywhere"
+            {...props}
+        >
             {children}
         </p>
     ),
     ul: ({ children, ...props }: any) => (
-        <ul className="list-disc list-outside text-sm text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2" {...props}>
+        <ul
+            className="list-disc list-outside text-base text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
+            {...props}
+        >
             {children}
         </ul>
     ),
     ol: ({ children, ...props }: any) => (
-        <ol className="list-decimal list-outside text-sm text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2" {...props}>
+        <ol
+            className="list-decimal list-outside text-base text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
+            {...props}
+        >
             {children}
         </ol>
     ),
     li: ({ children, ...props }: any) => (
-        <li className="text-sm text-text-light dark:text-text-dark leading-relaxed" {...props}>
+        <li
+            className="text-base text-text-light dark:text-text-dark leading-relaxed"
+            {...props}
+        >
             {children}
         </li>
     ),
@@ -318,7 +365,10 @@ const MarkdownComponents = {
     ),
     table: ({ children, ...props }: any) => (
         <div className="overflow-x-auto mb-4">
-            <table className="min-w-full border-collapse border border-gray-light dark:border-gray-dark" {...props}>
+            <table
+                className="min-w-full border-collapse border border-gray-light dark:border-gray-dark"
+                {...props}
+            >
                 {children}
             </table>
         </div>
@@ -329,30 +379,45 @@ const MarkdownComponents = {
         </thead>
     ),
     tbody: ({ children, ...props }: any) => (
-        <tbody className="divide-y divide-gray-light dark:divide-gray-dark" {...props}>
+        <tbody
+            className="divide-y divide-gray-light dark:divide-gray-dark"
+            {...props}
+        >
             {children}
         </tbody>
     ),
     tr: ({ children, ...props }: any) => (
-        <tr className="border-b border-gray-light dark:border-gray-dark" {...props}>
+        <tr
+            className="border-b border-gray-light dark:border-gray-dark"
+            {...props}
+        >
             {children}
         </tr>
     ),
     th: ({ children, ...props }: any) => (
-        <th className="px-4 py-2 text-left text-xs font-semibold text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark" {...props}>
+        <th
+            className="px-4 py-2 text-left text-sm font-semibold text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark"
+            {...props}
+        >
             {children}
         </th>
     ),
     td: ({ children, ...props }: any) => (
-        <td className="px-4 py-2 text-xs text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark" {...props}>
+        <td
+            className="px-4 py-2 text-sm text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark"
+            {...props}
+        >
             {children}
         </td>
     ),
     hr: ({ ...props }: any) => (
-        <hr className="border-gray-light dark:border-gray-dark my-6" {...props} />
+        <hr className="border-gray-300 dark:border-gray-800 my-6" {...props} />
     ),
     strong: ({ children, ...props }: any) => (
-        <strong className="font-semibold text-text-light dark:text-text-dark" {...props}>
+        <strong
+            className="font-semibold text-text-light dark:text-text-dark"
+            {...props}
+        >
             {children}
         </strong>
     ),
@@ -362,7 +427,10 @@ const MarkdownComponents = {
         </em>
     ),
     del: ({ children, ...props }: any) => (
-        <del className="line-through text-text-muted-light dark:text-text-muted-dark" {...props}>
+        <del
+            className="line-through text-text-muted-light dark:text-text-muted-dark"
+            {...props}
+        >
             {children}
         </del>
     ),
@@ -374,8 +442,11 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
             return (
                 <div className="flex justify-end mb-6 items-end">
                     <div className="max-w-[80%] bg-white dark:bg-gray-darker rounded-xl py-3 px-4 border border-gray-light dark:border-gray-dark mr-2 overflow-hidden">
-                        <div className="text-sm text-text-light dark:text-text-dark break-words overflow-wrap-anywhere">
-                            <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
+                        <div className="text-base text-text-light dark:text-text-dark break-words overflow-wrap-anywhere">
+                            <ReactMarkdown
+                                components={MarkdownComponents}
+                                remarkPlugins={[remarkGfm]}
+                            >
                                 {message.content}
                             </ReactMarkdown>
                         </div>
@@ -387,8 +458,11 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
         return (
             <div className="flex mb-6 items-start">
                 <div className="max-w-[100%] px-1 min-w-0">
-                    <div className="text-sm text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
-                        <ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
+                    <div className="text-base text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
+                        <ReactMarkdown
+                            components={MarkdownComponents}
+                            remarkPlugins={[remarkGfm]}
+                        >
                             {message.content}
                         </ReactMarkdown>
                     </div>
