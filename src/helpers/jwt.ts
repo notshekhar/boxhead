@@ -10,7 +10,10 @@ export const sign = (payload: any) => {
     })
 }
 
-export const verify = (token: string, schema: z.ZodSchema) => {
+export const verify = <T extends z.ZodTypeAny>(
+    token: string,
+    schema: T
+): z.infer<T> => {
     const decoded = jwt.verify(token, JWT_SECRET, {
         algorithms: ["HS256"],
     })

@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
+import { useAuth } from "./auth-context"
 
 interface Message {
     id: string
@@ -37,7 +38,11 @@ const chats = [
 ]
 
 export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
-    const [sidebarVisible, setSidebarVisible] = useState<boolean>(initialSidebarVisible)
+    const { user } = useAuth()
+
+    const [sidebarVisible, setSidebarVisible] = useState<boolean>(
+        initialSidebarVisible
+    )
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
     const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
@@ -65,7 +70,9 @@ export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
     // Save sidebar state to cookies whenever it changes
     useEffect(() => {
         if (!isMobile) {
-            document.cookie = `sidebarVisible=${sidebarVisible}; path=/; max-age=${60 * 60 * 24 * 365}` // 1 year
+            document.cookie = `sidebarVisible=${sidebarVisible}; path=/; max-age=${
+                60 * 60 * 24 * 365
+            }` // 1 year
         }
     }, [sidebarVisible, isMobile])
 
@@ -216,7 +223,7 @@ export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
                 {/* Messages container */}
                 <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
                     {messages.length === 0 ? (
-                        <EmptyState username="Shekhar" />
+                        <EmptyState username={user?.name || "Guest"} />
                     ) : (
                         <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
                             <div className="h-[50px]" />
@@ -250,4 +257,4 @@ export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
             </div>
         </div>
     )
-} 
+}

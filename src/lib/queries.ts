@@ -1,6 +1,16 @@
 import { db } from "@/db"
-import { chats, messages } from "@/db/schema"
+import { chats, messages, users } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
+
+export async function getUser(email: string) {
+    try {
+        const user = await db.select().from(users).where(eq(users.email, email))
+        return user[0]
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
+}
 
 export async function createChat(data: { userId: number; title: string }) {
     try {
