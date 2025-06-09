@@ -1,4 +1,12 @@
-import { date, integer, jsonb, pgTable, varchar } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
+import {
+    date,
+    integer,
+    jsonb,
+    pgTable,
+    uuid,
+    varchar,
+} from "drizzle-orm/pg-core"
 
 export const users = pgTable("users", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -9,13 +17,20 @@ export const users = pgTable("users", {
 })
 export const chats = pgTable("chats", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    pubId: uuid("pub_id")
+        .default(sql`gen_random_uuid()`)
+        .notNull()
+        .unique(), // pub_id
+    title: varchar({ length: 255 }).notNull(),
     userId: integer("user_id").references(() => users.id),
     createdAt: date("created_at").defaultNow().notNull(),
 })
 
 export const messages = pgTable("messages", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    chatId: integer("chat_id").references(() => chats.id),
+    chatId: integer("chat_id").references(() => chats.id, {
+        onDelete: "cascade",
+    }),
     userId: integer("user_id").references(() => users.id),
     role: varchar({ length: 255 }).notNull(),
     parts: jsonb("parts").notNull(),

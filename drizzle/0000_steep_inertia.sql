@@ -1,7 +1,9 @@
 CREATE TABLE "chats" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "chats_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"pub_id" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" integer,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_at" date DEFAULT now() NOT NULL,
+	CONSTRAINT "chats_pub_id_unique" UNIQUE("pub_id")
 );
 --> statement-breakpoint
 CREATE TABLE "messages" (

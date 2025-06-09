@@ -1,6 +1,6 @@
 {
-  "id": "3e469a3d-8902-420a-ad46-3e3e033e3299",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "8cd49e7f-6453-49d2-9f43-3ae6a5eff849",
+  "prevId": "3e469a3d-8902-420a-ad46-3e3e033e3299",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -31,6 +31,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
         },
         "user_id": {
           "name": "user_id",
