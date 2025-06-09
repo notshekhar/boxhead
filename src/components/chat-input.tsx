@@ -392,7 +392,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type your query here..."
+                        placeholder="Ask anything"
                         className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 my-auto resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
                         rows={1}
                         style={{ minHeight: "24px", maxHeight: "150px" }}
