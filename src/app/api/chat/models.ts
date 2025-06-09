@@ -1,7 +1,6 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 import { createOpenAI } from "@ai-sdk/openai"
 import { createAnthropic } from "@ai-sdk/anthropic"
-import { z } from "zod"
 
 const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
@@ -35,11 +34,6 @@ export enum ModelName {
     GPT_4O_MINI = "gpt-4o-mini",
     CLAUDE_3_5_SONNET = "claude-3.5-sonnet",
 }
-
-export const modelValidator = z.object({
-    model_provider: z.nativeEnum(ModelProvider),
-    model_name: z.nativeEnum(ModelName),
-})
 
 export const getModel = (
     model_provider: ModelProvider,

@@ -1,12 +1,7 @@
 import { CoreMessage, smoothStream, streamText } from "ai"
 import { assistantPrompt } from "./prompts"
-import {
-    getModel,
-    ModelName,
-    ModelProvider,
-    modelProviders,
-    modelValidator,
-} from "./models"
+import { getModel, ModelName, ModelProvider } from "./models"
+import { bodyValidator } from "./schema"
 
 export async function GET() {
     try {
@@ -27,10 +22,7 @@ export async function POST(request: Request) {
             model_name: ModelName
         }
 
-        const validate = modelValidator.safeParse({
-            model_name,
-            model_provider,
-        })
+        const validate = bodyValidator.safeParse(body)
 
         if (!validate.success) {
             return new Response(validate.error.message, { status: 400 })
