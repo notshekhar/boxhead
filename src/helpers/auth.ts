@@ -3,6 +3,7 @@ import { verify } from "./jwt"
 import { z } from "zod"
 
 const schema = z.object({
+    id: z.number(),
     email: z.string().email(),
     name: z.string(),
 })

@@ -35,9 +35,16 @@ export enum ModelName {
     CLAUDE_3_5_SONNET = "claude-3.5-sonnet",
 }
 
-export const getModel = (
-    model_provider: ModelProvider,
-    model_name: ModelName
-) => {
-    return modelProviders[model_provider](model_name)
+export const ModelProviderMapping = {
+    [ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20]: ModelProvider.GOOGLE,
+    [ModelName.GEMINI_2_0_FLASH]: ModelProvider.GOOGLE,
+    [ModelName.GEMINI_2_0_FLASH_LITE]: ModelProvider.GOOGLE,
+    [ModelName.GPT_4O]: ModelProvider.OPENAI,
+    [ModelName.GPT_4O_MINI]: ModelProvider.OPENAI,
+    [ModelName.CLAUDE_3_5_SONNET]: ModelProvider.ANTHROPIC,
+}
+
+export const getModel = (model: ModelName) => {
+    const provider = ModelProviderMapping[model]
+    return modelProviders[provider](model)
 }

@@ -78,6 +78,7 @@ export async function GET(request: Request) {
     }
 
     const token = sign({
+        id: user[0].id,
         email: user[0].email,
         name: user[0].name,
     })

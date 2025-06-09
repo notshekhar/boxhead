@@ -20,12 +20,17 @@ export async function getUser(email: string) {
     }
 }
 
-export async function createChat(data: { userId: number; title: string }) {
+export async function createChat(data: {
+    userId: number
+    title: string
+    pubId: string
+}) {
     try {
         const chat = await db
             .insert(chats)
             .values({
                 userId: data.userId,
+                pubId: data.pubId,
                 title: data.title,
             })
             .returning()

@@ -2,6 +2,9 @@ import { CoreMessage, smoothStream, streamText } from "ai"
 import { assistantPrompt } from "./prompts"
 import { getModel, ModelName, ModelProvider } from "./models"
 import { bodyValidator } from "./schema"
+import { auth } from "@/helpers/auth"
+import { createChat, getChat } from "@/lib/queries"
+import { generateChatTitle } from "@/helpers/ai"
 
 export async function GET() {
     try {
@@ -13,14 +16,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json()
+        const authUser = await auth()
 
-        let messages = body.messages as CoreMessage[]
-
-        const { model_provider, model_name } = body as {
-            model_provider: ModelProvider
-            model_name: ModelName
+        if (!authUser) {
+            return new Response("Unauthorized", { status: 401 })
         }
+
+        const body = await request.json()
 
         const validate = bodyValidator.safeParse(body)
 
@@ -28,22 +30,42 @@ export async function POST(request: Request) {
             return new Response(validate.error.message, { status: 400 })
         }
 
-        messages = [
+        const { model } = validate.data
+
+        let chatId = body.id
+
+        const chat = await getChat({
+            userId: authUser.id,
+            pubId: chatId,
+        })
+
+        if (!chat) {
+            const title = await generateChatTitle(model, validate.data.messages)
+
+            const newChat = await createChat({
+                userId: authUser.id,
+                title,
+                pubId: chatId,
+            })
+
+            chatId = newChat.pubId
+        }
+
+        const messages = [
             assistantPrompt({
-                modelProvider: model_provider,
-                modelName: model_name,
+                model,
             }),
-            ...messages,
+            ...validate.data.messages,
         ] as CoreMessage[]
 
         const stream = streamText({
-            model: getModel(model_provider, model_name),
+            model: getModel(model),
             messages,
             maxSteps: 5,
             maxRetries: 3,
             experimental_transform: smoothStream({
                 delayInMs: 20,
-                chunking: "line",
+                chunking: "word",
             }),
             onError: (error) => {
                 console.error(error)

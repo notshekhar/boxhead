@@ -16,12 +16,10 @@ export const users = pgTable("users", {
     password: varchar({ length: 255 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 })
+
 export const chats = pgTable("chats", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    pubId: uuid("pub_id")
-        .default(sql`gen_random_uuid()`)
-        .notNull()
-        .unique(), // pub_id
+    pubId: uuid("pub_id").notNull().unique(), // pub_id
     title: varchar({ length: 255 }).notNull(),
     userId: integer("user_id").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),

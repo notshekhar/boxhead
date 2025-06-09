@@ -1,12 +1,6 @@
 import { ModelName, ModelProvider } from "./models"
 
-export const assistantPrompt = ({
-    modelProvider,
-    modelName,
-}: {
-    modelProvider: ModelProvider
-    modelName: ModelName
-}) => {
+export const assistantPrompt = ({ model }: { model: ModelName }) => {
     return {
         role: "system",
         content: `You are boxhead, a helpful assistant that helps user with anything.
@@ -14,8 +8,7 @@ export const assistantPrompt = ({
 
     # Metadata
     - current time: ${new Date().toLocaleTimeString()}
-    - model provider: ${modelProvider}
-    - model name: ${modelName}
+    - model name: ${model}
 
     #Guidelines
     - Don't just randomly tell user the model name and provider, tell only when user asks
