@@ -88,7 +88,26 @@ export async function deleteChat(data: { userId: number; pubId: string }) {
     }
 }
 
-export async function createMessage(data: {
+export async function getMessages(data: { chatId: number; userId: number }) {
+    try {
+        const all_messages = await db
+            .select()
+            .from(messages)
+            .where(
+                and(
+                    eq(messages.chatId, data.chatId),
+                    eq(messages.userId, data.userId)
+                )
+            )
+
+        return all_messages
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
+}
+
+export async function saveMessage(data: {
     chatId: number
     userId: number
     role: string
@@ -98,20 +117,6 @@ export async function createMessage(data: {
     try {
         const message = await db.insert(messages).values(data).returning()
         return message[0]
-    } catch (error) {
-        console.error(error)
-        throw error
-    }
-}
-
-export async function getMessages(data: { chatId: number }) {
-    try {
-        const all_messages = await db
-            .select()
-            .from(messages)
-            .where(eq(messages.chatId, data.chatId))
-
-        return all_messages
     } catch (error) {
         console.error(error)
         throw error
