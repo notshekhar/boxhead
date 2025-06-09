@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
-import { useAuth } from "./auth-context"
+import { useAuth, User } from "./auth-context"
 
 interface Message {
     id: string
@@ -27,6 +27,7 @@ interface Chat {
 
 interface ChatPageProps {
     initialSidebarVisible: boolean
+    initialUser: User | null
 }
 
 const chats = [
@@ -37,8 +38,11 @@ const chats = [
     },
 ]
 
-export function ChatPage({ initialSidebarVisible }: ChatPageProps) {
-    const { user } = useAuth()
+export function ChatPage({
+    initialSidebarVisible,
+    initialUser,
+}: ChatPageProps) {
+    const { user } = useAuth(initialUser)
 
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(
         initialSidebarVisible

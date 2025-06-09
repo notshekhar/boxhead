@@ -9,6 +9,10 @@ export async function GET(request: Request) {
         }
         const user = await getUser(authUser.email)
 
+        if (!user) {
+            return new Response("User not found", { status: 404 })
+        }
+
         return new Response(JSON.stringify({ user }), { status: 200 })
     } catch (error) {
         console.error(error)

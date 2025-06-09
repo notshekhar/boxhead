@@ -4,11 +4,19 @@ import { and, eq } from "drizzle-orm"
 
 export async function getUser(email: string) {
     try {
-        const user = await db.select().from(users).where(eq(users.email, email))
+        const user = await db
+            .select({
+                id: users.id,
+                name: users.name,
+                email: users.email,
+                avatar: users.avatar,
+                createdAt: users.createdAt,
+            })
+            .from(users)
+            .where(eq(users.email, email))
         return user[0]
     } catch (error) {
-        console.error(error)
-        throw error
+        return null
     }
 }
 
