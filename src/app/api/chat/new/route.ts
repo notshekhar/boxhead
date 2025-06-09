@@ -46,11 +46,13 @@ export async function POST(request: Request) {
             }),
         })
 
-        const id = crypto.randomUUID()
+        // const chat = await createChat({
+        //     userId:
+        // })
 
         return new Response(
             JSON.stringify({
-                id,
+                id: "",
                 title: text.object.chatTitle,
             }),
             { status: 200 }
