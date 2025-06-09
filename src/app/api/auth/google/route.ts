@@ -1,53 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { generateCodeVerifier, generateState, Google } from "arctic"
+import { cookies } from "next/headers"
 
-// In-memory storage for Google users (in real app, this would be in your database)
-let googleUsers: any[] = []
+const google = new Google(
+    process.env.GOOGLE_CLIENT_ID!,
+    process.env.GOOGLE_CLIENT_SECRET!,
+    `${process.env.BASE_URL}/api/auth/google/callback`
+)
 
-export async function POST(request: NextRequest) {
-  try {
-    // In a real implementation, you would:
-    // 1. Verify the Google OAuth token
-    // 2. Get user info from Google's API
-    // 3. Create or find user in your database
-    
-    // For demo purposes, we'll simulate a successful Google login
-    const simulatedGoogleUser = {
-      id: 'google_' + Date.now(),
-      email: 'user@gmail.com',
-      name: 'Google User',
-      avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
-      createdAt: new Date().toISOString(),
-    }
+export async function GET(): Promise<Response> {
+    const state = generateState()
 
-    // Store the user (in real app, this would be saved to database)
-    googleUsers.push(simulatedGoogleUser)
+    const codeVerifier = generateCodeVerifier()
 
-    // Create session
-    const sessionToken = `session_${simulatedGoogleUser.id}_${Date.now()}`
-    
-    const response = NextResponse.json({
-      user: simulatedGoogleUser,
-      message: 'Google login successful'
+    const url = google.createAuthorizationURL(state, codeVerifier, [
+        "openid",
+        "profile",
+        "email",
+    ])
+
+    const cookieStore = await cookies()
+
+    cookieStore.set("google_oauth_state", state, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 10, // 10 minutes
+        sameSite: "lax",
     })
 
-    // Set cookie
-    response.cookies.set('auth-token', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+    cookieStore.set("google_code_verifier", codeVerifier, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 10, // 10 minutes
+        sameSite: "lax",
     })
 
-    return response
-
-  } catch (error) {
-    console.error('Google login error:', error)
-    return NextResponse.json(
-      { error: 'Google login failed' },
-      { status: 500 }
-    )
-  }
+    return Response.redirect(url.toString())
 }
-
-// Export the googleUsers array so it can be shared
-export { googleUsers } 

@@ -1,9 +1,9 @@
 import { sql } from "drizzle-orm"
 import {
-    date,
     integer,
     jsonb,
     pgTable,
+    timestamp,
     uuid,
     varchar,
 } from "drizzle-orm/pg-core"
@@ -14,7 +14,7 @@ export const users = pgTable("users", {
     email: varchar({ length: 255 }).notNull().unique(),
     avatar: varchar({ length: 255 }),
     password: varchar({ length: 255 }),
-    createdAt: date("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 export const chats = pgTable("chats", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -24,7 +24,7 @@ export const chats = pgTable("chats", {
         .unique(), // pub_id
     title: varchar({ length: 255 }).notNull(),
     userId: integer("user_id").references(() => users.id),
-    createdAt: date("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
 export const messages = pgTable("messages", {
@@ -36,5 +36,5 @@ export const messages = pgTable("messages", {
     role: varchar({ length: 255 }).notNull(),
     parts: jsonb("parts").notNull(),
     attachments: jsonb("attachments"),
-    createdAt: date("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 })
