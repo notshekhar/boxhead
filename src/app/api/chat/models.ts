@@ -40,3 +40,10 @@ export const modelValidator = z.object({
     model_provider: z.nativeEnum(ModelProvider),
     model_name: z.nativeEnum(ModelName),
 })
+
+export const getModel = (
+    model_provider: ModelProvider,
+    model_name: ModelName
+) => {
+    return modelProviders[model_provider](model_name)
+}

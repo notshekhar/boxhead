@@ -1,6 +1,7 @@
 import { CoreMessage, smoothStream, streamText } from "ai"
 import { assistantPrompt } from "./prompts"
 import {
+    getModel,
     ModelName,
     ModelProvider,
     modelProviders,
@@ -9,7 +10,6 @@ import {
 
 export async function GET() {
     try {
-        // create a new chat
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         ] as CoreMessage[]
 
         const stream = streamText({
-            model: modelProviders[model_provider](model_name),
+            model: getModel(model_provider, model_name),
             messages,
             maxSteps: 5,
             maxRetries: 3,
