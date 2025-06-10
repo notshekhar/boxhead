@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 
         let chatId = body.id
 
-        const chat = await getChat({
+        let chat = await getChat({
             userId: authUser.id,
             pubId: chatId,
         })
@@ -97,7 +97,11 @@ export async function POST(request: Request) {
                 pubId: chatId,
             })
 
-            chatId = newChat.pubId
+            chat = newChat
+        }
+
+        if (!chat || !chat.id) {
+            return new Response("Chat not found", { status: 404 })
         }
 
         const messages = [
