@@ -1,5 +1,5 @@
 import { getModel, ModelName } from "@/app/api/chat/models"
-import { CoreMessage, generateObject } from "ai"
+import { CoreMessage, generateObject, Message } from "ai"
 import { z } from "zod"
 
 export async function generateChatTitle(model: ModelName, messages: any[]) {
@@ -24,8 +24,8 @@ export async function generateChatTitle(model: ModelName, messages: any[]) {
             role: "system",
             content: prompt,
         },
-        messages,
-    ] as CoreMessage[]
+        ...messages,
+    ] as Message[]
 
     const response = await generateObject({
         model: getModel(model),

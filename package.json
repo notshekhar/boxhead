@@ -36,6 +36,7 @@
     "remark-gfm": "^4.0.1",
     "sequelize": "^6.37.7",
     "shiki": "^3.6.0",
+    "uuid": "^11.1.0",
     "zod": "^3.25.42"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",

@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { chats, messages, users } from "@/db/schema"
-import { and, eq } from "drizzle-orm"
+import { and, asc, eq } from "drizzle-orm"
 
 export async function getUser(email: string) {
     try {
@@ -134,12 +134,36 @@ export async function saveMessage(data: {
     chatId: number
     userId: number
     role: string
+    content: string
     parts: any[]
     attachments: any[]
 }) {
     try {
         const message = await db.insert(messages).values(data).returning()
         return message[0]
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
+}
+
+export async function getAllChatMessages(data: {
+    chatId: number
+    userId: number
+}) {
+    try {
+        const all_messages = await db
+            .select()
+            .from(messages)
+            .where(
+                and(
+                    eq(messages.chatId, data.chatId),
+                    eq(messages.userId, data.userId)
+                )
+            )
+            .orderBy(asc(messages.createdAt))
+
+        return all_messages
     } catch (error) {
         console.error(error)
         throw error

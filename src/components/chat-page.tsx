@@ -12,6 +12,7 @@ import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
+import { UIMessage } from "ai"
 
 interface Message {
     id: string
@@ -28,6 +29,11 @@ interface Chat {
 interface ChatPageProps {
     initialSidebarVisible: boolean
     initialUser: User | null
+    chatId: string
+    initialChat: {
+        chat: Chat
+        messages: UIMessage[]
+    } | null
 }
 
 const chats = [
@@ -41,6 +47,8 @@ const chats = [
 export function ChatPage({
     initialSidebarVisible,
     initialUser,
+    chatId,
+    initialChat,
 }: ChatPageProps) {
     const { user } = useAuth(initialUser)
 
@@ -85,14 +93,15 @@ export function ChatPage({
         api: "/api/chat",
         experimental_prepareRequestBody: ({ messages }) => {
             return {
-                model_provider: "google",
-                model_name: "gemini-2.5-flash-preview-05-20",
+                model: "gemini-2.5-flash-preview-05-20",
+                id: chatId,
                 messages,
             }
         },
         onError: (error) => {
             errorToast(error)
         },
+        initialMessages: initialChat?.messages || [],
         credentials: "include",
     })
 

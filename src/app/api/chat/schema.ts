@@ -2,12 +2,13 @@ import { z } from "zod"
 import { ModelName, ModelProvider } from "./models"
 
 const textPartSchema = z.object({
-    text: z.string(),
-    type: z.enum(["text"]),
+    type: z.string(),
+    text: z.string().optional(),
 })
 
 const messageSchema = z.object({
-    role: z.string(),
+    id: z.union([z.string(), z.number()]),
+    role: z.enum(["data", "user", "system", "assistant"]),
     content: z.string(),
     parts: z.array(textPartSchema),
     experimental_attachments: z

@@ -9,11 +9,46 @@ import { assistantPrompt } from "./prompts"
 import { getModel } from "./models"
 import { bodyValidator } from "./schema"
 import { auth } from "@/helpers/auth"
-import { createChat, getChat, saveMessage } from "@/lib/queries"
+import {
+    createChat,
+    getAllChatMessages,
+    getChat,
+    saveMessage,
+} from "@/lib/queries"
 import { generateChatTitle } from "@/helpers/ai"
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const authUser = await auth()
+
+        if (!authUser) {
+            return new Response("Unauthorized", { status: 401 })
+        }
+
+        const url = new URL(request.url)
+        const chatId = url.searchParams.get("chatId")
+
+        if (!chatId) {
+            return new Response("Chat ID is required", { status: 400 })
+        }
+
+        const chat = await getChat({
+            userId: authUser.id,
+            pubId: chatId,
+        })
+
+        const messages = await getAllChatMessages({
+            chatId: chat.id,
+            userId: authUser.id,
+        })
+
+        return new Response(
+            JSON.stringify({
+                chat: chat,
+                messages: messages,
+            }),
+            { status: 200 }
+        )
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })
@@ -36,8 +71,9 @@ export async function POST(request: Request) {
             return new Response(validate.error.message, { status: 400 })
         }
 
-        const lastMessage =
-            validate.data.messages[validate.data.messages.length - 1]
+        const lastMessage = validate.data.messages[
+            validate.data.messages.length - 1
+        ] as Message
 
         if (lastMessage.role !== "user") {
             return new Response("Invalid request", { status: 400 })
@@ -83,25 +119,27 @@ export async function POST(request: Request) {
             onError: (error) => {
                 console.error(error)
             },
-            onFinish: async ({ response }) => {
+            onFinish: async ({ response, text, steps }) => {
                 try {
                     await saveMessage({
-                        chatId,
+                        chatId: chat.id,
                         userId: authUser.id,
                         role: lastMessage.role,
-                        parts: lastMessage.parts,
+                        content: lastMessage.content,
+                        parts: lastMessage.parts ?? [],
                         attachments: lastMessage.experimental_attachments ?? [],
                     })
 
                     const [_, assistantMessage] = appendResponseMessages({
-                        messages: [...messages],
+                        messages: [lastMessage],
                         responseMessages: response.messages,
                     })
 
                     await saveMessage({
-                        chatId,
+                        chatId: chat.id,
                         userId: authUser.id,
                         role: "assistant",
+                        content: text,
                         parts: assistantMessage.parts ?? [],
                         attachments:
                             assistantMessage.experimental_attachments ?? [],
