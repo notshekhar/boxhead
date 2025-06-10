@@ -11,6 +11,7 @@ import { bodyValidator } from "./schema"
 import { auth } from "@/helpers/auth"
 import {
     createChat,
+    deleteChat,
     getAllChatMessages,
     getChat,
     saveMessage,
@@ -165,6 +166,42 @@ export async function POST(request: Request) {
         })
 
         return stream.toDataStreamResponse()
+    } catch (error) {
+        console.error(error)
+        return new Response("Internal Server Error", { status: 500 })
+    }
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const authUser = await auth()
+
+        if (!authUser) {
+            return new Response("Unauthorized", { status: 401 })
+        }
+
+        const url = new URL(request.url)
+        const chatId = url.searchParams.get("chatId")
+
+        if (!chatId) {
+            return new Response("Chat ID is required", { status: 400 })
+        }
+
+        const chat = await getChat({
+            userId: authUser.id,
+            pubId: chatId,
+        })
+
+        if (!chat) {
+            return new Response("Chat not found", { status: 404 })
+        }
+
+        await deleteChat({
+            pubId: chatId,
+            userId: authUser.id,
+        })
+
+        return new Response("Chat deleted", { status: 200 })
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })

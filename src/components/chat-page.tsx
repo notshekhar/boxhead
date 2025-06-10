@@ -1,7 +1,5 @@
 "use client"
 
-import { v4 as uuidv4 } from "uuid"
-
 import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { ChatMessage } from "@/components/chat-message"
 import { ChatInput } from "@/components/chat-input"
@@ -15,8 +13,8 @@ import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
 import { UIMessage } from "ai"
-import { redirect } from "next/navigation"
 import axios from "axios"
+import { redirect, useRouter } from "next/navigation"
 
 interface Chat {
     id: string
@@ -38,6 +36,8 @@ export function ChatPage({
     initialChats,
 }: ChatPageProps) {
     const { user } = useAuth(initialUser)
+
+    const router = useRouter()
 
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(
         initialSidebarVisible
@@ -136,13 +136,15 @@ export function ChatPage({
         onError: (error) => {
             errorToast(error)
         },
+        onResponse: () => {
+            if (typeof window !== "undefined") {
+                window.history.replaceState(null, "", `/chat/${chatId}`)
+                fetchChats()
+            }
+        },
         initialMessages: initialChat?.messages || [],
         credentials: "include",
     })
-
-    useEffect(() => {
-        fetchChats()
-    }, [messages.length])
 
     const handleToggleSidebar = () => {
         setSidebarVisible(!sidebarVisible)
@@ -156,8 +158,7 @@ export function ChatPage({
     }
 
     const handleNewChat = () => {
-        const chatId = uuidv4()
-        redirect(`/chat/${chatId}`)
+        redirect(`/`)
     }
 
     const scrollToBottom = () => {
@@ -216,6 +217,9 @@ export function ChatPage({
                 onToggleSidebar={handleToggleSidebar}
                 onOpenSearch={() => setShowSearchPopup(true)}
                 isOpen={sidebarVisible}
+                onDeleteChat={() => {
+                    fetchChats()
+                }}
             />
 
             {/* Main chat area */}
