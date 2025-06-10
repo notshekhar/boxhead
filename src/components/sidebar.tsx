@@ -41,6 +41,16 @@ MobileOverlay.displayName = "MobileOverlay"
 const UserInfo = React.memo(() => {
     const { user, openAuthPopup } = useAuth()
 
+    const handleLogout = async () => {
+        try {
+            await axios.get("/api/auth/logout")
+            // Reload the page to reset the auth state
+            window.location.reload()
+        } catch (error: unknown) {
+            errorToast(error)
+        }
+    }
+
     if (user) {
         return (
             <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
@@ -68,12 +78,31 @@ const UserInfo = React.memo(() => {
                         {user.name.charAt(0).toUpperCase()}
                     </span>
                 </div>
-                <div>
+                <div className="flex-1">
                     <h2 className="text-sm font-medium text-gray-800 dark:text-white">
                         {user.name}
                     </h2>
                     <p className="text-xs text-gray-400">Free</p>
                 </div>
+                <button
+                    onClick={handleLogout}
+                    className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors cursor-pointer"
+                    title="Logout"
+                >
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l4-4m0 0l-4-4m4 4H9"
+                        />
+                    </svg>
+                </button>
             </div>
         )
     }
