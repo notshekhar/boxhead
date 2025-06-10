@@ -1,9 +1,12 @@
 import React, { useState } from "react"
 import { useAuth } from "./auth-context"
+import { useRouter, usePathname } from "next/navigation"
 
 interface ChatItem {
     id: string
+    pubId: string
     title: string
+    createdAt?: string | Date
 }
 
 interface SidebarProps {
@@ -24,9 +27,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     isOpen = true,
 }) => {
     const { user, openAuthPopup } = useAuth()
-    const [todayExpanded, setTodayExpanded] = useState(true)
-    const [previousExpanded, setPreviousExpanded] = useState(true)
-    const [olderExpanded, setOlderExpanded] = useState(true)
+    const router = useRouter()
+    const pathname = usePathname()
+
+    // Extract the current chat pubId from the URL
+    const currentChatPubId = pathname.startsWith('/chat/') ? pathname.split('/chat/')[1] : null
 
     const handleSearchClick = () => {
         if (onOpenSearch) {
@@ -34,7 +39,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
     }
 
-    // We don't need to group chats as we're using static content for the demo
+    const handleChatClick = (pubId: string) => {
+        router.push(`/chat/${pubId}`)
+    }
 
     return (
         <>
@@ -57,21 +64,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {user ? (
                         <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30">
                             {user.avatar ? (
-                                <img 
-                                    src={user.avatar} 
+                                <img
+                                    src={user.avatar}
                                     alt={user.name}
                                     className="w-8 h-8 rounded-full mr-2 object-cover"
                                     referrerPolicy="no-referrer"
                                     crossOrigin="anonymous"
                                     onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                        if (fallback) fallback.style.display = 'flex';
+                                        e.currentTarget.style.display = "none"
+                                        const fallback = e.currentTarget
+                                            .nextElementSibling as HTMLElement
+                                        if (fallback)
+                                            fallback.style.display = "flex"
                                     }}
                                 />
                             ) : null}
-                            <div 
-                                className={`items-center justify-center w-8 h-8 rounded-full bg-gray-600 dark:bg-gray-700 text-white mr-2 ${user.avatar ? 'hidden' : 'flex'}`}
+                            <div
+                                className={`items-center justify-center w-8 h-8 rounded-full bg-gray-600 dark:bg-gray-700 text-white mr-2 ${
+                                    user.avatar ? "hidden" : "flex"
+                                }`}
                             >
                                 <span className="font-medium text-sm">
                                     {user.name.charAt(0).toUpperCase()}
@@ -199,144 +210,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {/* Chat list */}
                 <div className="flex-1 overflow-y-auto py-2 mt-2">
-                    {/* Today section */}
-                    <div className="px-3 mb-2">
-                        <div className="flex items-center justify-between px-2 py-1">
-                            <button
-                                onClick={() => setTodayExpanded(!todayExpanded)}
-                                className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={`h-3 w-3 mr-1 transition-transform duration-200 ${
-                                        todayExpanded
-                                            ? "transform rotate-0"
-                                            : "transform -rotate-90"
-                                    }`}
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                                Today
-                            </button>
-                        </div>
-
-                        {todayExpanded && (
-                            <div className="space-y-0.5 mt-1">
+                    <div className="px-3 space-y-0.5">
+                        {chats.map((chat) => {
+                            const isSelected = currentChatPubId === chat.pubId
+                            return (
                                 <button
-                                    onClick={() => onSelectChat("1")}
-                                    className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer"
-                                >
-                                    Wordle Game Canvas
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Previous 30 days section */}
-                    <div className="px-3 mb-2">
-                        <div className="flex items-center justify-between px-2 py-1">
-                            <button
-                                onClick={() =>
-                                    setPreviousExpanded(!previousExpanded)
-                                }
-                                className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={`h-3 w-3 mr-1 transition-transform duration-200 ${
-                                        previousExpanded
-                                            ? "transform rotate-0"
-                                            : "transform -rotate-90"
+                                    key={chat.id}
+                                    onClick={() => handleChatClick(chat.pubId)}
+                                    className={`w-full text-left px-2 py-2 rounded text-sm cursor-pointer transition-colors ${
+                                        isSelected
+                                            ? "bg-gray-200 dark:bg-[#2A2B32] text-gray-900 dark:text-white"
+                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-lighter dark:hover:bg-[#1E1F25]"
                                     }`}
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
                                 >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                                Previous 30 days
-                            </button>
-                        </div>
-
-                        {previousExpanded && (
-                            <div className="space-y-0.5 mt-1">
-                                <button className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
-                                    Snake Game Creation
+                                    <span className="truncate block">
+                                        {chat.title}
+                                    </span>
                                 </button>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Older section */}
-                    <div className="px-3">
-                        <div className="flex items-center justify-between px-2 py-1">
-                            <button
-                                onClick={() => setOlderExpanded(!olderExpanded)}
-                                className="flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={`h-3 w-3 mr-1 transition-transform duration-200 ${
-                                        olderExpanded
-                                            ? "transform rotate-0"
-                                            : "transform -rotate-90"
-                                    }`}
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                                Older
-                            </button>
-                        </div>
-
-                        {olderExpanded && (
-                            <div className="space-y-0.5 mt-1">
-                                {[
-                                    "Snake Game Tutorial",
-                                    "Chat Interface",
-                                    "Mistral Chat Interface",
-                                    "Random Text Inquiry",
-                                    "Random Text Inquiry",
-                                    "Random Text Assistance",
-                                    "Corrected Input",
-                                    "Random Text Inquiry",
-                                    "Random Text Inquiry",
-                                    "Random Text Inquiry",
-                                    "Correction Request",
-                                    "Random Text Inquiry",
-                                    "Invalid Input",
-                                    "Clarify Request",
-                                    "Typo Clarification",
-                                ].map((title, index) => (
-                                    <button
-                                        key={index}
-                                        className="w-full text-left px-2 py-2 rounded hover:bg-gray-lighter dark:hover:bg-[#1E1F25] text-gray-700 dark:text-gray-300 text-sm cursor-pointer"
-                                    >
-                                        {title}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                            )
+                        })}
                     </div>
                 </div>
 

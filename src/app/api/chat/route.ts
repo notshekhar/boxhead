@@ -37,6 +37,16 @@ export async function GET(request: Request) {
             pubId: chatId,
         })
 
+        if (!chat) {
+            return new Response(
+                JSON.stringify({
+                    chat: null,
+                    messages: [],
+                }),
+                { status: 200 }
+            )
+        }
+
         const messages = await getAllChatMessages({
             chatId: chat.id,
             userId: authUser.id,

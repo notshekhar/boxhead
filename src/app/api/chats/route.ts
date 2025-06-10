@@ -13,12 +13,8 @@ export async function GET(request: Request) {
 
         const { searchParams } = new URL(request.url)
 
-        const page = searchParams.get("page")
+        const page = searchParams.get("page") || 1
         const search = searchParams.get("search")
-
-        if (!page) {
-            return new Response("Bad Request", { status: 400 })
-        }
 
         const all_chats = await db
             .select({

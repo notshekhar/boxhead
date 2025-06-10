@@ -19,6 +19,7 @@ import { redirect } from "next/navigation"
 
 interface Chat {
     id: string
+    pubId: string
     title: string
 }
 
@@ -32,14 +33,6 @@ interface ChatPageProps {
     } | null
     initialChats: Chat[]
 }
-
-const chats = [
-    {
-        id: "1",
-        title: "Generate Image",
-        messages: [],
-    },
-]
 
 export function ChatPage({
     initialSidebarVisible,
@@ -164,12 +157,12 @@ export function ChatPage({
                 isOpen={showSearchPopup}
                 onClose={() => setShowSearchPopup(false)}
                 onSelectChat={() => {}}
-                recentChats={chats}
+                recentChats={initialChats}
             />
 
             {/* Sidebar - always rendered but positioned off-screen when not visible */}
             <Sidebar
-                chats={chats}
+                chats={initialChats}
                 onNewChat={handleNewChat}
                 onSelectChat={() => {}}
                 onToggleSidebar={handleToggleSidebar}
