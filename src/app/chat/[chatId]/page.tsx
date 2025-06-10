@@ -29,6 +29,21 @@ async function getChat(chatId: string, authToken: string) {
     }
 }
 
+export async function getChats(authToken: string) {
+    try {
+        const response = await axios.get(`${process.env.BASE_URL}/api/chats`, {
+            withCredentials: true,
+            headers: {
+                Cookie: `token=${authToken}`,
+            },
+        })
+        const data = response.data
+        return data
+    } catch (error) {
+        return null
+    }
+}
+
 export default async function Chat({ params }: ChatPageProps) {
     // Get sidebar visibility from cookies server-side
     const cookieStore = await cookies()
@@ -53,12 +68,15 @@ export default async function Chat({ params }: ChatPageProps) {
 
     const chat = await getChat(chatId, authToken?.value || "")
 
+    const chats = await getChats(authToken?.value || "")
+
     return (
         <ChatPage
             initialSidebarVisible={initialSidebarVisible}
             initialUser={user}
             chatId={chatId}
             initialChat={chat}
+            initialChats={chats?.chats || []}
         />
     )
 }

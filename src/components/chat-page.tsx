@@ -1,5 +1,7 @@
 "use client"
 
+import { v4 as uuidv4 } from "uuid"
+
 import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { ChatMessage } from "@/components/chat-message"
 import { ChatInput } from "@/components/chat-input"
@@ -13,17 +15,11 @@ import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
 import { UIMessage } from "ai"
-
-interface Message {
-    id: string
-    content: string
-    type: "user" | "ai"
-}
+import { redirect } from "next/navigation"
 
 interface Chat {
     id: string
     title: string
-    messages: Message[]
 }
 
 interface ChatPageProps {
@@ -34,6 +30,7 @@ interface ChatPageProps {
         chat: Chat
         messages: UIMessage[]
     } | null
+    initialChats: Chat[]
 }
 
 const chats = [
@@ -49,6 +46,7 @@ export function ChatPage({
     initialUser,
     chatId,
     initialChat,
+    initialChats,
 }: ChatPageProps) {
     const { user } = useAuth(initialUser)
 
@@ -117,11 +115,8 @@ export function ChatPage({
     }
 
     const handleNewChat = () => {
-        const newChat: Chat = {
-            id: Date.now().toString(),
-            title: "New Chat",
-            messages: [],
-        }
+        const chatId = uuidv4()
+        redirect(`/chat/${chatId}`)
     }
 
     const scrollToBottom = () => {
