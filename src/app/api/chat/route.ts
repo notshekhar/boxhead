@@ -6,7 +6,7 @@ import {
     streamText,
 } from "ai"
 import { assistantPrompt } from "./prompts"
-import { getModel, ModelName, ModelProvider } from "./models"
+import { getModel } from "./models"
 import { bodyValidator } from "./schema"
 import { auth } from "@/helpers/auth"
 import { createChat, getChat, saveMessage } from "@/lib/queries"
@@ -84,27 +84,31 @@ export async function POST(request: Request) {
                 console.error(error)
             },
             onFinish: async ({ response }) => {
-                await saveMessage({
-                    chatId,
-                    userId: authUser.id,
-                    role: lastMessage.role,
-                    parts: lastMessage.parts,
-                    attachments: lastMessage.experimental_attachments ?? [],
-                })
+                try {
+                    await saveMessage({
+                        chatId,
+                        userId: authUser.id,
+                        role: lastMessage.role,
+                        parts: lastMessage.parts,
+                        attachments: lastMessage.experimental_attachments ?? [],
+                    })
 
-                const [_, assistantMessage] = appendResponseMessages({
-                    messages: [...messages],
-                    responseMessages: response.messages,
-                })
+                    const [_, assistantMessage] = appendResponseMessages({
+                        messages: [...messages],
+                        responseMessages: response.messages,
+                    })
 
-                await saveMessage({
-                    chatId,
-                    userId: authUser.id,
-                    role: "assistant",
-                    parts: assistantMessage.parts ?? [],
-                    attachments:
-                        assistantMessage.experimental_attachments ?? [],
-                })
+                    await saveMessage({
+                        chatId,
+                        userId: authUser.id,
+                        role: "assistant",
+                        parts: assistantMessage.parts ?? [],
+                        attachments:
+                            assistantMessage.experimental_attachments ?? [],
+                    })
+                } catch (error) {
+                    console.error(error)
+                }
             },
         })
 
