@@ -1,9 +1,15 @@
-import { CoreMessage, smoothStream, streamText } from "ai"
+import {
+    appendResponseMessages,
+    CoreMessage,
+    Message,
+    smoothStream,
+    streamText,
+} from "ai"
 import { assistantPrompt } from "./prompts"
 import { getModel, ModelName, ModelProvider } from "./models"
 import { bodyValidator } from "./schema"
 import { auth } from "@/helpers/auth"
-import { createChat, getChat } from "@/lib/queries"
+import { createChat, getChat, saveMessage } from "@/lib/queries"
 import { generateChatTitle } from "@/helpers/ai"
 
 export async function GET() {
@@ -28,6 +34,13 @@ export async function POST(request: Request) {
 
         if (!validate.success) {
             return new Response(validate.error.message, { status: 400 })
+        }
+
+        const lastMessage =
+            validate.data.messages[validate.data.messages.length - 1]
+
+        if (lastMessage.role !== "user") {
+            return new Response("Invalid request", { status: 400 })
         }
 
         const { model } = validate.data
@@ -56,7 +69,7 @@ export async function POST(request: Request) {
                 model,
             }),
             ...validate.data.messages,
-        ] as CoreMessage[]
+        ] as Message[]
 
         const stream = streamText({
             model: getModel(model),
@@ -69,6 +82,29 @@ export async function POST(request: Request) {
             }),
             onError: (error) => {
                 console.error(error)
+            },
+            onFinish: async ({ response }) => {
+                await saveMessage({
+                    chatId,
+                    userId: authUser.id,
+                    role: lastMessage.role,
+                    parts: lastMessage.parts,
+                    attachments: lastMessage.experimental_attachments ?? [],
+                })
+
+                const [_, assistantMessage] = appendResponseMessages({
+                    messages: [...messages],
+                    responseMessages: response.messages,
+                })
+
+                await saveMessage({
+                    chatId,
+                    userId: authUser.id,
+                    role: "assistant",
+                    parts: assistantMessage.parts ?? [],
+                    attachments:
+                        assistantMessage.experimental_attachments ?? [],
+                })
             },
         })
 
