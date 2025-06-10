@@ -11,25 +11,7 @@ interface ChatPageProps {
     }
 }
 
-async function getChat(chatId: string, authToken: string) {
-    try {
-        const response = await axios.get(
-            `${process.env.BASE_URL}/api/chat?chatId=${chatId}`,
-            {
-                withCredentials: true,
-                headers: {
-                    Cookie: `token=${authToken}`,
-                },
-            }
-        )
-        const data = response.data
-        return data
-    } catch (error) {
-        return null
-    }
-}
-
-export async function getChats(authToken: string) {
+async function getChats(authToken: string) {
     try {
         const response = await axios.get(`${process.env.BASE_URL}/api/chats`, {
             withCredentials: true,
@@ -66,8 +48,6 @@ export default async function Chat({ params }: ChatPageProps) {
     const resolvedParams = await params
     const chatId = resolvedParams.chatId
 
-    const chat = await getChat(chatId, authToken?.value || "")
-
     const chats = await getChats(authToken?.value || "")
 
     return (
@@ -75,7 +55,6 @@ export default async function Chat({ params }: ChatPageProps) {
             initialSidebarVisible={initialSidebarVisible}
             initialUser={user}
             chatId={chatId}
-            initialChat={chat}
             initialChats={chats?.chats || []}
         />
     )

@@ -9,13 +9,14 @@ import { Sidebar } from "@/components/sidebar"
 import { EmptyState } from "@/components/empty-state"
 import { HeaderControls } from "@/components/header-controls"
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
 import { UIMessage } from "ai"
 import { redirect } from "next/navigation"
+import axios from "axios"
 
 interface Chat {
     id: string
@@ -27,10 +28,6 @@ interface ChatPageProps {
     initialSidebarVisible: boolean
     initialUser: User | null
     chatId: string
-    initialChat: {
-        chat: Chat
-        messages: UIMessage[]
-    } | null
     initialChats: Chat[]
 }
 
@@ -38,7 +35,6 @@ export function ChatPage({
     initialSidebarVisible,
     initialUser,
     chatId,
-    initialChat,
     initialChats,
 }: ChatPageProps) {
     const { user } = useAuth(initialUser)
@@ -49,6 +45,54 @@ export function ChatPage({
     const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
     const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
+    const [initialChat, setInitialChat] = useState<{
+        chat: Chat
+        messages: UIMessage[]
+    } | null>(null)
+
+    const [chats, setChats] = useState<Chat[]>(initialChats || [])
+
+    async function getChat(chatId: string) {
+        try {
+            const response = await axios.get(`/api/chat`, {
+                params: {
+                    chatId,
+                },
+                withCredentials: true,
+            })
+            const data = response.data
+            return data
+        } catch (error) {
+            return null
+        }
+    }
+
+    async function getChats() {
+        try {
+            const response = await axios.get("/api/chats", {
+                withCredentials: true,
+            })
+            const data = response.data
+            return data
+        } catch (error) {
+            return null
+        }
+    }
+
+    const fetchChat = useCallback(async () => {
+        const chat = await getChat(chatId)
+        setInitialChat(chat)
+    }, [chatId])
+
+    useEffect(() => {
+        fetchChat()
+    }, [chatId])
+
+    const fetchChats = useCallback(async () => {
+        const chats = await getChats()
+        setChats(chats?.chats || [])
+    }, [])
+
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     // Set mobile state based on screen size
@@ -95,6 +139,10 @@ export function ChatPage({
         initialMessages: initialChat?.messages || [],
         credentials: "include",
     })
+
+    useEffect(() => {
+        fetchChats()
+    }, [messages.length])
 
     const handleToggleSidebar = () => {
         setSidebarVisible(!sidebarVisible)
@@ -162,7 +210,7 @@ export function ChatPage({
 
             {/* Sidebar - always rendered but positioned off-screen when not visible */}
             <Sidebar
-                chats={initialChats}
+                chats={chats}
                 onNewChat={handleNewChat}
                 onSelectChat={() => {}}
                 onToggleSidebar={handleToggleSidebar}
