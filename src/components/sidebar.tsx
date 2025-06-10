@@ -199,40 +199,84 @@ const SearchButton = React.memo<{ onOpenSearch?: () => void }>(
 
 SearchButton.displayName = "SearchButton"
 
+// Delete Confirmation Modal Component
+const DeleteConfirmationModal = React.memo<{
+    isOpen: boolean
+    chatTitle: string
+    isDeleting: boolean
+    onConfirm: () => void
+    onCancel: () => void
+}>(({ isOpen, chatTitle, isDeleting, onConfirm, onCancel }) => {
+    if (!isOpen) return null
+
+    return (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-[#1E1F25] rounded-lg border border-gray-200 dark:border-gray-700/30 p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Delete Chat
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    Are you sure you want to delete "{chatTitle}"? This action cannot be undone.
+                </p>
+                <div className="flex space-x-3 justify-end">
+                    <button
+                        onClick={onCancel}
+                        disabled={isDeleting}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isDeleting}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                        {isDeleting ? (
+                            <>
+                                <svg
+                                    className="w-4 h-4 mr-2 animate-spin"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    />
+                                </svg>
+                                Deleting...
+                            </>
+                        ) : (
+                            "Delete"
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+})
+
+DeleteConfirmationModal.displayName = "DeleteConfirmationModal"
+
 // Chat Item Component
 const ChatItemComponent = React.memo<{
     chat: ChatItem
     isSelected: boolean
     onSelect: (pubId: string) => void
     onDelete: (pubId: string) => void
-}>(({ chat, isSelected, onSelect, onDelete }) => {
-    const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
-
+    onDeleteClick: (chat: ChatItem) => void
+}>(({ chat, isSelected, onSelect, onDeleteClick }) => {
     const handleDeleteClick = (e: React.MouseEvent) => {
         e.stopPropagation()
-        setShowConfirmDelete(true)
-    }
-
-    const handleConfirmDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation()
-        setIsDeleting(true)
-        try {
-            await axios.delete("/api/chat", {
-                params: { chatId: chat.pubId },
-            })
-            onDelete(chat.pubId)
-        } catch (error: unknown) {
-            errorToast(error)
-        } finally {
-            setIsDeleting(false)
-            setShowConfirmDelete(false)
-        }
-    }
-
-    const handleCancelDelete = (e: React.MouseEvent) => {
-        e.stopPropagation()
-        setShowConfirmDelete(false)
+        onDeleteClick(chat)
     }
 
     return (
@@ -246,92 +290,25 @@ const ChatItemComponent = React.memo<{
         >
             <span className="truncate block flex-1">{chat.title}</span>
 
-            {showConfirmDelete ? (
-                <div className="flex items-center space-x-1 ml-2">
-                    <button
-                        onClick={handleConfirmDelete}
-                        disabled={isDeleting}
-                        className="p-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-                        title="Confirm delete"
-                    >
-                        {isDeleting ? (
-                            <svg
-                                className="w-3 h-3 animate-spin"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                />
-                                <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                            </svg>
-                        ) : (
-                            <svg
-                                className="w-3 h-3"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
-                        )}
-                    </button>
-                    <button
-                        onClick={handleCancelDelete}
-                        disabled={isDeleting}
-                        className="p-1 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-                        title="Cancel delete"
-                    >
-                        <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </div>
-            ) : (
-                <button
-                    onClick={handleDeleteClick}
-                    className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 cursor-pointer"
-                    title="Delete chat"
+            <button
+                onClick={handleDeleteClick}
+                className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 cursor-pointer"
+                title="Delete chat"
+            >
+                <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
                 >
-                    <svg
-                        className="w-3 h-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                    </svg>
-                </button>
-            )}
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
         </div>
     )
 })
@@ -344,7 +321,8 @@ const ChatList = React.memo<{
     currentChatPubId: string | null
     onSelectChat: (pubId: string) => void
     onDeleteChat?: (pubId: string) => void
-}>(({ chats, currentChatPubId, onSelectChat, onDeleteChat }) => {
+    onDeleteClick: (chat: ChatItem) => void
+}>(({ chats, currentChatPubId, onSelectChat, onDeleteChat, onDeleteClick }) => {
     const router = useRouter()
 
     const handleChatClick = (pubId: string) => {
@@ -369,6 +347,7 @@ const ChatList = React.memo<{
                             isSelected={isSelected}
                             onSelect={handleChatClick}
                             onDelete={handleChatDelete}
+                            onDeleteClick={onDeleteClick}
                         />
                     )
                 })}
@@ -477,11 +456,58 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
         isOpen = true,
     }) => {
         const pathname = usePathname()
+        const [deleteModalData, setDeleteModalData] = useState<{
+            isOpen: boolean
+            chat: ChatItem | null
+            isDeleting: boolean
+        }>({
+            isOpen: false,
+            chat: null,
+            isDeleting: false,
+        })
 
         // Extract the current chat pubId from the URL
         const currentChatPubId = pathname.startsWith("/chat/")
             ? pathname.split("/chat/")[1]
             : null
+
+        const handleDeleteClick = (chat: ChatItem) => {
+            setDeleteModalData({
+                isOpen: true,
+                chat: chat,
+                isDeleting: false,
+            })
+        }
+
+        const handleConfirmDelete = async () => {
+            if (!deleteModalData.chat) return
+
+            setDeleteModalData(prev => ({ ...prev, isDeleting: true }))
+            try {
+                await axios.delete("/api/chat", {
+                    params: { chatId: deleteModalData.chat.pubId },
+                })
+                if (onDeleteChat) {
+                    onDeleteChat(deleteModalData.chat.pubId)
+                }
+                setDeleteModalData({
+                    isOpen: false,
+                    chat: null,
+                    isDeleting: false,
+                })
+            } catch (error: unknown) {
+                errorToast(error)
+                setDeleteModalData(prev => ({ ...prev, isDeleting: false }))
+            }
+        }
+
+        const handleCancelDelete = () => {
+            setDeleteModalData({
+                isOpen: false,
+                chat: null,
+                isDeleting: false,
+            })
+        }
 
         return (
             <>
@@ -508,6 +534,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
                         currentChatPubId={currentChatPubId}
                         onSelectChat={onSelectChat}
                         onDeleteChat={onDeleteChat}
+                        onDeleteClick={handleDeleteClick}
                     />
 
                     <style jsx global>{`
@@ -532,6 +559,15 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
                         }
                     `}</style>
                 </div>
+
+                {/* Full-screen Delete Confirmation Modal */}
+                <DeleteConfirmationModal
+                    isOpen={deleteModalData.isOpen}
+                    chatTitle={deleteModalData.chat?.title || ""}
+                    isDeleting={deleteModalData.isDeleting}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={handleCancelDelete}
+                />
             </>
         )
     }
