@@ -258,91 +258,89 @@ const CodeBlock = React.memo(({ children, className, ...props }: any) => {
 })
 
 const MarkdownComponents = {
-    h1: React.memo(({ children, ...props }: any) => (
+    h1: ({ children, ...props }: any) => (
         <h1
             className="text-2xl font-bold text-text-light dark:text-text-dark mb-4 mt-6 first:mt-0"
             {...props}
         >
             {children}
         </h1>
-    )),
-    h2: React.memo(({ children, ...props }: any) => (
+    ),
+    h2: ({ children, ...props }: any) => (
         <h2
             className="text-xl font-bold text-text-light dark:text-text-dark mb-3 mt-5 first:mt-0"
             {...props}
         >
             {children}
         </h2>
-    )),
-    h3: React.memo(({ children, ...props }: any) => (
+    ),
+    h3: ({ children, ...props }: any) => (
         <h3
             className="text-lg font-semibold text-text-light dark:text-text-dark mb-2 mt-4 first:mt-0"
             {...props}
         >
             {children}
         </h3>
-    )),
-    h4: React.memo(({ children, ...props }: any) => (
+    ),
+    h4: ({ children, ...props }: any) => (
         <h4
             className="text-base font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
             {...props}
         >
             {children}
         </h4>
-    )),
-    h5: React.memo(({ children, ...props }: any) => (
+    ),
+    h5: ({ children, ...props }: any) => (
         <h5
             className="text-base font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
             {...props}
         >
             {children}
         </h5>
-    )),
-    h6: React.memo(({ children, ...props }: any) => (
+    ),
+    h6: ({ children, ...props }: any) => (
         <h6
             className="text-sm font-semibold text-text-light dark:text-text-dark mb-2 mt-3 first:mt-0"
             {...props}
         >
             {children}
         </h6>
-    )),
-    p: React.memo(({ children, ...props }: any) => (
+    ),
+    p: ({ children, ...props }: any) => (
         <p
             className="text-base text-text-light dark:text-text-dark mb-4 last:mb-0 leading-relaxed break-words overflow-wrap-anywhere"
             {...props}
         >
             {children}
         </p>
-    )),
-    ul: React.memo(({ children, ...props }: any) => (
+    ),
+    ul: ({ children, ...props }: any) => (
         <ul
             className="list-disc list-outside text-base text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
             {...props}
         >
             {children}
         </ul>
-    )),
-    ol: React.memo(({ children, ...props }: any) => (
+    ),
+    ol: ({ children, ...props }: any) => (
         <ol
             className="list-decimal list-outside text-base text-text-light dark:text-text-dark mb-4 space-y-2 pl-6 ml-2"
             {...props}
         >
             {children}
         </ol>
-    )),
-    li: React.memo(({ children, ...props }: any) => (
+    ),
+    li: ({ children, ...props }: any) => (
         <li
             className="text-base text-text-light dark:text-text-dark leading-relaxed"
             {...props}
         >
             {children}
         </li>
-    )),
+    ),
     code: CodeBlock,
-    pre: React.memo(({ children, ...props }: any) => (
-        <pre {...props}>{children}</pre>
-    )),
-    a: React.memo(({ children, href, ...props }: any) => (
+    pre: ({ children, ...props }: any) => <pre {...props}>{children}</pre>,
+    a: ({ children, href, ...props }: any) => (
         <a
             href={href}
             target="_blank"
@@ -352,16 +350,16 @@ const MarkdownComponents = {
         >
             {children}
         </a>
-    )),
-    blockquote: React.memo(({ children, ...props }: any) => (
+    ),
+    blockquote: ({ children, ...props }: any) => (
         <blockquote
             className="border-l-4 border-accent-blue bg-gray-lighter dark:bg-gray-darker pl-4 py-2 mb-4 italic text-text-muted-light dark:text-text-muted-dark"
             {...props}
         >
             {children}
         </blockquote>
-    )),
-    table: React.memo(({ children, ...props }: any) => (
+    ),
+    table: ({ children, ...props }: any) => (
         <div className="overflow-x-auto mb-4">
             <table
                 className="min-w-full border-collapse border border-gray-light dark:border-gray-dark"
@@ -370,68 +368,68 @@ const MarkdownComponents = {
                 {children}
             </table>
         </div>
-    )),
-    thead: React.memo(({ children, ...props }: any) => (
+    ),
+    thead: ({ children, ...props }: any) => (
         <thead className="bg-gray-lighter dark:bg-gray-darker" {...props}>
             {children}
         </thead>
-    )),
-    tbody: React.memo(({ children, ...props }: any) => (
+    ),
+    tbody: ({ children, ...props }: any) => (
         <tbody
             className="divide-y divide-gray-light dark:divide-gray-dark"
             {...props}
         >
             {children}
         </tbody>
-    )),
-    tr: React.memo(({ children, ...props }: any) => (
+    ),
+    tr: ({ children, ...props }: any) => (
         <tr
             className="border-b border-gray-light dark:border-gray-dark"
             {...props}
         >
             {children}
         </tr>
-    )),
-    th: React.memo(({ children, ...props }: any) => (
+    ),
+    th: ({ children, ...props }: any) => (
         <th
             className="px-4 py-2 text-left text-sm font-semibold text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark"
             {...props}
         >
             {children}
         </th>
-    )),
-    td: React.memo(({ children, ...props }: any) => (
+    ),
+    td: ({ children, ...props }: any) => (
         <td
             className="px-4 py-2 text-sm text-text-light dark:text-text-dark border border-gray-light dark:border-gray-dark"
             {...props}
         >
             {children}
         </td>
-    )),
-    hr: React.memo(({ ...props }: any) => (
+    ),
+    hr: ({ ...props }: any) => (
         <hr className="border-gray-300 dark:border-gray-800 my-6" {...props} />
-    )),
-    strong: React.memo(({ children, ...props }: any) => (
+    ),
+    strong: ({ children, ...props }: any) => (
         <strong
             className="font-semibold text-text-light dark:text-text-dark"
             {...props}
         >
             {children}
         </strong>
-    )),
-    em: React.memo(({ children, ...props }: any) => (
+    ),
+    em: ({ children, ...props }: any) => (
         <em className="italic text-text-light dark:text-text-dark" {...props}>
             {children}
         </em>
-    )),
-    del: React.memo(({ children, ...props }: any) => (
+    ),
+    del: ({ children, ...props }: any) => (
         <del
             className="line-through text-text-muted-light dark:text-text-muted-dark"
             {...props}
         >
             {children}
         </del>
-    )),
+    ),
 }
 
 export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
