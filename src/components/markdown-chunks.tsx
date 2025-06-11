@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm"
 import { codeToHtml } from "shiki"
 import { useTheme } from "next-themes"
 import { CopyButton } from "./common"
+import { marked } from "marked"
 
 /**
  * I have converted text-sm to text-base
@@ -63,11 +64,12 @@ const getLanguageDisplayName = (language: string): string => {
 
     return languageMap[language.toLowerCase()] || language.toUpperCase()
 }
-
 // Custom code block component with syntax highlighting
 const CodeBlock = React.memo(({ children, className, ...props }: any) => {
     const { theme, resolvedTheme } = useTheme()
+
     const [highlightedCode, setHighlightedCode] = useState<string>("")
+
     const match = /language-(\w+)/.exec(className || "")
     const language = match ? match[1] : ""
     const isInline = !className?.includes("language-")
@@ -343,7 +345,7 @@ const MarkdownComponents = {
     ),
 }
 
-export const MemoizedMarkdown = React.memo(
+const ReactMarkdownMemo = React.memo(
     ({ children, ...props }: any) => {
         return (
             <ReactMarkdown
@@ -355,10 +357,28 @@ export const MemoizedMarkdown = React.memo(
             </ReactMarkdown>
         )
     },
-    (prevProps, nextProps) => {
-        if (prevProps.content !== nextProps.content) {
-            return false
-        }
-        return true
-    }
+    (prevProps, nextProps) => prevProps.children === nextProps.children
+)
+
+export const MemoizedMarkdown = React.memo(
+    ({ children }: any) => {
+        const tokens = React.useMemo(() => marked.lexer(children), [children])
+
+        return (
+            <>
+                {tokens.map((token: any, index: number) => {
+                    return (
+                        <ReactMarkdownMemo
+                            components={MarkdownComponents}
+                            remarkPlugins={[remarkGfm]}
+                            key={index}
+                        >
+                            {token.raw}
+                        </ReactMarkdownMemo>
+                    )
+                })}
+            </>
+        )
+    },
+    (prevProps, nextProps) => prevProps.children === nextProps.children
 )

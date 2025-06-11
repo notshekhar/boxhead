@@ -321,7 +321,7 @@ export const ChatPage = React.memo(
                         <ChatInput
                             input={input}
                             setInput={setInput}
-                            onSendMessage={() => withAuth(handleSubmit)}
+                            onSendMessage={() => handleSubmit()}
                             isLoading={isLoading}
                         />
                     </div>

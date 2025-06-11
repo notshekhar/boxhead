@@ -68,11 +68,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
-        const authUser = await auth()
+        // const authUser = await auth()
 
-        if (!authUser) {
-            return new Response("Unauthorized", { status: 401 })
-        }
+        // if (!authUser) {
+        //     return new Response("Unauthorized", { status: 401 })
+        // }
 
         const body = await request.json()
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         let chatId = body.id
 
         let chat = await getChat({
-            userId: authUser.id,
+            userId: 1,
             pubId: chatId,
         })
 
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
             const title = await generateChatTitle(model, validate.data.messages)
 
             const newChat = await createChat({
-                userId: authUser.id,
+                userId: 1,
                 title,
                 pubId: chatId,
             })
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
                 try {
                     await saveMessage({
                         chatId: chat.id,
-                        userId: authUser.id,
+                        userId: 1,
                         role: lastMessage.role,
                         content: lastMessage.content,
                         parts: lastMessage.parts ?? [],
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
 
                     await saveMessage({
                         chatId: chat.id,
-                        userId: authUser.id,
+                        userId: 1,
                         role: "assistant",
                         content: text,
                         parts: assistantMessage.parts ?? [],
