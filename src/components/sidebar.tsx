@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import { useAuth } from "./auth-context"
 import { useRouter, usePathname } from "next/navigation"
 import axios from "axios"
@@ -14,7 +14,6 @@ interface ChatItem {
 interface SidebarProps {
     chats: ChatItem[]
     onNewChat: () => void
-    onSelectChat: (chatId: string) => void
     onDeleteChat?: (chatId: string) => void
     onToggleSidebar: () => void
     onOpenSearch?: () => void
@@ -216,7 +215,8 @@ const DeleteConfirmationModal = React.memo<{
                     Delete Chat
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                    Are you sure you want to delete "{chatTitle}"? This action cannot be undone.
+                    Are you sure you want to delete "{chatTitle}"? This action
+                    cannot be undone.
                 </p>
                 <div className="flex space-x-3 justify-end">
                     <button
@@ -319,10 +319,9 @@ ChatItemComponent.displayName = "ChatItemComponent"
 const ChatList = React.memo<{
     chats: ChatItem[]
     currentChatPubId: string | null
-    onSelectChat: (pubId: string) => void
     onDeleteChat?: (pubId: string) => void
     onDeleteClick: (chat: ChatItem) => void
-}>(({ chats, currentChatPubId, onSelectChat, onDeleteChat, onDeleteClick }) => {
+}>(({ chats, currentChatPubId, onDeleteChat, onDeleteClick }) => {
     const router = useRouter()
 
     const handleChatClick = (pubId: string) => {
@@ -449,7 +448,6 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
     ({
         chats,
         onNewChat,
-        onSelectChat,
         onDeleteChat,
         onToggleSidebar,
         onOpenSearch,
@@ -471,18 +469,18 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
             ? pathname.split("/chat/")[1]
             : null
 
-        const handleDeleteClick = (chat: ChatItem) => {
+        const handleDeleteClick = useCallback((chat: ChatItem) => {
             setDeleteModalData({
                 isOpen: true,
                 chat: chat,
                 isDeleting: false,
             })
-        }
+        }, [])
 
         const handleConfirmDelete = async () => {
             if (!deleteModalData.chat) return
 
-            setDeleteModalData(prev => ({ ...prev, isDeleting: true }))
+            setDeleteModalData((prev) => ({ ...prev, isDeleting: true }))
             try {
                 await axios.delete("/api/chat", {
                     params: { chatId: deleteModalData.chat.pubId },
@@ -497,17 +495,17 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
                 })
             } catch (error: unknown) {
                 errorToast(error)
-                setDeleteModalData(prev => ({ ...prev, isDeleting: false }))
+                setDeleteModalData((prev) => ({ ...prev, isDeleting: false }))
             }
         }
 
-        const handleCancelDelete = () => {
+        const handleCancelDelete = useCallback(() => {
             setDeleteModalData({
                 isOpen: false,
                 chat: null,
                 isDeleting: false,
             })
-        }
+        }, [])
 
         return (
             <>
@@ -532,7 +530,6 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
                     <ChatList
                         chats={chats}
                         currentChatPubId={currentChatPubId}
-                        onSelectChat={onSelectChat}
                         onDeleteChat={onDeleteChat}
                         onDeleteClick={handleDeleteClick}
                     />

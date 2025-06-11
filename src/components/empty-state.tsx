@@ -4,7 +4,7 @@ interface EmptyStateProps {
     username?: string
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
+export const EmptyState: React.FC<EmptyStateProps> = React.memo(({
     username = "there",
 }) => {
     const displayName = username === "there" ? "there" : username
@@ -33,4 +33,4 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             </div>
         </div>
     )
-}
+})

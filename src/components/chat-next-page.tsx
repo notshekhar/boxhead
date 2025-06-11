@@ -1,7 +1,4 @@
 import { v4 as uuidv4 } from "uuid"
-import { User } from "@/components/auth-context"
-import { auth } from "@/helpers/auth"
-import { getUser } from "@/lib/queries"
 import axios from "axios"
 import { cookies } from "next/headers"
 import { ChatPage } from "./chat-page"
@@ -37,8 +34,6 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
     // Default to true for desktop if no cookie is set
     const initialSidebarVisible =
         sidebarCookie?.value === "false" ? false : true
-
-    
 
     const resolvedParams = await params
 

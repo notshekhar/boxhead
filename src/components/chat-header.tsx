@@ -4,7 +4,7 @@ interface ChatHeaderProps {
     title: string
 }
 
-export const ChatHeader: React.FC<ChatHeaderProps> = ({ title }) => {
+export const ChatHeader: React.FC<ChatHeaderProps> = React.memo(({ title }) => {
     return (
         <div>
             <div className="flex items-center">
@@ -29,4 +29,4 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ title }) => {
             </div>
         </div>
     )
-}
+})

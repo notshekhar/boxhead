@@ -1,5 +1,6 @@
 "use client"
 
+import { v4 as uuidv4 } from "uuid"
 import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { ChatMessage } from "@/components/chat-message"
 import { ChatInput } from "@/components/chat-input"
@@ -7,7 +8,7 @@ import { Sidebar } from "@/components/sidebar"
 import { EmptyState } from "@/components/empty-state"
 import { HeaderControls } from "@/components/header-controls"
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
-import { useState, useEffect, useRef, useCallback } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
@@ -28,298 +29,304 @@ interface ChatPageProps {
     initialChats: Chat[]
 }
 
-export function ChatPage({
-    initialSidebarVisible,
-    chatId,
-    initialChats,
-}: ChatPageProps) {
-    const { user, withAuth } = useAuth()
+export const ChatPage = React.memo(
+    ({ initialSidebarVisible, chatId, initialChats }: ChatPageProps) => {
+        const { user, withAuth } = useAuth()
 
-    const [sidebarVisible, setSidebarVisible] = useState<boolean>(
-        initialSidebarVisible
-    )
-    const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
-    const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false)
-    const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
-    const [initialChat, setInitialChat] = useState<{
-        chat: Chat
-        messages: UIMessage[]
-    } | null>(null)
-
-    const [chats, setChats] = useState<Chat[]>(initialChats || [])
-
-    async function getChat(chatId: string) {
-        try {
-            const response = await axios.get(`/api/chat`, {
-                params: {
-                    chatId,
-                },
-                withCredentials: true,
-            })
-            const data = response.data
-            return data
-        } catch (error) {
-            return null
-        }
-    }
-
-    async function getChats() {
-        try {
-            const response = await axios.get("/api/chats", {
-                withCredentials: true,
-            })
-            const data = response.data
-            return data
-        } catch (error) {
-            return null
-        }
-    }
-
-    const fetchChat = useCallback(async () => {
-        const chat = await getChat(chatId)
-        if (!chat && window.location.pathname !== "/") {
-            redirect("/")
-        }
-        setInitialChat(chat)
-    }, [chatId])
-
-    useEffect(() => {
-        fetchChat()
-    }, [chatId])
-
-    const fetchChats = useCallback(async () => {
-        const chats = await getChats()
-        setChats(chats?.chats || [])
-    }, [])
-
-    useEffect(() => {
-        fetchChats()
-    }, [user])
-
-    const messagesEndRef = useRef<HTMLDivElement>(null)
-
-    // Set mobile state based on screen size
-    useEffect(() => {
-        const handleResize = () => {
-            const mobile = window.innerWidth < 768 // md breakpoint
-            setIsMobile(mobile)
-
-            // On mobile, always hide sidebar; on desktop, use cookie state
-            if (mobile) {
-                setSidebarVisible(false)
-            }
-        }
-
-        // Set initial state
-        handleResize()
-
-        window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
-    }, [])
-
-    // Save sidebar state to cookies whenever it changes
-    useEffect(() => {
-        if (!isMobile) {
-            document.cookie = `sidebarVisible=${sidebarVisible}; path=/; max-age=${
-                60 * 60 * 24 * 365
-            }` // 1 year
-        }
-    }, [sidebarVisible, isMobile])
-
-    // useChat hook for API integration
-    const { messages, input, setInput, handleSubmit, isLoading } = useChat({
-        api: "/api/chat",
-        experimental_prepareRequestBody: ({ messages }) => {
-            return {
-                model: "gemini-2.5-flash-preview-05-20",
-                id: chatId,
-                messages,
-            }
-        },
-        onError: (error) => {
-            errorToast(error)
-        },
-        onResponse: () => {
-            if (typeof window !== "undefined") {
-                window.history.replaceState(null, "", `/chat/${chatId}`)
-                fetchChats()
-            }
-        },
-        initialMessages: initialChat?.messages || [],
-        credentials: "include",
-    })
-
-    const handleToggleSidebar = () => {
-        setSidebarVisible(!sidebarVisible)
-    }
-
-    // Close sidebar when clicking outside on mobile
-    const handleBackdropClick = () => {
-        if (isMobile) {
-            setSidebarVisible(false)
-        }
-    }
-
-    const handleNewChat = () => {
-        redirect(`/`)
-    }
-
-    const scrollToBottom = () => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({
-                behavior: "smooth",
-            })
-        }
-    }
-
-    useEffect(() => {
-        if (isLoading) {
-            scrollToBottom()
-        }
-    }, [isLoading])
-
-    // Monitor when the messages end div is in view
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                // Show scroll-to-bottom button when the end div is NOT in view
-                setShowScrollToBottom(!entry.isIntersecting)
-            },
-            {
-                threshold: 0.1, // Trigger when at least 10% is visible
-                rootMargin: "0px 0px -50px 0px", // Add some margin to trigger earlier
-            }
+        const [sidebarVisible, setSidebarVisible] = useState<boolean>(
+            initialSidebarVisible
         )
+        const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
+        const [showScrollToBottom, setShowScrollToBottom] =
+            useState<boolean>(false)
+        const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
+        const [initialChat, setInitialChat] = useState<{
+            chat: Chat
+            messages: UIMessage[]
+        } | null>(null)
 
-        if (messagesEndRef.current) {
-            observer.observe(messagesEndRef.current)
-        }
+        const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
-        return () => {
-            if (messagesEndRef.current) {
-                observer.unobserve(messagesEndRef.current)
+        async function getChat(chatId: string) {
+            try {
+                const response = await axios.get(`/api/chat`, {
+                    params: {
+                        chatId,
+                    },
+                    withCredentials: true,
+                })
+                const data = response.data
+                return data
+            } catch (error) {
+                return null
             }
         }
-    }, [messages.length]) // Re-run when messages change
 
-    return (
-        <div className="fixed inset-0 bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark">
-            {/* Search Popup */}
-            <SearchPopup
-                isOpen={showSearchPopup}
-                onClose={() => setShowSearchPopup(false)}
-                onSelectChat={() => {}}
-                recentChats={initialChats}
-            />
+        async function getChats() {
+            try {
+                const response = await axios.get("/api/chats", {
+                    withCredentials: true,
+                })
+                const data = response.data
+                return data
+            } catch (error) {
+                return null
+            }
+        }
 
-            {/* Sidebar - always rendered but positioned off-screen when not visible */}
-            <Sidebar
-                chats={chats}
-                onNewChat={handleNewChat}
-                onSelectChat={() => {}}
-                onToggleSidebar={handleToggleSidebar}
-                onOpenSearch={() => setShowSearchPopup(true)}
-                isOpen={sidebarVisible}
-                onDeleteChat={() => {
+        const fetchChat = useCallback(async () => {
+            const chat = await getChat(chatId)
+            if (!chat && window.location.pathname !== "/") {
+                redirect("/")
+            }
+            setInitialChat(chat)
+        }, [chatId])
+
+        useEffect(() => {
+            fetchChat()
+        }, [chatId])
+
+        const fetchChats = useCallback(async () => {
+            const chats = await getChats()
+            setChats(chats?.chats || [])
+        }, [])
+
+        useEffect(() => {
+            fetchChats()
+        }, [user])
+
+        const messagesEndRef = useRef<HTMLDivElement>(null)
+
+        // Set mobile state based on screen size
+        useEffect(() => {
+            const handleResize = () => {
+                const mobile = window.innerWidth < 768 // md breakpoint
+                setIsMobile(mobile)
+
+                // On mobile, always hide sidebar; on desktop, use cookie state
+                if (mobile) {
+                    setSidebarVisible(false)
+                }
+            }
+
+            // Set initial state
+            handleResize()
+
+            window.addEventListener("resize", handleResize)
+            return () => window.removeEventListener("resize", handleResize)
+        }, [])
+
+        // Save sidebar state to cookies whenever it changes
+        useEffect(() => {
+            if (!isMobile) {
+                document.cookie = `sidebarVisible=${sidebarVisible}; path=/; max-age=${
+                    60 * 60 * 24 * 365
+                }` // 1 year
+            }
+        }, [sidebarVisible, isMobile])
+
+        // useChat hook for API integration
+        const {
+            messages,
+            input,
+            setInput,
+            handleSubmit,
+            isLoading,
+            setMessages,
+        } = useChat({
+            api: "/api/chat",
+            experimental_prepareRequestBody: ({ messages }) => {
+                return {
+                    model: "gemini-2.5-flash-preview-05-20",
+                    id: chatId,
+                    messages,
+                }
+            },
+            onError: (error) => {
+                errorToast(error)
+            },
+            onResponse: () => {
+                if (typeof window !== "undefined") {
+                    window.history.replaceState(null, "", `/chat/${chatId}`)
                     fetchChats()
-                }}
-            />
+                }
+            },
+            initialMessages: initialChat?.messages || [],
+            credentials: "include",
+        })
 
-            {/* Main chat area */}
-            <div
-                className={`fixed h-full inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
-                    sidebarVisible ? "md:left-[260px] left-0" : "left-0"
-                }`}
-            >
-                {/* Header controls - always show on mobile, conditional on desktop */}
-                {!sidebarVisible || isMobile ? (
-                    <>
-                        <div className="absolute top-4 left-4 z-20">
-                            <HeaderControls
-                                key={`header-controls-${sidebarVisible}`}
-                                onToggleSidebar={handleToggleSidebar}
-                                onNewChat={handleNewChat}
-                                onOpenSearch={() => setShowSearchPopup(true)}
-                                isSidebarOpen={sidebarVisible}
+        const handleToggleSidebar = () => {
+            setSidebarVisible(!sidebarVisible)
+        }
+
+        const handleNewChat = () => {
+            // clean the chat from useChat hook
+            setInput("")
+            setMessages([])
+            setInitialChat(null)
+            setShowScrollToBottom(false)
+
+            redirect(`/`)
+        }
+
+        const scrollToBottom = () => {
+            if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({
+                    behavior: "smooth",
+                })
+            }
+        }
+
+        useEffect(() => {
+            if (isLoading) {
+                scrollToBottom()
+            }
+        }, [isLoading])
+
+        // Monitor when the messages end div is in view
+        useEffect(() => {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    // Show scroll-to-bottom button when the end div is NOT in view
+                    setShowScrollToBottom(!entry.isIntersecting)
+                },
+                {
+                    threshold: 0.1, // Trigger when at least 10% is visible
+                    rootMargin: "0px 0px -50px 0px", // Add some margin to trigger earlier
+                }
+            )
+
+            if (messagesEndRef.current) {
+                observer.observe(messagesEndRef.current)
+            }
+
+            return () => {
+                if (messagesEndRef.current) {
+                    observer.unobserve(messagesEndRef.current)
+                }
+            }
+        }, [messages.length]) // Re-run when messages change
+
+        return (
+            <div className="fixed inset-0 bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark">
+                {/* Search Popup */}
+                <SearchPopup
+                    isOpen={showSearchPopup}
+                    onClose={() => setShowSearchPopup(false)}
+                    onSelectChat={() => {}}
+                    recentChats={initialChats}
+                />
+
+                {/* Sidebar - always rendered but positioned off-screen when not visible */}
+                <Sidebar
+                    chats={chats}
+                    onNewChat={handleNewChat}
+                    onToggleSidebar={handleToggleSidebar}
+                    onOpenSearch={() => setShowSearchPopup(true)}
+                    isOpen={sidebarVisible}
+                    onDeleteChat={() => {
+                        fetchChats()
+                    }}
+                />
+
+                {/* Main chat area */}
+                <div
+                    className={`fixed h-full inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
+                        sidebarVisible ? "md:left-[260px] left-0" : "left-0"
+                    }`}
+                >
+                    {/* Header controls - always show on mobile, conditional on desktop */}
+                    {!sidebarVisible || isMobile ? (
+                        <>
+                            <div className="absolute top-4 left-4 z-20">
+                                <HeaderControls
+                                    key={`header-controls-${sidebarVisible}`}
+                                    onToggleSidebar={handleToggleSidebar}
+                                    onNewChat={handleNewChat}
+                                    onOpenSearch={() =>
+                                        setShowSearchPopup(true)
+                                    }
+                                    isSidebarOpen={sidebarVisible}
+                                />
+                            </div>
+                            <div className="absolute top-4 right-4 z-20">
+                                <ThemeToggleButton />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Sidebar toggle button positioned at the edge of the sidebar - desktop only */}
+                            <div
+                                className="fixed top-4 z-50 hidden md:block"
+                                style={{ left: "25px", top: "25px" }}
+                            >
+                                <button
+                                    onClick={handleToggleSidebar}
+                                    className="text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
+                                    style={{ transform: "translateX(-50%)" }}
+                                >
+                                    <svg
+                                        width="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className={`transition-transform duration-200 ${
+                                            sidebarVisible ? "" : "scale-x-[-1]"
+                                        }`}
+                                    >
+                                        <path
+                                            d="M9.35719 3H14.6428C15.7266 2.99999 16.6007 2.99998 17.3086 3.05782C18.0375 3.11737 18.6777 3.24318 19.27 3.54497C20.2108 4.02433 20.9757 4.78924 21.455 5.73005C21.7568 6.32234 21.8826 6.96253 21.9422 7.69138C22 8.39925 22 9.27339 22 10.3572V13.6428C22 14.7266 22 15.6008 21.9422 16.3086C21.8826 17.0375 21.7568 17.6777 21.455 18.27C20.9757 19.2108 20.2108 19.9757 19.27 20.455C18.6777 20.7568 18.0375 20.8826 17.3086 20.9422C16.6008 21 15.7266 21 14.6428 21H9.35717C8.27339 21 7.39925 21 6.69138 20.9422C5.96253 20.8826 5.32234 20.7568 4.73005 20.455C3.78924 19.9757 3.02433 19.2108 2.54497 18.27C2.24318 17.6777 2.11737 17.0375 2.05782 16.3086C1.99998 15.6007 1.99999 14.7266 2 13.6428V10.3572C1.99999 9.27341 1.99998 8.39926 2.05782 7.69138C2.11737 6.96253 2.24318 6.32234 2.54497 5.73005C3.02433 4.78924 3.78924 4.02433 4.73005 3.54497C5.32234 3.24318 5.96253 3.11737 6.69138 3.05782C7.39926 2.99998 8.27341 2.99999 9.35719 3ZM6.85424 5.05118C6.24907 5.10062 5.90138 5.19279 5.63803 5.32698C5.07354 5.6146 4.6146 6.07354 4.32698 6.63803C4.19279 6.90138 4.10062 7.24907 4.05118 7.85424C4.00078 8.47108 4 9.26339 4 10.4V13.6C4 14.7366 4.00078 15.5289 4.05118 16.1458C4.10062 16.7509 4.19279 17.0986 4.32698 17.362C4.6146 17.9265 5.07354 18.3854 5.63803 18.673C5.90138 18.8072 6.24907 18.8994 6.85424 18.9488C7.47108 18.9992 8.26339 19 9.4 19H14.6C15.7366 19 16.5289 18.9992 17.1458 18.9488C17.7509 18.8994 18.0986 18.8072 18.362 18.673C18.9265 18.3854 19.3854 17.9265 19.673 17.362C19.8072 17.0986 19.8994 16.7509 19.9488 16.1458C19.9992 15.5289 20 14.7366 20 13.6V10.4C20 9.26339 19.9992 8.47108 19.9488 7.85424C19.8994 7.24907 19.8072 6.90138 19.673 6.63803C19.3854 6.07354 18.9265 5.6146 18.362 5.32698C18.0986 5.19279 17.7509 5.10062 17.1458 5.05118C16.5289 5.00078 15.7366 5 14.6 5H9.4C8.26339 5 7.47108 5.00078 6.85424 5.05118ZM7 7C7.55229 7 8 7.44772 8 8V16C8 16.5523 7.55229 17 7 17C6.44772 17 6 16.5523 6 16V8C6 7.44772 6.44772 7 7 7Z"
+                                            fill="currentColor"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="absolute top-4 right-4 z-20">
+                                <ThemeToggleButton />
+                            </div>
+                        </>
+                    )}
+                    {/* Messages container */}
+                    <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
+                        {messages.length === 0 ? (
+                            <EmptyState username={user?.name || "Guest"} />
+                        ) : (
+                            <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
+                                <div className="h-[50px]" />
+                                {messages.map((message, index) => (
+                                    <ChatMessage
+                                        key={message.id}
+                                        message={message}
+                                        isLoading={
+                                            isLoading &&
+                                            message.role === "assistant" &&
+                                            index === messages.length - 1
+                                        }
+                                    />
+                                ))}
+                                {isLoading && "Thinking..."}
+                                <div ref={messagesEndRef} />
+                                <div className="h-[100px]" />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="absolute bottom-0 left-0 right-0 bg-transparent z-50">
+                        <div className="px-3 sm:px-4 md:px-8 lg:px-16 max-w-[850px] mx-auto w-full">
+                            <ScrollToBottomButton
+                                onClick={scrollToBottom}
+                                isVisible={showScrollToBottom}
                             />
                         </div>
-                        <div className="absolute top-4 right-4 z-20">
-                            <ThemeToggleButton />
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Sidebar toggle button positioned at the edge of the sidebar - desktop only */}
-                        <div
-                            className="fixed top-4 z-50 hidden md:block"
-                            style={{ left: "25px", top: "25px" }}
-                        >
-                            <button
-                                onClick={handleToggleSidebar}
-                                className="text-gray-600 dark:text-gray-300 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
-                                style={{ transform: "translateX(-50%)" }}
-                            >
-                                <svg
-                                    width="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className={`transition-transform duration-200 ${
-                                        sidebarVisible ? "" : "scale-x-[-1]"
-                                    }`}
-                                >
-                                    <path
-                                        d="M9.35719 3H14.6428C15.7266 2.99999 16.6007 2.99998 17.3086 3.05782C18.0375 3.11737 18.6777 3.24318 19.27 3.54497C20.2108 4.02433 20.9757 4.78924 21.455 5.73005C21.7568 6.32234 21.8826 6.96253 21.9422 7.69138C22 8.39925 22 9.27339 22 10.3572V13.6428C22 14.7266 22 15.6008 21.9422 16.3086C21.8826 17.0375 21.7568 17.6777 21.455 18.27C20.9757 19.2108 20.2108 19.9757 19.27 20.455C18.6777 20.7568 18.0375 20.8826 17.3086 20.9422C16.6008 21 15.7266 21 14.6428 21H9.35717C8.27339 21 7.39925 21 6.69138 20.9422C5.96253 20.8826 5.32234 20.7568 4.73005 20.455C3.78924 19.9757 3.02433 19.2108 2.54497 18.27C2.24318 17.6777 2.11737 17.0375 2.05782 16.3086C1.99998 15.6007 1.99999 14.7266 2 13.6428V10.3572C1.99999 9.27341 1.99998 8.39926 2.05782 7.69138C2.11737 6.96253 2.24318 6.32234 2.54497 5.73005C3.02433 4.78924 3.78924 4.02433 4.73005 3.54497C5.32234 3.24318 5.96253 3.11737 6.69138 3.05782C7.39926 2.99998 8.27341 2.99999 9.35719 3ZM6.85424 5.05118C6.24907 5.10062 5.90138 5.19279 5.63803 5.32698C5.07354 5.6146 4.6146 6.07354 4.32698 6.63803C4.19279 6.90138 4.10062 7.24907 4.05118 7.85424C4.00078 8.47108 4 9.26339 4 10.4V13.6C4 14.7366 4.00078 15.5289 4.05118 16.1458C4.10062 16.7509 4.19279 17.0986 4.32698 17.362C4.6146 17.9265 5.07354 18.3854 5.63803 18.673C5.90138 18.8072 6.24907 18.8994 6.85424 18.9488C7.47108 18.9992 8.26339 19 9.4 19H14.6C15.7366 19 16.5289 18.9992 17.1458 18.9488C17.7509 18.8994 18.0986 18.8072 18.362 18.673C18.9265 18.3854 19.3854 17.9265 19.673 17.362C19.8072 17.0986 19.8994 16.7509 19.9488 16.1458C19.9992 15.5289 20 14.7366 20 13.6V10.4C20 9.26339 19.9992 8.47108 19.9488 7.85424C19.8994 7.24907 19.8072 6.90138 19.673 6.63803C19.3854 6.07354 18.9265 5.6146 18.362 5.32698C18.0986 5.19279 17.7509 5.10062 17.1458 5.05118C16.5289 5.00078 15.7366 5 14.6 5H9.4C8.26339 5 7.47108 5.00078 6.85424 5.05118ZM7 7C7.55229 7 8 7.44772 8 8V16C8 16.5523 7.55229 17 7 17C6.44772 17 6 16.5523 6 16V8C6 7.44772 6.44772 7 7 7Z"
-                                        fill="currentColor"
-                                    ></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="absolute top-4 right-4 z-20">
-                            <ThemeToggleButton />
-                        </div>
-                    </>
-                )}
-                {/* Messages container */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
-                    {messages.length === 0 ? (
-                        <EmptyState username={user?.name || "Guest"} />
-                    ) : (
-                        <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
-                            <div className="h-[50px]" />
-                            {messages.map((message, index) => (
-                                <ChatMessage
-                                    key={message.id}
-                                    message={message}
-                                    isLoading={
-                                        isLoading &&
-                                        message.role === "assistant" &&
-                                        index === messages.length - 1
-                                    }
-                                />
-                            ))}
-                            {isLoading && "Thinking..."}
-                            <div ref={messagesEndRef} />
-                            <div className="h-[100px]" />
-                        </div>
-                    )}
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 bg-transparent z-50">
-                    <div className="px-3 sm:px-4 md:px-8 lg:px-16 max-w-[850px] mx-auto w-full">
-                        <ScrollToBottomButton
-                            onClick={scrollToBottom}
-                            isVisible={showScrollToBottom}
+                        <ChatInput
+                            input={input}
+                            setInput={setInput}
+                            onSendMessage={() => withAuth(handleSubmit)}
+                            isLoading={isLoading}
                         />
                     </div>
-                    <ChatInput
-                        input={input}
-                        setInput={setInput}
-                        onSendMessage={() => withAuth(handleSubmit)}
-                        isLoading={isLoading}
-                    />
                 </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
+)

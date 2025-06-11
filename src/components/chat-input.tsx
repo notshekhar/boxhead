@@ -183,7 +183,7 @@ const SendButton: React.FC<{
     onClick: () => void
     disabled: boolean
     isExpanded?: boolean
-}> = ({ onClick, disabled, isExpanded = false }) => (
+}> = React.memo(({ onClick, disabled, isExpanded = false }) => (
     <button
         onClick={onClick}
         disabled={disabled}
@@ -207,18 +207,18 @@ const SendButton: React.FC<{
             />
         </svg>
     </button>
-)
+))
 
-const ModelSelector: React.FC = () => (
+const ModelSelector: React.FC = React.memo(() => (
     <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer">
         <div className="w-2.5 h-2.5 rounded-full bg-[#2D7FF9] mr-1.5"></div>
         <span>UUI v6.0</span>
     </button>
-)
+))
 
 const FileAttachButton: React.FC<{
     onClick: () => void
-}> = ({ onClick }) => (
+}> = React.memo(({ onClick }) => (
     <button
         className="flex items-center gap-1 p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
         onClick={onClick}
@@ -239,13 +239,13 @@ const FileAttachButton: React.FC<{
         </svg>
         <span className="text-xs font-medium">Attach the file</span>
     </button>
-)
+))
 
 const FilePreviewItem: React.FC<{
     file: FilePreview
     index: number
     onRemove: (index: number) => void
-}> = ({ file, index, onRemove }) => {
+}> = React.memo(({ file, index, onRemove }) => {
     // Animation delay based on index for staggered appearance
     const animationDelay = `${index * 100}ms`
 
@@ -312,9 +312,9 @@ const FilePreviewItem: React.FC<{
             </button>
         </div>
     )
-}
+})
 
-const DragOverlay: React.FC = () => (
+const DragOverlay: React.FC = React.memo(() => (
     <div
         className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 backdrop-blur-sm flex items-center justify-center rounded-xl z-10 border-2 border-dashed border-blue-500"
         style={{
@@ -347,122 +347,121 @@ const DragOverlay: React.FC = () => (
             Drop files here
         </div>
     </div>
-)
+))
 
 // Main component
-export const ChatInput: React.FC<ChatInputProps> = ({
-    onSendMessage,
-    input,
-    setInput,
-    isLoading = false,
-}) => {
-    const {
-        isDragging,
-        attachedFiles,
-        isExpanded,
-        textareaRef,
-        fileInputRef,
-        handleFileSelect,
-        handleDragOver,
-        handleDragLeave,
-        handleDrop,
-        removeFile,
-        handleSendMessage,
-        handleKeyDown,
-    } = useChatInput(onSendMessage, input, setInput)
+export const ChatInput: React.FC<ChatInputProps> = React.memo(
+    ({ onSendMessage, input, setInput, isLoading = false }) => {
+        const {
+            isDragging,
+            attachedFiles,
+            isExpanded,
+            textareaRef,
+            fileInputRef,
+            handleFileSelect,
+            handleDragOver,
+            handleDragLeave,
+            handleDrop,
+            removeFile,
+            handleSendMessage,
+            handleKeyDown,
+        } = useChatInput(onSendMessage, input, setInput)
 
-    return (
-        <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
-            {/* Glass effect around the input - only in light mode */}
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
-            <div
-                className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
-                    isDragging
-                        ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20 shadow-glow-blue"
-                        : ""
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-                {/* Input field section */}
-                <div className="m-2 px-4 py-3 relative flex items-center rounded-lg bg-white dark:bg-[#1E1F25]">
-                    <textarea
-                        ref={textareaRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Ask anything"
-                        className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 my-auto resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
-                        rows={1}
-                        style={{ minHeight: "24px", maxHeight: "150px" }}
-                        aria-label="Message input"
-                    />
-                    {/* Send button */}
-                    <SendButton
-                        onClick={handleSendMessage}
-                        disabled={
-                            !(input.trim() || attachedFiles.length > 0) ||
-                            isLoading
-                        }
-                        isExpanded={isExpanded}
-                    />
-                </div>
-
-                {/* Bottom section with tools and file previews */}
-                <div className="bg-gray-200 dark:bg-[#2A2A30] rounded-b-xl transition-all duration-300 overflow-hidden">
-                    {/* Tools bar */}
-                    <div className="flex items-center justify-between px-4 py-2">
-                        {/* Left aligned tools */}
-                        <div className="flex items-center space-x-4">
-                            {/* Model selector */}
-                            <ModelSelector />
-
-                            {/* File input (hidden) */}
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileSelect}
-                                className="hidden"
-                                multiple
-                            />
-
-                            {/* File icon with text */}
-                            <FileAttachButton
-                                onClick={() => fileInputRef.current?.click()}
-                            />
-                        </div>
+        return (
+            <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
+                {/* Glass effect around the input - only in light mode */}
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
+                <div
+                    className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
+                        isDragging
+                            ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20 shadow-glow-blue"
+                            : ""
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
+                    {/* Input field section */}
+                    <div className="m-2 px-4 py-3 relative flex items-center rounded-lg bg-white dark:bg-[#1E1F25]">
+                        <textarea
+                            ref={textareaRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Ask anything"
+                            className="flex-1 bg-transparent border-0 focus:ring-0 outline-none text-base py-1 my-auto resize-none overflow-y-auto placeholder-gray-400 dark:placeholder-gray-400"
+                            rows={1}
+                            style={{ minHeight: "24px", maxHeight: "150px" }}
+                            aria-label="Message input"
+                        />
+                        {/* Send button */}
+                        <SendButton
+                            onClick={handleSendMessage}
+                            disabled={
+                                !(input.trim() || attachedFiles.length > 0) ||
+                                isLoading
+                            }
+                            isExpanded={isExpanded}
+                        />
                     </div>
 
-                    {/* File preview section - only render when there are files */}
-                    {attachedFiles.length > 0 && (
-                        <div
-                            className="px-4 py-3 border-t border-gray-300 dark:border-gray-700 transition-all animate-scale-in"
-                            style={{
-                                transformOrigin: "top center",
-                                animationDuration: "0.3s",
-                            }}
-                        >
-                            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-                                Attached files:
-                            </div>
-                            <div className="flex flex-wrap gap-3">
-                                {attachedFiles.map((file, index) => (
-                                    <FilePreviewItem
-                                        key={index}
-                                        file={file}
-                                        index={index}
-                                        onRemove={removeFile}
-                                    />
-                                ))}
+                    {/* Bottom section with tools and file previews */}
+                    <div className="bg-gray-200 dark:bg-[#2A2A30] rounded-b-xl transition-all duration-300 overflow-hidden">
+                        {/* Tools bar */}
+                        <div className="flex items-center justify-between px-4 py-2">
+                            {/* Left aligned tools */}
+                            <div className="flex items-center space-x-4">
+                                {/* Model selector */}
+                                <ModelSelector />
+
+                                {/* File input (hidden) */}
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                    multiple
+                                />
+
+                                {/* File icon with text */}
+                                <FileAttachButton
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                />
                             </div>
                         </div>
-                    )}
 
-                    {/* Drag overlay */}
-                    {isDragging && <DragOverlay />}
+                        {/* File preview section - only render when there are files */}
+                        {attachedFiles.length > 0 && (
+                            <div
+                                className="px-4 py-3 border-t border-gray-300 dark:border-gray-700 transition-all animate-scale-in"
+                                style={{
+                                    transformOrigin: "top center",
+                                    animationDuration: "0.3s",
+                                }}
+                            >
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                                    Attached files:
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {attachedFiles.map((file, index) => (
+                                        <FilePreviewItem
+                                            key={index}
+                                            file={file}
+                                            index={index}
+                                            onRemove={removeFile}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Drag overlay */}
+                        {isDragging && <DragOverlay />}
+                    </div>
                 </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
+)
