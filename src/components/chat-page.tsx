@@ -24,20 +24,16 @@ interface Chat {
 
 interface ChatPageProps {
     initialSidebarVisible: boolean
-    initialUser: User | null
     chatId: string
     initialChats: Chat[]
 }
 
 export function ChatPage({
     initialSidebarVisible,
-    initialUser,
     chatId,
     initialChats,
 }: ChatPageProps) {
-    const { user, withAuth } = useAuth(initialUser)
-
-    const router = useRouter()
+    const { user, withAuth } = useAuth()
 
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(
         initialSidebarVisible
@@ -291,10 +287,15 @@ export function ChatPage({
                     ) : (
                         <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
                             <div className="h-[50px]" />
-                            {messages.map((message) => (
+                            {messages.map((message, index) => (
                                 <ChatMessage
                                     key={message.id}
                                     message={message}
+                                    isLoading={
+                                        isLoading &&
+                                        message.role === "assistant" &&
+                                        index === messages.length - 1
+                                    }
                                 />
                             ))}
                             {isLoading && "Thinking..."}

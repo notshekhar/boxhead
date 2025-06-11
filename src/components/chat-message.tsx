@@ -432,8 +432,8 @@ const MarkdownComponents = {
     ),
 }
 
-export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
-    ({ message }: { message: UIMessage }) => {
+export const ChatMessage: React.FC<{ message: UIMessage; isLoading?: boolean }> = React.memo(
+    ({ message, isLoading = false }: { message: UIMessage; isLoading?: boolean }) => {
         if (message.role === "user") {
             return (
                 <div className="flex flex-col items-end mb-6">
@@ -465,9 +465,11 @@ export const ChatMessage: React.FC<{ message: UIMessage }> = React.memo(
                             {message.content}
                         </ReactMarkdown>
                     </div>
-                    <div className="flex justify-start mt-3">
-                        <CopyButton text={message.content} label="Copy" />
-                    </div>
+                    {!isLoading && (
+                        <div className="flex justify-start mt-3">
+                            <CopyButton text={message.content} label="Copy" />
+                        </div>
+                    )}
                 </div>
             </div>
         )

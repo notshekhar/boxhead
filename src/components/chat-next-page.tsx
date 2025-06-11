@@ -38,13 +38,7 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
     const initialSidebarVisible =
         sidebarCookie?.value === "false" ? false : true
 
-    const authUser = await auth()
-
-    let user = null
-
-    if (authUser) {
-        user = (await getUser(authUser.email)) as unknown as User
-    }
+    
 
     const resolvedParams = await params
 
@@ -59,7 +53,6 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
     return (
         <ChatPage
             initialSidebarVisible={initialSidebarVisible}
-            initialUser={user}
             chatId={chatId}
             initialChats={chats?.chats || []}
         />

@@ -32,8 +32,14 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Provider component
-export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null)
+export function AuthProvider({
+    children,
+    initialUser,
+}: {
+    children: ReactNode
+    initialUser: User | null
+}) {
+    const [user, setUser] = useState<User | null>(initialUser || null)
     const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false)
 
     useEffect(() => {
