@@ -137,7 +137,7 @@ export const ChatPage = React.memo(
             api: "/api/chat",
             experimental_prepareRequestBody: ({ messages }) => {
                 return {
-                    model: "gemini-2.5-flash-preview-05-20",
+                    model: "gemini-2.0-flash-lite",
                     id: chatId,
                     messages,
                 }
@@ -321,7 +321,7 @@ export const ChatPage = React.memo(
                         <ChatInput
                             input={input}
                             setInput={setInput}
-                            onSendMessage={() => handleSubmit()}
+                            onSendMessage={() => withAuth(handleSubmit)}
                             isLoading={isLoading}
                         />
                     </div>
