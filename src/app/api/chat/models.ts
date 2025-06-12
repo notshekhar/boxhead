@@ -44,6 +44,34 @@ export const ModelProviderMapping = {
     [ModelName.CLAUDE_3_5_SONNET]: ModelProvider.ANTHROPIC,
 }
 
+export const models = [
+    {
+        name: ModelName.GEMINI_2_0_FLASH_LITE,
+        provider: ModelProvider.GOOGLE,
+        default: true,
+    },
+    {
+        name: ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20,
+        provider: ModelProvider.GOOGLE,
+    },
+    {
+        name: ModelName.GEMINI_2_0_FLASH,
+        provider: ModelProvider.GOOGLE,
+    },
+    {
+        name: ModelName.GPT_4O,
+        provider: ModelProvider.OPENAI,
+    },
+    {
+        name: ModelName.GPT_4O_MINI,
+        provider: ModelProvider.OPENAI,
+    },
+    {
+        name: ModelName.CLAUDE_3_5_SONNET,
+        provider: ModelProvider.ANTHROPIC,
+    },
+]
+
 export const getModel = (model: ModelName) => {
     const provider = ModelProviderMapping[model]
     return modelProviders[provider](model)
