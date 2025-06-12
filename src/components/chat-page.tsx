@@ -45,6 +45,7 @@ export const ChatPage = React.memo(
             chat: Chat
             messages: UIMessage[]
         } | null>(null)
+        const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
@@ -84,11 +85,16 @@ export const ChatPage = React.memo(
         }
 
         const fetchChat = useCallback(async () => {
-            const chat = await getChat(chatId)
-            if (!chat && window.location.pathname !== "/") {
-                redirect("/")
+            setIsChatLoading(true)
+            try {
+                const chat = await getChat(chatId)
+                if (!chat && window.location.pathname !== "/") {
+                    redirect("/")
+                }
+                setInitialChat(chat)
+            } finally {
+                setIsChatLoading(false)
             }
-            setInitialChat(chat)
         }, [chatId])
 
         useEffect(() => {
@@ -295,7 +301,14 @@ export const ChatPage = React.memo(
                     )}
                     {/* Messages container */}
                     <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
-                        {messages.length === 0 ? (
+                        {isChatLoading ? (
+                            <div className="flex items-center justify-center h-full">
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="w-8 h-8 border-2 border-[#2D7FF9] border-t-transparent rounded-full animate-spin"></div>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm">Loading chat...</p>
+                                </div>
+                            </div>
+                        ) : messages.length === 0 ? (
                             <EmptyState username={user?.name || "Guest"} />
                         ) : (
                             <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
