@@ -12,6 +12,9 @@
     --foreground: #e8e9ec;
     --prism-theme: prism-tomorrow;
 }
+.token.operator {
+    background: none !important;
+}
 
 @theme inline {
     --color-background: var(--background);
