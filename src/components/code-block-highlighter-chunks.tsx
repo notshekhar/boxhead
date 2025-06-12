@@ -4,6 +4,13 @@ import { useTheme } from "next-themes"
 
 import Prism from "prismjs"
 import "prismjs/components/prism-diff"
+import "prismjs/components/prism-r"
+import "prismjs/components/prism-bash"
+import "prismjs/components/prism-python"
+import "prismjs/components/prism-java"
+import "prismjs/components/prism-csharp"
+import "prismjs/components/prism-c"
+import "prismjs/components/prism-go"
 
 /**
  * I have converted text-sm to text-base
@@ -68,10 +75,6 @@ const MemoizedCodeLine = React.memo(
     ({ children, language }: any) => {
         const { theme, resolvedTheme } = useTheme()
 
-        if (!Prism.languages[language]) {
-            return <code className="text-sm">{children}</code>
-        }
-
         const html = Prism.highlight(
             children,
             Prism.languages[language],
@@ -88,6 +91,24 @@ const MemoizedCodeLine = React.memo(
     (prevProps, nextProps) =>
         prevProps.children === nextProps.children &&
         prevProps.language === nextProps.language
+)
+
+export const NoLanguageCodeBlock = React.memo(
+    ({ children, className, language, ...props }: any) => {
+        return (
+            <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
+                <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
+                    <span className="text-sm font-semibold text-text-light dark:text-text-dark">
+                        {getLanguageDisplayName(language)}
+                    </span>
+                    <CopyButton text={children} />
+                </div>
+                <pre className="bg-gray-lighter dark:bg-gray-darker text-text-light dark:text-text-dark p-4 text-sm font-mono overflow-x-auto m-0 border-0">
+                    <code>{children}</code>
+                </pre>
+            </div>
+        )
+    }
 )
 
 export const MemoizedCodeBlock = React.memo(
@@ -109,6 +130,14 @@ export const MemoizedCodeBlock = React.memo(
 
         const match = /language-(\w+)/.exec(className || "")
         const language = match ? match[1] : ""
+
+        if (!Prism.languages[language]) {
+            return (
+                <NoLanguageCodeBlock language={language}>
+                    {children}
+                </NoLanguageCodeBlock>
+            )
+        }
 
         if (language) {
             const tokens = React.useMemo(() => {
