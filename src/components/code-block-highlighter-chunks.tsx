@@ -67,13 +67,20 @@ const getLanguageDisplayName = (language: string): string => {
 
 const MemoizedCodeLine = React.memo(
     ({ children, language }: any) => {
+        const { theme, resolvedTheme } = useTheme()
+
         const html = Prism.highlight(
             children,
             Prism.languages[language],
             language
         )
 
-        return <div dangerouslySetInnerHTML={{ __html: html }} />
+        return (
+            <div
+                className="text-sm"
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
+        )
     },
     (prevProps, nextProps) =>
         prevProps.children === nextProps.children &&
@@ -82,8 +89,6 @@ const MemoizedCodeLine = React.memo(
 
 export const MemoizedCodeBlock = React.memo(
     ({ children, className, ...props }: any) => {
-        const { theme, resolvedTheme } = useTheme()
-
         const isInline = !className?.includes("language-")
         const codeContent = String(children).replace(/\n$/, "")
 
