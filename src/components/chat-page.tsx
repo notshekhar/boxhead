@@ -37,6 +37,7 @@ export const ChatPage = React.memo(
             initialSidebarVisible
         )
         const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
+
         const [showScrollToBottom, setShowScrollToBottom] =
             useState<boolean>(false)
         const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
@@ -46,6 +47,14 @@ export const ChatPage = React.memo(
         } | null>(null)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
+
+        const handleOpenSearch = useCallback(() => {
+            setShowSearchPopup(true)
+        }, [])
+
+        const handleDeleteChat = useCallback(() => {
+            fetchChats()
+        }, [])
 
         async function getChat(chatId: string) {
             try {
@@ -155,11 +164,11 @@ export const ChatPage = React.memo(
             credentials: "include",
         })
 
-        const handleToggleSidebar = () => {
-            setSidebarVisible(!sidebarVisible)
-        }
+        const handleToggleSidebar = useCallback(() => {
+            setSidebarVisible((v) => !v)
+        }, [])
 
-        const handleNewChat = () => {
+        const handleNewChat = useCallback(() => {
             // clean the chat from useChat hook
             setInput("")
             setMessages([])
@@ -167,7 +176,7 @@ export const ChatPage = React.memo(
             setShowScrollToBottom(false)
 
             redirect(`/`)
-        }
+        }, [])
 
         const scrollToBottom = () => {
             if (messagesEndRef.current) {
@@ -222,11 +231,9 @@ export const ChatPage = React.memo(
                     chats={chats}
                     onNewChat={handleNewChat}
                     onToggleSidebar={handleToggleSidebar}
-                    onOpenSearch={() => setShowSearchPopup(true)}
+                    onOpenSearch={handleOpenSearch}
                     isOpen={sidebarVisible}
-                    onDeleteChat={() => {
-                        fetchChats()
-                    }}
+                    onDeleteChat={handleDeleteChat}
                 />
 
                 {/* Main chat area */}
