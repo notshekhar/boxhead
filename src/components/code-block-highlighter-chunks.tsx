@@ -1,10 +1,9 @@
 import { CopyButton } from "./common"
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { useTheme } from "next-themes"
 
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-
 import Prism from "prismjs"
+import "prismjs/components/prism-diff"
 
 /**
  * I have converted text-sm to text-base
@@ -68,6 +67,10 @@ const getLanguageDisplayName = (language: string): string => {
 const MemoizedCodeLine = React.memo(
     ({ children, language }: any) => {
         const { theme, resolvedTheme } = useTheme()
+
+        if (!Prism.languages[language]) {
+            return <code className="text-sm">{children}</code>
+        }
 
         const html = Prism.highlight(
             children,
