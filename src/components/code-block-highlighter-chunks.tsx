@@ -1,7 +1,10 @@
-import { codeToHtml } from "shiki"
 import { CopyButton } from "./common"
 import React, { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
+
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+
+import Prism from "prismjs"
 
 /**
  * I have converted text-sm to text-base
@@ -63,35 +66,18 @@ const getLanguageDisplayName = (language: string): string => {
 }
 
 const MemoizedCodeLine = React.memo(
-    ({ children, isDarkMode, language }: any) => {
-        const [highlightedCode, setHighlightedCode] = useState<string>("")
-
-        useEffect(() => {
-            const highlightCode = async () => {
-                const shikiTheme = isDarkMode ? "vitesse-dark" : "vitesse-light"
-                const html = await codeToHtml(children, {
-                    lang: language,
-                    theme: shikiTheme,
-                })
-                setHighlightedCode(html)
-            }
-            highlightCode()
-        }, [children, isDarkMode, language])
-
-        if (!highlightedCode) {
-            return <div>{children}</div>
-        }
-        return (
-            <>
-                <div
-                    dangerouslySetInnerHTML={{
-                        __html: highlightedCode,
-                    }}
-                />
-            </>
+    ({ children, language }: any) => {
+        const html = Prism.highlight(
+            children,
+            Prism.languages[language],
+            language
         )
+
+        return <div dangerouslySetInnerHTML={{ __html: html }} />
     },
-    (prevProps, nextProps) => prevProps.children === nextProps.children
+    (prevProps, nextProps) =>
+        prevProps.children === nextProps.children &&
+        prevProps.language === nextProps.language
 )
 
 export const MemoizedCodeBlock = React.memo(
@@ -116,27 +102,11 @@ export const MemoizedCodeBlock = React.memo(
         const match = /language-(\w+)/.exec(className || "")
         const language = match ? match[1] : ""
 
-        const isDarkMode = theme === "dark" || resolvedTheme === "dark"
-
-        const [highlightedCode, setHighlightedCode] = useState<string>("")
-
-        useEffect(() => {
-            const highlightCode = async () => {
-                const shikiTheme = isDarkMode ? "vitesse-dark" : "vitesse-light"
-                const html = await codeToHtml(codeContent, {
-                    lang: language,
-                    theme: shikiTheme,
-                })
-                setHighlightedCode(html)
-            }
-            highlightCode()
-        }, [codeContent, isDarkMode, language])
-
-        // const codeLines = React.useMemo(() => {
-        //     return children?.split("\n") || []
-        // }, [children])
-
         if (language) {
+            const tokens = React.useMemo(() => {
+                return codeContent.split("\n")
+            }, [codeContent])
+
             return (
                 <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                     <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
@@ -146,32 +116,16 @@ export const MemoizedCodeBlock = React.memo(
                         <CopyButton text={codeContent} />
                     </div>
                     <div className="overflow-x-auto">
-                        {highlightedCode ? (
-                            <div
-                                className="shiki-container [&_pre]:!bg-transparent [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:text-sm [&_pre]:leading-relaxed [&_code]:!bg-transparent"
-                                dangerouslySetInnerHTML={{
-                                    __html: highlightedCode,
-                                }}
-                            />
-                        ) : (
-                            <pre className="bg-transparent text-text-light dark:text-text-dark p-4 text-sm font-mono overflow-x-auto m-0">
-                                <code className="bg-transparent">
-                                    {codeContent}
-                                </code>
-                            </pre>
-                        )}
-
-                        {/* <div className="shiki-container [&_pre]:!bg-transparent p-4 [&_pre]:!m-0 [&_pre]:text-sm [&_pre]:leading-relaxed [&_code]:!bg-transparent">
-                            {codeLines.map((line: string, index: number) => (
+                        <div className="shiki-container [&_pre]:!bg-transparent p-4 [&_pre]:!m-0 [&_pre]:text-sm [&_pre]:leading-relaxed [&_code]:!bg-transparent">
+                            {tokens.map((token: any, index: number) => (
                                 <MemoizedCodeLine
-                                    isDarkMode={isDarkMode}
-                                    language={language}
                                     key={index}
+                                    language={language}
                                 >
-                                    {line}
+                                    {token}
                                 </MemoizedCodeLine>
                             ))}
-                        </div> */}
+                        </div>
                     </div>
                 </div>
             )
