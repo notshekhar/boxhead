@@ -25,10 +25,9 @@ async function getChats(authToken: string) {
 }
 
 export default async function ChatNextPage({ params }: ChatPageProps) {
-    // Get sidebar visibility from cookies server-side
+    // Get cookies server-side
     const cookieStore = await cookies()
     const sidebarCookie = cookieStore.get("sidebarVisible")
-
     const authToken = cookieStore.get("token")
 
     // Default to true for desktop if no cookie is set
@@ -43,6 +42,7 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
         chatId = uuidv4()
     }
 
+    // Fetch chats
     const chats = await getChats(authToken?.value || "")
 
     return (

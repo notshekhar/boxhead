@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
+import { ModelSelectorPopup } from "./model-selector-popup"
+import { useModels } from "./models-context"
 
-// Type definitions
 interface ChatInputProps {
     onSendMessage: () => void
     input: string
@@ -209,12 +210,33 @@ const SendButton: React.FC<{
     </button>
 ))
 
-const ModelSelector: React.FC = React.memo(() => (
-    <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2D7FF9] mr-1.5"></div>
-        <span>UUI v6.0</span>
-    </button>
-))
+const ModelSelector: React.FC<{
+    selectedModel: string
+    onClick: () => void
+}> = React.memo(({ selectedModel, onClick }) => {
+    // Get provider color based on model name
+    const getProviderColor = (modelName: string) => {
+        if (modelName.includes("gemini")) return "bg-blue-500"
+        if (modelName.includes("gpt")) return "bg-green-500"
+        if (modelName.includes("claude")) return "bg-orange-500"
+        return "bg-[#2D7FF9]"
+    }
+
+    // Get display name for model
+    const getModelDisplayName = (name: string) => {
+        return name.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    }
+
+    return (
+        <button 
+            onClick={onClick}
+            className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
+        >
+            <div className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(selectedModel)}`}></div>
+            <span>{getModelDisplayName(selectedModel)}</span>
+        </button>
+    )
+})
 
 const FileAttachButton: React.FC<{
     onClick: () => void
@@ -352,6 +374,9 @@ const DragOverlay: React.FC = React.memo(() => (
 // Main component
 export const ChatInput: React.FC<ChatInputProps> = React.memo(
     ({ onSendMessage, input, setInput, isLoading = false }) => {
+        const [showModelPopup, setShowModelPopup] = useState(false)
+        const { models, selectedModel, setSelectedModel } = useModels()
+        
         const {
             isDragging,
             attachedFiles,
@@ -369,6 +394,15 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
 
         return (
             <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
+                {/* Model Selector Popup */}
+                <ModelSelectorPopup
+                    selectedModel={selectedModel}
+                    onModelSelect={setSelectedModel}
+                    isOpen={showModelPopup}
+                    onClose={() => setShowModelPopup(false)}
+                    models={models}
+                />
+                
                 {/* Glass effect around the input - only in light mode */}
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
                 <div
@@ -412,7 +446,10 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                             {/* Left aligned tools */}
                             <div className="flex items-center space-x-4">
                                 {/* Model selector */}
-                                <ModelSelector />
+                                <ModelSelector 
+                                    selectedModel={selectedModel}
+                                    onClick={() => setShowModelPopup(true)}
+                                />
 
                                 {/* File input (hidden) */}
                                 <input

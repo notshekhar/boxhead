@@ -13,6 +13,7 @@ import { SearchPopup } from "@/components/search-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
+import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import axios from "axios"
 import { redirect, useRouter } from "next/navigation"
@@ -32,6 +33,7 @@ interface ChatPageProps {
 export const ChatPage = React.memo(
     ({ initialSidebarVisible, chatId, initialChats }: ChatPageProps) => {
         const { user, withAuth } = useAuth()
+        const { models, selectedModel, setSelectedModel } = useModels()
 
         const [sidebarVisible, setSidebarVisible] = useState<boolean>(
             initialSidebarVisible
@@ -48,6 +50,8 @@ export const ChatPage = React.memo(
         const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
+
+
 
         const handleOpenSearch = useCallback(() => {
             setShowSearchPopup(true)
@@ -152,7 +156,7 @@ export const ChatPage = React.memo(
             api: "/api/chat",
             experimental_prepareRequestBody: ({ messages }) => {
                 return {
-                    model: "gemini-2.0-flash-lite",
+                    model: selectedModel,
                     id: chatId,
                     messages,
                 }
