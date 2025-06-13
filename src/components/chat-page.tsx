@@ -10,13 +10,14 @@ import { HeaderControls } from "@/components/header-controls"
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
+import { ModelSelectorPopup } from "@/components/model-selector-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth, User } from "./auth-context"
 import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import axios from "axios"
-import { redirect, useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 
 interface Chat {
     id: string
@@ -39,6 +40,8 @@ export const ChatPage = React.memo(
             initialSidebarVisible
         )
         const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
+        const [showModelSelector, setShowModelSelector] =
+            useState<boolean>(false)
 
         const [showScrollToBottom, setShowScrollToBottom] =
             useState<boolean>(false)
@@ -50,8 +53,6 @@ export const ChatPage = React.memo(
         const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
-
-
 
         const handleOpenSearch = useCallback(() => {
             setShowSearchPopup(true)
@@ -236,6 +237,15 @@ export const ChatPage = React.memo(
                     recentChats={initialChats}
                 />
 
+                {/* Model Selector Popup */}
+                <ModelSelectorPopup
+                    selectedModel={selectedModel}
+                    onModelSelect={setSelectedModel}
+                    isOpen={showModelSelector}
+                    onClose={() => setShowModelSelector(false)}
+                    models={models}
+                />
+
                 {/* Sidebar - always rendered but positioned off-screen when not visible */}
                 <Sidebar
                     chats={chats}
@@ -267,7 +277,22 @@ export const ChatPage = React.memo(
                                 />
                             </div>
                             <div className="absolute top-4 right-4 z-20">
-                                <ThemeToggleButton />
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() =>
+                                            setShowModelSelector(true)
+                                        }
+                                        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1E1F25] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+                                    >
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        {selectedModel
+                                            ?.replace(/-/g, " ")
+                                            .replace(/\b\w/g, (l: string) =>
+                                                l.toUpperCase()
+                                            ) || "Select Model"}
+                                    </button>
+                                    <ThemeToggleButton />
+                                </div>
                             </div>
                         </>
                     ) : (
@@ -299,7 +324,22 @@ export const ChatPage = React.memo(
                                 </button>
                             </div>
                             <div className="absolute top-4 right-4 z-20">
-                                <ThemeToggleButton />
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() =>
+                                            setShowModelSelector(true)
+                                        }
+                                        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1E1F25] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+                                    >
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        {selectedModel
+                                            ?.replace(/-/g, " ")
+                                            .replace(/\b\w/g, (l: string) =>
+                                                l.toUpperCase()
+                                            ) || "Select Model"}
+                                    </button>
+                                    <ThemeToggleButton />
+                                </div>
                             </div>
                         </>
                     )}
@@ -309,7 +349,9 @@ export const ChatPage = React.memo(
                             <div className="flex items-center justify-center h-full">
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="w-8 h-8 border-2 border-[#2D7FF9] border-t-transparent rounded-full animate-spin"></div>
-                                    <p className="text-gray-600 dark:text-gray-400 text-sm">Loading chat...</p>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                        Loading chat...
+                                    </p>
                                 </div>
                             </div>
                         ) : messages.length === 0 ? (

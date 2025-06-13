@@ -3,6 +3,7 @@ import { useAuth } from "./auth-context"
 import { useRouter, usePathname } from "next/navigation"
 import axios from "axios"
 import { errorToast } from "@/hooks/error-toast"
+import { CommonPopup } from "@/components/common-popup"
 
 interface ChatItem {
     id: string
@@ -206,14 +207,16 @@ const DeleteConfirmationModal = React.memo<{
     onConfirm: () => void
     onCancel: () => void
 }>(({ isOpen, chatTitle, isDeleting, onConfirm, onCancel }) => {
-    if (!isOpen) return null
-
     return (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1E1F25] rounded-lg border border-gray-200 dark:border-gray-700/30 p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    Delete Chat
-                </h3>
+        <CommonPopup
+            isOpen={isOpen}
+            onClose={onCancel}
+            title="Delete Chat"
+            maxWidth="md"
+            showCloseButton={false}
+            closeOnBackdropClick={!isDeleting}
+        >
+            <div className="p-6">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                     Are you sure you want to delete "{chatTitle}"? This action
                     cannot be undone.
@@ -260,7 +263,7 @@ const DeleteConfirmationModal = React.memo<{
                     </button>
                 </div>
             </div>
-        </div>
+        </CommonPopup>
     )
 })
 
