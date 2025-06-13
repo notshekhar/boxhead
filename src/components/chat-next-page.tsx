@@ -4,9 +4,9 @@ import { cookies } from "next/headers"
 import { ChatPage } from "./chat-page"
 
 interface ChatPageProps {
-    params: {
+    params: Promise<{
         chatId: string
-    }
+    }>
 }
 
 async function getChats(authToken: string) {
@@ -24,7 +24,7 @@ async function getChats(authToken: string) {
     }
 }
 
-export default async function ChatNextPage(params: Promise<ChatPageProps>) {
+export default async function ChatNextPage({ params }: ChatPageProps) {
     // Get cookies server-side
     const cookieStore = await cookies()
     const sidebarCookie = cookieStore.get("sidebarVisible")
@@ -36,7 +36,7 @@ export default async function ChatNextPage(params: Promise<ChatPageProps>) {
 
     const resolvedParams = await params
 
-    let chatId = resolvedParams.params.chatId
+    let chatId = resolvedParams.chatId
 
     if (!chatId) {
         chatId = uuidv4()
