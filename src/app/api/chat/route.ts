@@ -92,7 +92,7 @@ export async function POST(request: Request) {
 
         const { model } = validate.data
 
-        let chatId = body.id
+        const chatId = body.id
 
         let chat = await getChat({
             userId: session.id,

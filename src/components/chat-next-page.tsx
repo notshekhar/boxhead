@@ -24,7 +24,7 @@ async function getChats(authToken: string) {
     }
 }
 
-export default async function ChatNextPage({ params }: ChatPageProps) {
+export default async function ChatNextPage(params: Promise<ChatPageProps>) {
     // Get cookies server-side
     const cookieStore = await cookies()
     const sidebarCookie = cookieStore.get("sidebarVisible")
@@ -36,7 +36,7 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
 
     const resolvedParams = await params
 
-    let chatId = resolvedParams.chatId
+    let chatId = resolvedParams.params.chatId
 
     if (!chatId) {
         chatId = uuidv4()

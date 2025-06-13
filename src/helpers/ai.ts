@@ -1,5 +1,5 @@
 import { getModel, ModelName } from "@/app/api/chat/models"
-import { CoreMessage, generateObject, Message } from "ai"
+import { generateObject, Message } from "ai"
 import { z } from "zod"
 
 export async function generateChatTitle(model: ModelName, messages: any[]) {

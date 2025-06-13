@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto"
 
-const hash = (text: string) => {
+export const hash = (text: string) => {
     return createHash("sha256").update(text).digest("hex")
 }

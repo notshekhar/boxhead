@@ -16,6 +16,7 @@ export async function getUser(email: string) {
             .where(eq(users.email, email))
         return user[0]
     } catch (error) {
+        console.error(error)
         return null
     }
 }
