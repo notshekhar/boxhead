@@ -237,15 +237,6 @@ export const ChatPage = React.memo(
                     recentChats={initialChats}
                 />
 
-                {/* Model Selector Popup */}
-                <ModelSelectorPopup
-                    selectedModel={selectedModel}
-                    onModelSelect={setSelectedModel}
-                    isOpen={showModelSelector}
-                    onClose={() => setShowModelSelector(false)}
-                    models={models}
-                />
-
                 {/* Sidebar - always rendered but positioned off-screen when not visible */}
                 <Sidebar
                     chats={chats}
@@ -278,19 +269,6 @@ export const ChatPage = React.memo(
                             </div>
                             <div className="absolute top-4 right-4 z-20">
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() =>
-                                            setShowModelSelector(true)
-                                        }
-                                        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1E1F25] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
-                                    >
-                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                        {selectedModel
-                                            ?.replace(/-/g, " ")
-                                            .replace(/\b\w/g, (l: string) =>
-                                                l.toUpperCase()
-                                            ) || "Select Model"}
-                                    </button>
                                     <ThemeToggleButton />
                                 </div>
                             </div>
@@ -325,19 +303,6 @@ export const ChatPage = React.memo(
                             </div>
                             <div className="absolute top-4 right-4 z-20">
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() =>
-                                            setShowModelSelector(true)
-                                        }
-                                        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1E1F25] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
-                                    >
-                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                        {selectedModel
-                                            ?.replace(/-/g, " ")
-                                            .replace(/\b\w/g, (l: string) =>
-                                                l.toUpperCase()
-                                            ) || "Select Model"}
-                                    </button>
                                     <ThemeToggleButton />
                                 </div>
                             </div>
