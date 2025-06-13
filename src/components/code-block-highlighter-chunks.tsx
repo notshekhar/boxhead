@@ -11,6 +11,7 @@ import "prismjs/components/prism-java"
 import "prismjs/components/prism-csharp"
 import "prismjs/components/prism-c"
 import "prismjs/components/prism-go"
+import "prismjs/components/prism-jsx"
 
 /**
  * I have converted text-sm to text-base

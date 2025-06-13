@@ -1,6 +1,5 @@
 "use client"
 
-import { v4 as uuidv4 } from "uuid"
 import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { ChatMessage } from "@/components/chat-message"
 import { ChatInput } from "@/components/chat-input"
@@ -18,6 +17,7 @@ import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import axios from "axios"
 import { redirect } from "next/navigation"
+import { LoadingDot } from "@/components/loading-dots"
 
 interface Chat {
     id: string
@@ -370,7 +370,7 @@ export const ChatPage = React.memo(
                                         }
                                     />
                                 ))}
-                                {isLoading && "Thinking..."}
+                                {isLoading && <LoadingDot />}
                                 <div ref={messagesEndRef} />
                                 <div className="h-[100px]" />
                             </div>
