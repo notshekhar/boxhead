@@ -5,26 +5,17 @@ import { CopyButton, BranchOutButton } from "./common"
 
 export const ChatMessage: React.FC<{
     message: UIMessage
+    messageIndex: number
     isLoading?: boolean
-    messages?: UIMessage[]
-    chatId?: string
-    model?: string
-    messageIndex?: number
 }> = React.memo(
     ({
         message,
-        isLoading = false,
-        messages,
-        chatId,
-        model,
         messageIndex,
+        isLoading = false,
     }: {
         message: UIMessage
         isLoading?: boolean
-        messages?: UIMessage[]
-        chatId?: string
-        model?: string
-        messageIndex?: number
+        messageIndex: number
     }) => {
         if (message.role === "user") {
             return (
@@ -52,13 +43,7 @@ export const ChatMessage: React.FC<{
                     {!isLoading && (
                         <div className="flex justify-start gap-2 mt-3">
                             <CopyButton text={message.content} label="Copy" />
-                            <BranchOutButton 
-                                text={message.content}
-                                messages={messages}
-                                chatId={chatId}
-                                model={model}
-                                messageIndex={messageIndex}
-                            />
+                            <BranchOutButton messageIndex={messageIndex} />
                         </div>
                     )}
                 </div>

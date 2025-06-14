@@ -336,9 +336,6 @@ export const ChatPage = React.memo(
                                             message.role === "assistant" &&
                                             index === messages.length - 1
                                         }
-                                        messages={messages}
-                                        chatId={chatId}
-                                        model={selectedModel}
                                         messageIndex={index}
                                     />
                                 ))}
