@@ -13,8 +13,6 @@ import { auth } from "@/helpers/auth"
 import { getUser } from "@/lib/queries"
 import axios from "axios"
 import { cookies } from "next/headers"
-import { ChatProvider } from "@/components/chat-context"
-import { v4 } from "uuid"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
