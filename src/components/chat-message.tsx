@@ -1,18 +1,30 @@
 import { UIMessage } from "ai"
 import React from "react"
 import { MemoizedMarkdown } from "./markdown-chunks"
-import { CopyButton } from "./common"
+import { CopyButton, BranchOutButton } from "./common"
 
 export const ChatMessage: React.FC<{
     message: UIMessage
     isLoading?: boolean
+    messages?: UIMessage[]
+    chatId?: string
+    model?: string
+    messageIndex?: number
 }> = React.memo(
     ({
         message,
         isLoading = false,
+        messages,
+        chatId,
+        model,
+        messageIndex,
     }: {
         message: UIMessage
         isLoading?: boolean
+        messages?: UIMessage[]
+        chatId?: string
+        model?: string
+        messageIndex?: number
     }) => {
         if (message.role === "user") {
             return (
@@ -24,7 +36,7 @@ export const ChatMessage: React.FC<{
                             </MemoizedMarkdown>
                         </div>
                     </div>
-                    <div className="flex justify-end mt-3 mr-2">
+                    <div className="flex justify-end gap-2 mt-3 mr-2">
                         <CopyButton text={message.content} label="Copy" />
                     </div>
                 </div>
@@ -38,8 +50,15 @@ export const ChatMessage: React.FC<{
                         <MemoizedMarkdown>{message.content}</MemoizedMarkdown>
                     </div>
                     {!isLoading && (
-                        <div className="flex justify-start mt-3">
+                        <div className="flex justify-start gap-2 mt-3">
                             <CopyButton text={message.content} label="Copy" />
+                            <BranchOutButton 
+                                text={message.content}
+                                messages={messages}
+                                chatId={chatId}
+                                model={model}
+                                messageIndex={messageIndex}
+                            />
                         </div>
                     )}
                 </div>

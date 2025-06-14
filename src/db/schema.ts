@@ -21,6 +21,7 @@ export const chats = pgTable("chats", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     pubId: uuid("pub_id").notNull().unique(), // pub_id
     title: varchar({ length: 255 }).notNull(),
+    parentId: integer("parent_id").references((): any => chats.id),
     userId: integer("user_id").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 })

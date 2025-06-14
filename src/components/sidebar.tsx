@@ -4,11 +4,13 @@ import { useRouter, usePathname } from "next/navigation"
 import axios from "axios"
 import { errorToast } from "@/hooks/error-toast"
 import { CommonPopup } from "@/components/common-popup"
+import { BranchOutIcon } from "@/components/common"
 
 interface ChatItem {
     id: string
     pubId: string
     title: string
+    parentId?: string
     createdAt?: string | Date
 }
 
@@ -291,11 +293,18 @@ const ChatItemComponent = React.memo<{
             }`}
             onClick={() => onSelect(chat.pubId)}
         >
-            <span className="truncate block flex-1">{chat.title}</span>
+            <div className="flex items-center flex-1 min-w-0">
+                {chat.parentId && (
+                    <div className="flex-shrink-0 mr-2" title="Branched chat">
+                        <BranchOutIcon className="text-gray-400 dark:text-gray-500" />
+                    </div>
+                )}
+                <span className="truncate block">{chat.title}</span>
+            </div>
 
             <button
                 onClick={handleDeleteClick}
-                className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 cursor-pointer"
+                className="p-1 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 cursor-pointer flex-shrink-0"
                 title="Delete chat"
             >
                 <svg

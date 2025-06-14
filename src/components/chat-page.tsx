@@ -9,7 +9,6 @@ import { HeaderControls } from "@/components/header-controls"
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
-import { ModelSelectorPopup } from "@/components/model-selector-popup"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
 import { useAuth } from "./auth-context"
@@ -23,6 +22,7 @@ interface Chat {
     id: string
     pubId: string
     title: string
+    parentId?: string
 }
 
 interface ChatPageProps {
@@ -34,14 +34,12 @@ interface ChatPageProps {
 export const ChatPage = React.memo(
     ({ initialSidebarVisible, chatId, initialChats }: ChatPageProps) => {
         const { user, withAuth } = useAuth()
-        const { models, selectedModel, setSelectedModel } = useModels()
+        const { selectedModel } = useModels()
 
         const [sidebarVisible, setSidebarVisible] = useState<boolean>(
             initialSidebarVisible
         )
         const [showSearchPopup, setShowSearchPopup] = useState<boolean>(false)
-        const [showModelSelector, setShowModelSelector] =
-            useState<boolean>(false)
 
         const [showScrollToBottom, setShowScrollToBottom] =
             useState<boolean>(false)
@@ -333,6 +331,10 @@ export const ChatPage = React.memo(
                                             message.role === "assistant" &&
                                             index === messages.length - 1
                                         }
+                                        messages={messages}
+                                        chatId={chatId}
+                                        model={selectedModel}
+                                        messageIndex={index}
                                     />
                                 ))}
                                 {isLoading && <LoadingDot />}
