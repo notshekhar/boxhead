@@ -1,8 +1,30 @@
-import React, { useRef, useEffect } from "react"
+import React, { useRef, useEffect, useState, useCallback } from "react"
+import axios from "axios"
+
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value, delay])
+
+    return debouncedValue
+}
 
 interface ChatItem {
     id: string
+    pubId: string
     title: string
+    createdAt?: string
+    parentId?: string
+    total?: number
 }
 
 interface SearchPopupProps {
@@ -20,6 +42,79 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
 }) => {
     const searchPopupRef = useRef<HTMLDivElement>(null)
     const searchInputRef = useRef<HTMLInputElement>(null)
+    
+    const [searchQuery, setSearchQuery] = useState("")
+    const [displayChats, setDisplayChats] = useState<ChatItem[]>(recentChats)
+    const [isSearching, setIsSearching] = useState(false)
+    const [selectedIndex, setSelectedIndex] = useState(-1)
+    
+    // Debounce the search query with 500ms delay
+    const debouncedSearchQuery = useDebounce(searchQuery, 500)
+
+    // Debounced search function
+    const searchChats = useCallback(async (query: string) => {
+        if (!query.trim()) {
+            setDisplayChats(recentChats)
+            setIsSearching(false)
+            return
+        }
+
+        setIsSearching(true)
+        try {
+            const response = await axios.get("/api/chats", {
+                params: {
+                    search: query,
+                    page: 1
+                },
+                withCredentials: true,
+            })
+            const data = response.data
+            setDisplayChats(data?.chats || [])
+        } catch (error) {
+            console.error("Search error:", error)
+            setDisplayChats([])
+        } finally {
+            setIsSearching(false)
+        }
+    }, [recentChats])
+
+    // Trigger search when debounced query changes
+    useEffect(() => {
+        searchChats(debouncedSearchQuery)
+    }, [debouncedSearchQuery, searchChats])
+
+    // Reset search when popup opens/closes
+    useEffect(() => {
+        if (isOpen) {
+            setSearchQuery("")
+            setDisplayChats(recentChats)
+            setSelectedIndex(-1)
+        }
+    }, [isOpen, recentChats])
+
+    // Handle keyboard navigation
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === "ArrowDown") {
+            e.preventDefault()
+            setSelectedIndex(prev => prev < displayChats.length - 1 ? prev + 1 : prev)
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault()
+            setSelectedIndex(prev => prev > 0 ? prev - 1 : -1)
+        } else if (e.key === "Enter") {
+            e.preventDefault()
+            if (selectedIndex >= 0 && selectedIndex < displayChats.length) {
+                const selectedChat = displayChats[selectedIndex]
+                onSelectChat(selectedChat.pubId)
+                onClose()
+            } else if (searchQuery.trim() === "") {
+                // Start new chat if no search query
+                window.location.href = "/"
+            }
+        } else if (e.key === "Escape") {
+            e.preventDefault()
+            onClose()
+        }
+    }, [displayChats, selectedIndex, onSelectChat, onClose, searchQuery])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -47,6 +142,8 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
     }, [isOpen])
 
     if (!isOpen) return null
+
+    const isShowingSearchResults = searchQuery.trim() && !isSearching && displayChats !== recentChats
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[9999]">
@@ -106,9 +203,20 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
                         <input
                             ref={searchInputRef}
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value)
+                                setSelectedIndex(-1) // Reset selection when typing
+                            }}
+                            onKeyDown={handleKeyDown}
                             className="flex-1 bg-transparent border-0 outline-none text-sm placeholder-gray-400 dark:placeholder-gray-400 focus:ring-0 py-0.5"
                             placeholder="Search or press Enter to start new chat..."
                         />
+                        {isSearching && (
+                            <div className="ml-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300"></div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -126,26 +234,41 @@ export const SearchPopup: React.FC<SearchPopupProps> = ({
                                 clipRule="evenodd"
                             />
                         </svg>
-                        <span>Recent Chats</span>
+                        <span>
+                            {isShowingSearchResults 
+                                ? `Search Results ${displayChats.length > 0 ? `(${displayChats.length})` : '(No results found)'}` 
+                                : "Recent Chats"
+                            }
+                        </span>
                     </div>
 
                     <div className="space-y-1">
-                        {recentChats.map((chat, index) => (
-                            <button
-                                key={chat.id}
-                                onClick={() => {
-                                    onSelectChat(chat.id)
-                                    onClose()
-                                }}
-                                className="w-full text-left px-2 py-2.5 hover:bg-gray-100/10 dark:hover:bg-gray-800/20 transition-all duration-200 text-sm animate-slideIn"
-                                style={{
-                                    animationDelay: `${index * 50}ms`,
-                                    animation: "slideIn 0.2s ease-out forwards",
-                                }}
-                            >
-                                {chat.title}
-                            </button>
-                        ))}
+                        {displayChats.length > 0 ? (
+                            displayChats.map((chat, index) => (
+                                <button
+                                    key={chat.id}
+                                    onClick={() => {
+                                        onSelectChat(chat.pubId)
+                                        onClose()
+                                    }}
+                                    className={`w-full text-left px-2 py-2.5 transition-all duration-200 text-sm animate-slideIn rounded-md ${
+                                        selectedIndex === index
+                                            ? "bg-gray-200/20 dark:bg-gray-700/30"
+                                            : "hover:bg-gray-100/10 dark:hover:bg-gray-800/20"
+                                    }`}
+                                    style={{
+                                        animationDelay: `${index * 50}ms`,
+                                        animation: "slideIn 0.2s ease-out forwards",
+                                    }}
+                                >
+                                    {chat.title}
+                                </button>
+                            ))
+                        ) : isShowingSearchResults && displayChats.length === 0 ? (
+                            <div className="px-2 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                No chats found matching "{searchQuery}"
+                            </div>
+                        ) : null}
                     </div>
                 </div>
             </div>

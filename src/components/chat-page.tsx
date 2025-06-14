@@ -15,7 +15,7 @@ import { useAuth } from "./auth-context"
 import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import axios from "axios"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { LoadingDot } from "@/components/loading-dots"
 
 interface Chat {
@@ -35,6 +35,8 @@ export const ChatPage = React.memo(
     ({ initialSidebarVisible, chatId, initialChats }: ChatPageProps) => {
         const { user, withAuth } = useAuth()
         const { selectedModel } = useModels()
+
+        const router = useRouter()
 
         const [sidebarVisible, setSidebarVisible] = useState<boolean>(
             initialSidebarVisible
@@ -231,8 +233,11 @@ export const ChatPage = React.memo(
                 <SearchPopup
                     isOpen={showSearchPopup}
                     onClose={() => setShowSearchPopup(false)}
-                    onSelectChat={() => {}}
-                    recentChats={initialChats}
+                    onSelectChat={(chatId) => {
+                        router.push(`/chat/${chatId}`)
+                        setShowSearchPopup(false)
+                    }}
+                    recentChats={chats}
                 />
 
                 {/* Sidebar - always rendered but positioned off-screen when not visible */}
