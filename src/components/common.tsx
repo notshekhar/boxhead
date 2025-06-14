@@ -188,7 +188,7 @@ BranchConfirmationModal.displayName = "BranchConfirmationModal"
 export const BranchOutButton = React.memo(
     ({ 
         text, 
-        label = "Branch Out",
+        label = "Branch Off",
         messages,
         chatId,
         model,
