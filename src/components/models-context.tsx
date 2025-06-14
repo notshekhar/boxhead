@@ -18,8 +18,8 @@ interface Model {
 
 interface ModelsContextType {
     models: Model[]
-    selectedModel: string
-    setSelectedModel: (model: string) => void
+    selectedModel: Model | null
+    setSelectedModel: (model: Model) => void
     isLoading: boolean
 }
 
@@ -37,8 +37,11 @@ export function ModelsProvider({
     initialSelectedModel,
 }: ModelsProviderProps) {
     const [models, setModels] = useState<Model[]>(initialModels)
-    const [selectedModel, setSelectedModelState] = useState<string>(() => {
-        if (initialSelectedModel) return initialSelectedModel
+    const [selectedModel, setSelectedModelState] = useState<Model | null>(() => {
+        if (initialSelectedModel) {
+            const foundModel = initialModels.find(model => model.name === initialSelectedModel)
+            if (foundModel) return foundModel
+        }
 
         // Get from cookie if available (client-side only)
         if (typeof window !== "undefined") {
@@ -47,16 +50,15 @@ export function ModelsProvider({
                 .find((row) => row.startsWith("selectedModel="))
                 ?.split("=")[1]
 
-            if (cookieValue) return cookieValue
+            if (cookieValue) {
+                const foundModel = initialModels.find(model => model.name === cookieValue)
+                if (foundModel) return foundModel
+            }
         }
 
         // Fallback to default model or first model
         const defaultModel = initialModels.find((model) => model.default)
-        return (
-            defaultModel?.name ||
-            initialModels[0]?.name ||
-            "gemini-2.0-flash-lite"
-        )
+        return defaultModel || initialModels[0] || null
     })
     const [isLoading, setIsLoading] = useState<boolean>(
         initialModels.length === 0
@@ -72,17 +74,16 @@ export function ModelsProvider({
     // Validate selected model when models change
     useEffect(() => {
         if (models.length > 0) {
-            const isValidModel = models.some(
-                (model) => model.name === selectedModel
+            const isValidModel = selectedModel && models.some(
+                (model) => model.name === selectedModel.name
             )
             if (!isValidModel) {
                 const defaultModel =
                     models.find((model) => model.default) || models[0]
-                const resetModel = defaultModel.name
-                setSelectedModelState(resetModel)
+                setSelectedModelState(defaultModel)
                 // Reset cookie to default model
-                if (typeof window !== "undefined") {
-                    document.cookie = `selectedModel=${resetModel}; path=/; max-age=${
+                if (typeof window !== "undefined" && defaultModel) {
+                    document.cookie = `selectedModel=${defaultModel.name}; path=/; max-age=${
                         60 * 60 * 24 * 365
                     }`
                 }
@@ -103,11 +104,11 @@ export function ModelsProvider({
         }
     }
 
-    const setSelectedModel = (model: string) => {
+    const setSelectedModel = (model: Model) => {
         setSelectedModelState(model)
         // Save to cookie
         if (typeof window !== "undefined") {
-            document.cookie = `selectedModel=${model}; path=/; max-age=${
+            document.cookie = `selectedModel=${model.name}; path=/; max-age=${
                 60 * 60 * 24 * 365
             }`
         }

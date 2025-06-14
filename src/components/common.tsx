@@ -228,7 +228,7 @@ export const BranchOutButton = React.memo(
                         id: newChatId,
                         parentId: chatId,
                         messages: messagesToBranch,
-                        model: selectedModel,
+                        model: selectedModel.name,
                     },
                     {
                         withCredentials: true,

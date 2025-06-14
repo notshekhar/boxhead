@@ -5,13 +5,14 @@ import { CommonPopup } from "@/components/common-popup"
 
 interface Model {
     name: string
+    displayName: string
     provider: string
     default?: boolean
 }
 
 interface ModelSelectorPopupProps {
-    selectedModel: string
-    onModelSelect: (model: string) => void
+    selectedModel: Model | null
+    onModelSelect: (model: Model) => void
     isOpen: boolean
     onClose: () => void
     models: Model[]
@@ -20,8 +21,8 @@ interface ModelSelectorPopupProps {
 export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
     ({ selectedModel, onModelSelect, isOpen, onClose, models }) => {
         // Handle model selection
-        const handleModelSelect = (modelName: string) => {
-            onModelSelect(modelName)
+        const handleModelSelect = (model: Model) => {
+            onModelSelect(model)
             onClose()
         }
 
@@ -37,11 +38,6 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                 default:
                     return "bg-gray-500"
             }
-        }
-
-        // Get display name for model
-        const getModelDisplayName = (name: string) => {
-            return name.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
         }
 
         return (
@@ -62,9 +58,9 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                             {models.map((model) => (
                                 <button
                                     key={model.name}
-                                    onClick={() => handleModelSelect(model.name)}
+                                    onClick={() => handleModelSelect(model)}
                                     className={`w-full flex items-center px-3 py-2 mx-1 my-0.5 rounded-lg transition-all duration-200 ${
-                                        selectedModel === model.name
+                                        selectedModel?.name === model.name
                                             ? "bg-[#2D7FF9] text-white"
                                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
@@ -72,7 +68,7 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                                     {/* Provider indicator */}
                                     <div
                                         className={`w-2.5 h-2.5 rounded-full mr-2.5 flex-shrink-0 ${
-                                            selectedModel === model.name
+                                            selectedModel?.name === model.name
                                                 ? "bg-white"
                                                 : getProviderColor(model.provider)
                                         }`}
@@ -80,11 +76,11 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                                     
                                     <div className="flex-1 text-left min-w-0">
                                         <div className="font-medium text-sm truncate">
-                                            {getModelDisplayName(model.name)}
+                                            {model.displayName}
                                         </div>
                                         <div
                                             className={`text-xs capitalize ${
-                                                selectedModel === model.name
+                                                selectedModel?.name === model.name
                                                     ? "text-white/70"
                                                     : "text-gray-500 dark:text-gray-400"
                                             }`}
@@ -94,14 +90,14 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                                     </div>
 
                                     {/* Default badge */}
-                                    {model.default && selectedModel !== model.name && (
+                                    {model.default && selectedModel?.name !== model.name && (
                                         <div className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-600 dark:text-gray-400 rounded flex-shrink-0 ml-2">
                                             Default
                                         </div>
                                     )}
 
                                     {/* Selected indicator */}
-                                    {selectedModel === model.name && (
+                                    {selectedModel?.name === model.name && (
                                         <svg
                                             className="w-4 h-4 ml-2 flex-shrink-0"
                                             fill="none"
