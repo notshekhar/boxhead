@@ -47,27 +47,33 @@ export const ModelProviderMapping = {
 export const models = [
     {
         name: ModelName.GEMINI_2_0_FLASH_LITE,
+        displayName: "Gemini 2.0 Flash Lite",
         provider: ModelProvider.GOOGLE,
         default: true,
     },
     {
         name: ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20,
+        displayName: "Gemini 2.5 Flash Preview",
         provider: ModelProvider.GOOGLE,
     },
     {
         name: ModelName.GEMINI_2_0_FLASH,
+        displayName: "Gemini 2.0 Flash",
         provider: ModelProvider.GOOGLE,
     },
     {
         name: ModelName.GPT_4O,
+        displayName: "GPT-4o",
         provider: ModelProvider.OPENAI,
     },
     {
         name: ModelName.GPT_4O_MINI,
+        displayName: "GPT-4o Mini",
         provider: ModelProvider.OPENAI,
     },
     {
         name: ModelName.CLAUDE_3_5_SONNET,
+        displayName: "Claude 3.5 Sonnet",
         provider: ModelProvider.ANTHROPIC,
     },
 ]

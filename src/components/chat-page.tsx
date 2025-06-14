@@ -15,8 +15,9 @@ import { useAuth } from "./auth-context"
 import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import axios from "axios"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { LoadingDot } from "@/components/loading-dots"
+import { useChatContext } from "./chat-context"
 
 interface Chat {
     id: string
@@ -27,14 +28,28 @@ interface Chat {
 
 interface ChatPageProps {
     initialSidebarVisible: boolean
-    chatId: string
-    initialChats: Chat[]
 }
 
 export const ChatPage = React.memo(
-    ({ initialSidebarVisible, chatId, initialChats }: ChatPageProps) => {
+    ({ initialSidebarVisible }: ChatPageProps) => {
+        const {
+            chatId,
+            chats,
+            isChatLoading,
+            fetchChats,
+            chat,
+            setChat,
+            messages,
+            input,
+            setInput,
+            handleSubmit,
+            isLoading,
+            setMessages,
+        } = useChatContext()
+
         const { user, withAuth } = useAuth()
-        const { selectedModel } = useModels()
+
+        const router = useRouter()
 
         const [sidebarVisible, setSidebarVisible] = useState<boolean>(
             initialSidebarVisible
@@ -44,13 +59,6 @@ export const ChatPage = React.memo(
         const [showScrollToBottom, setShowScrollToBottom] =
             useState<boolean>(false)
         const [isMobile, setIsMobile] = useState<boolean>(true) // Default to mobile for SSR
-        const [initialChat, setInitialChat] = useState<{
-            chat: Chat
-            messages: UIMessage[]
-        } | null>(null)
-        const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
-
-        const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
         const handleOpenSearch = useCallback(() => {
             setShowSearchPopup(true)
@@ -59,59 +67,6 @@ export const ChatPage = React.memo(
         const handleDeleteChat = useCallback(() => {
             fetchChats()
         }, [])
-
-        async function getChat(chatId: string) {
-            try {
-                const response = await axios.get(`/api/chat`, {
-                    params: {
-                        chatId,
-                    },
-                    withCredentials: true,
-                })
-                const data = response.data
-                return data
-            } catch (error) {
-                return null
-            }
-        }
-
-        async function getChats() {
-            try {
-                const response = await axios.get("/api/chats", {
-                    withCredentials: true,
-                })
-                const data = response.data
-                return data
-            } catch (error) {
-                return null
-            }
-        }
-
-        const fetchChat = useCallback(async () => {
-            setIsChatLoading(true)
-            try {
-                const chat = await getChat(chatId)
-                if (!chat && window.location.pathname !== "/") {
-                    redirect("/")
-                }
-                setInitialChat(chat)
-            } finally {
-                setIsChatLoading(false)
-            }
-        }, [chatId])
-
-        useEffect(() => {
-            fetchChat()
-        }, [chatId])
-
-        const fetchChats = useCallback(async () => {
-            const chats = await getChats()
-            setChats(chats?.chats || [])
-        }, [])
-
-        useEffect(() => {
-            fetchChats()
-        }, [user])
 
         const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -143,36 +98,6 @@ export const ChatPage = React.memo(
             }
         }, [sidebarVisible, isMobile])
 
-        // useChat hook for API integration
-        const {
-            messages,
-            input,
-            setInput,
-            handleSubmit,
-            isLoading,
-            setMessages,
-        } = useChat({
-            api: "/api/chat",
-            experimental_prepareRequestBody: ({ messages }) => {
-                return {
-                    model: selectedModel,
-                    id: chatId,
-                    messages,
-                }
-            },
-            onError: (error) => {
-                errorToast(error)
-            },
-            onResponse: () => {
-                if (typeof window !== "undefined") {
-                    window.history.replaceState(null, "", `/chat/${chatId}`)
-                    fetchChats()
-                }
-            },
-            initialMessages: initialChat?.messages || [],
-            credentials: "include",
-        })
-
         const handleToggleSidebar = useCallback(() => {
             setSidebarVisible((v) => !v)
         }, [])
@@ -181,7 +106,7 @@ export const ChatPage = React.memo(
             // clean the chat from useChat hook
             setInput("")
             setMessages([])
-            setInitialChat(null)
+            setChat(null)
             setShowScrollToBottom(false)
 
             redirect(`/`)
@@ -231,8 +156,11 @@ export const ChatPage = React.memo(
                 <SearchPopup
                     isOpen={showSearchPopup}
                     onClose={() => setShowSearchPopup(false)}
-                    onSelectChat={() => {}}
-                    recentChats={initialChats}
+                    onSelectChat={(chatId) => {
+                        router.push(`/chat/${chatId}`)
+                        setShowSearchPopup(false)
+                    }}
+                    recentChats={chats}
                 />
 
                 {/* Sidebar - always rendered but positioned off-screen when not visible */}
@@ -331,9 +259,6 @@ export const ChatPage = React.memo(
                                             message.role === "assistant" &&
                                             index === messages.length - 1
                                         }
-                                        messages={messages}
-                                        chatId={chatId}
-                                        model={selectedModel}
                                         messageIndex={index}
                                     />
                                 ))}

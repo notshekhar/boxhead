@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from "react"
 import { UIMessage } from "ai"
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4, v4 } from "uuid"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import { CommonPopup } from "./common-popup"
 import { errorToast } from "@/hooks/error-toast"
+import { useChatContext } from "./chat-context"
+import { useModels } from "./models-context"
 
 // Copy icon component
 export const CopyIcon = React.memo(({ className }: { className?: string }) => (
@@ -44,25 +46,27 @@ export const CheckIcon = React.memo(({ className }: { className?: string }) => (
 ))
 
 // Branch out icon component (git branch)
-export const BranchOutIcon = React.memo(({ className }: { className?: string }) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-    >
-        <line x1="6" y1="3" x2="6" y2="15" />
-        <circle cx="18" cy="6" r="3" />
-        <circle cx="6" cy="18" r="3" />
-        <path d="m18 9a9 9 0 0 1-9 9" />
-    </svg>
-))
+export const BranchOutIcon = React.memo(
+    ({ className }: { className?: string }) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <line x1="6" y1="3" x2="6" y2="15" />
+            <circle cx="18" cy="6" r="3" />
+            <circle cx="6" cy="18" r="3" />
+            <path d="m18 9a9 9 0 0 1-9 9" />
+        </svg>
+    )
+)
 
 // Custom hook for copy functionality
 const useCopyToClipboard = () => {
@@ -117,7 +121,7 @@ export const CopyButton = React.memo(
 )
 
 // Branch Confirmation Modal Component
-const BranchConfirmationModal = React.memo<{
+export const BranchConfirmationModal = React.memo<{
     isOpen: boolean
     isBranching: boolean
     onConfirm: () => void
@@ -134,7 +138,9 @@ const BranchConfirmationModal = React.memo<{
         >
             <div className="p-6">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                    This will create a new conversation branch from this point. You can continue the conversation from here in a separate thread.
+                    This will create a new conversation branch from this point.
+                    You can continue the conversation from here in a separate
+                    thread.
                 </p>
                 <div className="flex space-x-3 justify-end">
                     <button
@@ -186,54 +192,48 @@ BranchConfirmationModal.displayName = "BranchConfirmationModal"
 
 // Branch out button component
 export const BranchOutButton = React.memo(
-    ({ 
-        text, 
-        label = "Branch Out",
-        messages,
-        chatId,
-        model,
-        messageIndex
-    }: { 
-        text: string
+    ({
+        messageIndex,
+        label = "Branch Off",
+    }: {
+        messageIndex: number
         label?: string
-        messages?: UIMessage[]
-        chatId?: string
-        model?: string
-        messageIndex?: number
     }) => {
-        const [modalData, setModalData] = useState<{
-            isOpen: boolean
-            isBranching: boolean
-        }>({
-            isOpen: false,
-            isBranching: false,
-        })
         const router = useRouter()
+        const { messages, chatId } = useChatContext()
+        const { selectedModel } = useModels()
+
+        const [showBranchConfirmationModal, setShowBranchConfirmationModal] =
+            useState<boolean>(false)
+        const [isBranching, setIsBranching] = useState<boolean>(false)
 
         const handleBranchOut = useCallback(async () => {
-            if (!messages || !chatId || !model || messageIndex === undefined) {
+            if (!messages || !chatId || !selectedModel || messageIndex === -1) {
                 console.error("Missing required props for branching")
                 return
             }
 
-            setModalData(prev => ({ ...prev, isBranching: true }))
-            
             try {
+                setIsBranching(true)
                 // Generate new UUID for the branch
-                const newChatId = uuidv4()
-                
+                const newChatId = v4()
+
                 // Get messages up to the current point (including the assistant message)
                 const messagesToBranch = messages.slice(0, messageIndex + 1)
-                
+
                 // Make API call to create branch
-                const response = await axios.post('/api/chat/branch', {
-                    id: newChatId,
-                    parentId: chatId,
-                    messages: messagesToBranch,
-                    model: model
-                }, {
-                    withCredentials: true
-                })
+                const response = await axios.post(
+                    "/api/chat/branch",
+                    {
+                        id: newChatId,
+                        parentId: chatId,
+                        messages: messagesToBranch,
+                        model: selectedModel,
+                    },
+                    {
+                        withCredentials: true,
+                    }
+                )
 
                 if (response.status === 200) {
                     // Redirect to the new branch chat
@@ -242,47 +242,33 @@ export const BranchOutButton = React.memo(
             } catch (error) {
                 console.error("Failed to create branch:", error)
                 errorToast(error)
-                setModalData(prev => ({ ...prev, isBranching: false }))
             } finally {
-                setModalData({
-                    isOpen: false,
-                    isBranching: false,
-                })
+                setIsBranching(false)
+                setShowBranchConfirmationModal(false)
             }
-        }, [messages, chatId, model, messageIndex, router])
-
-        const handleOpenModal = useCallback(() => {
-            setModalData({
-                isOpen: true,
-                isBranching: false,
-            })
-        }, [])
-
-        const handleCloseModal = useCallback(() => {
-            setModalData({
-                isOpen: false,
-                isBranching: false,
-            })
         }, [])
 
         return (
             <>
+                <BranchConfirmationModal
+                    isOpen={showBranchConfirmationModal}
+                    isBranching={isBranching}
+                    onConfirm={handleBranchOut}
+                    onCancel={() => {
+                        setShowBranchConfirmationModal(false)
+                        setIsBranching(false)
+                    }}
+                />
                 <button
-                    onClick={handleOpenModal}
-                    disabled={!messages || !chatId || !model || messageIndex === undefined}
+                    onClick={() => {
+                        setShowBranchConfirmationModal(true)
+                    }}
                     className="flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark disabled:opacity-50 disabled:cursor-not-allowed"
                     title={label}
                 >
                     <BranchOutIcon />
                     {label}
                 </button>
-
-                <BranchConfirmationModal
-                    isOpen={modalData.isOpen}
-                    isBranching={modalData.isBranching}
-                    onConfirm={handleBranchOut}
-                    onCancel={handleCloseModal}
-                />
             </>
         )
     }
