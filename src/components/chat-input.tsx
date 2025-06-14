@@ -234,6 +234,20 @@ const ModelSelector: React.FC<{
         >
             <div className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(selectedModel)}`}></div>
             <span>{getModelDisplayName(selectedModel)}</span>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 ml-1"
+                fill="none"
+                viewBox="0 0 25 25"
+                stroke="currentColor"
+                strokeWidth={2}
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                />
+            </svg>
         </button>
     )
 })
