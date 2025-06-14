@@ -474,12 +474,12 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                                     multiple
                                 />
 
-                                {/* File icon with text */}
-                                <FileAttachButton
+                                {/* TODO: File icon with text - not working */}
+                                {/* <FileAttachButton
                                     onClick={() =>
                                         fileInputRef.current?.click()
                                     }
-                                />
+                                /> */}
                             </div>
                         </div>
 
