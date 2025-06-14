@@ -34,14 +34,6 @@ export default async function RootLayout({
         chatId: string
     }>
 }>) {
-    const authUser = await auth()
-
-    let user = null
-
-    if (authUser) {
-        user = (await getUser(authUser.email)) as unknown as User
-    }
-
     // Fetch models and get selected model from cookie
     const [models, cookieStore] = await Promise.all([getModels(), cookies()])
 
@@ -70,15 +62,13 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-            <AuthProvider initialUser={user}>
-                <ModelsProvider
-                    initialModels={models}
-                    initialSelectedModel={initialSelectedModel}
-                >
-                    {children}
-                    <AuthPopup />
-                </ModelsProvider>
-            </AuthProvider>
+            <ModelsProvider
+                initialModels={models}
+                initialSelectedModel={initialSelectedModel}
+            >
+                {children}
+                <AuthPopup />
+            </ModelsProvider>
             <Toaster position="bottom-right" />
         </ThemeProvider>
     )
