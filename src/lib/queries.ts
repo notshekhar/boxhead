@@ -25,6 +25,7 @@ export async function createChat(data: {
     userId: number
     title: string
     pubId: string
+    parentId?: number
 }) {
     try {
         const chat = await db
@@ -33,6 +34,7 @@ export async function createChat(data: {
                 userId: data.userId,
                 pubId: data.pubId,
                 title: data.title,
+                parentId: data.parentId,
             })
             .returning()
 
