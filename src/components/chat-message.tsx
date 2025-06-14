@@ -1,18 +1,21 @@
 import { UIMessage } from "ai"
 import React from "react"
 import { MemoizedMarkdown } from "./markdown-chunks"
-import { CopyButton } from "./common"
+import { CopyButton, BranchOutButton } from "./common"
 
 export const ChatMessage: React.FC<{
     message: UIMessage
+    messageIndex: number
     isLoading?: boolean
 }> = React.memo(
     ({
         message,
+        messageIndex,
         isLoading = false,
     }: {
         message: UIMessage
         isLoading?: boolean
+        messageIndex: number
     }) => {
         if (message.role === "user") {
             return (
@@ -24,7 +27,7 @@ export const ChatMessage: React.FC<{
                             </MemoizedMarkdown>
                         </div>
                     </div>
-                    <div className="flex justify-end mt-3 mr-2">
+                    <div className="flex justify-end gap-2 mt-3 mr-2">
                         <CopyButton text={message.content} label="Copy" />
                     </div>
                 </div>
@@ -38,8 +41,9 @@ export const ChatMessage: React.FC<{
                         <MemoizedMarkdown>{message.content}</MemoizedMarkdown>
                     </div>
                     {!isLoading && (
-                        <div className="flex justify-start mt-3">
+                        <div className="flex justify-start gap-2 mt-3">
                             <CopyButton text={message.content} label="Copy" />
+                            <BranchOutButton messageIndex={messageIndex} />
                         </div>
                     )}
                 </div>

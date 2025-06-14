@@ -1,7 +1,8 @@
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4, v4 } from "uuid"
 import axios from "axios"
 import { cookies } from "next/headers"
 import { ChatPage } from "./chat-page"
+import { ChatProvider } from "./chat-context"
 
 interface ChatPageProps {
     params: Promise<{
@@ -39,17 +40,15 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
     let chatId = resolvedParams.chatId
 
     if (!chatId) {
-        chatId = uuidv4()
+        chatId = v4()
     }
 
     // Fetch chats
     const chats = await getChats(authToken?.value || "")
 
     return (
-        <ChatPage
-            initialSidebarVisible={initialSidebarVisible}
-            chatId={chatId}
-            initialChats={chats?.chats || []}
-        />
+        <ChatProvider chatId={chatId} initialChats={chats?.chats || []}>
+            <ChatPage initialSidebarVisible={initialSidebarVisible} />
+        </ChatProvider>
     )
 }

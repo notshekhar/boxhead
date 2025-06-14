@@ -21,6 +21,7 @@ export async function GET(request: Request) {
                 id: chats.id,
                 title: chats.title,
                 createdAt: chats.createdAt,
+                parentId: chats.parentId,
                 pubId: chats.pubId,
                 total: sql<number>`count(*) over ()`,
             })
