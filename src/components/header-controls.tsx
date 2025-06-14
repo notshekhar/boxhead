@@ -23,7 +23,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
 
     return (
         <div
-            className={`bg-white dark:bg-[#27272A] rounded-xl border border-gray-100 dark:border-0 px-2 py-1.5 ${
+            className={`bg-white dark:bg-[#1E1F25] rounded border border-gray-100 dark:border-gray-700/30 px-2 py-1.5 ${
                 isVisible ? "animate-scale-in" : "opacity-0"
             }`}
         >
