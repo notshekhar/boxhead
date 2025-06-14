@@ -13,6 +13,8 @@ import { auth } from "@/helpers/auth"
 import { getUser } from "@/lib/queries"
 import axios from "axios"
 import { cookies } from "next/headers"
+import { ChatProvider } from "@/components/chat-context"
+import { v4 } from "uuid"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -48,9 +50,13 @@ async function getModels() {
 }
 
 export default async function RootLayout({
+    params,
     children,
 }: Readonly<{
     children: React.ReactNode
+    params: Promise<{
+        chatId: string
+    }>
 }>) {
     const authUser = await auth()
 
@@ -61,13 +67,10 @@ export default async function RootLayout({
     }
 
     // Fetch models and get selected model from cookie
-    const [models, cookieStore] = await Promise.all([
-        getModels(),
-        cookies()
-    ])
+    const [models, cookieStore] = await Promise.all([getModels(), cookies()])
 
     const selectedModelCookie = cookieStore.get("selectedModel")
-    
+
     // Get default model from fetched models
     const defaultModel = models.find((model: Model) => model.default)
     const defaultModelName = defaultModel?.name || "gemini-2.0-flash-lite"
@@ -96,7 +99,7 @@ export default async function RootLayout({
                     disableTransitionOnChange
                 >
                     <AuthProvider initialUser={user}>
-                        <ModelsProvider 
+                        <ModelsProvider
                             initialModels={models}
                             initialSelectedModel={initialSelectedModel}
                         >
