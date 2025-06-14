@@ -210,21 +210,29 @@ const SendButton: React.FC<{
     </button>
 ))
 
+interface Model {
+    name: string
+    displayName: string
+    provider: string
+    default?: boolean
+}
+
 const ModelSelector: React.FC<{
-    selectedModel: string
+    selectedModel: Model | null
     onClick: () => void
 }> = React.memo(({ selectedModel, onClick }) => {
-    // Get provider color based on model name
-    const getProviderColor = (modelName: string) => {
-        if (modelName.includes("gemini")) return "bg-blue-500"
-        if (modelName.includes("gpt")) return "bg-green-500"
-        if (modelName.includes("claude")) return "bg-orange-500"
-        return "bg-[#2D7FF9]"
-    }
-
-    // Get display name for model
-    const getModelDisplayName = (name: string) => {
-        return name.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    // Get provider color based on provider
+    const getProviderColor = (provider: string) => {
+        switch (provider) {
+            case "google":
+                return "bg-blue-500"
+            case "openai":
+                return "bg-green-500"
+            case "anthropic":
+                return "bg-orange-500"
+            default:
+                return "bg-[#2D7FF9]"
+        }
     }
 
     return (
@@ -232,8 +240,8 @@ const ModelSelector: React.FC<{
             onClick={onClick}
             className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
         >
-            <div className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(selectedModel)}`}></div>
-            <span>{getModelDisplayName(selectedModel)}</span>
+            <div className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(selectedModel?.provider || "")}`}></div>
+            <span>{selectedModel?.displayName || "Select Model"}</span>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 ml-1"

@@ -135,7 +135,7 @@ export const ChatProvider = React.memo(
             api: "/api/chat",
             experimental_prepareRequestBody: ({ messages }) => {
                 return {
-                    model: selectedModel,
+                    model: selectedModel?.name,
                     id: chatId,
                     messages,
                 }
