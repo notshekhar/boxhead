@@ -39,7 +39,6 @@ export enum ModelName {
     GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite",
 
     LLAMA_3_3_8B = "meta-llama/llama-3.3-8b-instruct:free",
-    PHI_4_REASONING_PLUS = "microsoft/phi-4-reasoning-plus:free",
     DEEPSEEK_R1_0528 = "deepseek/deepseek-r1-0528:free",
     QWEN_3_30B_A3B = "qwen/qwen3-30b-a3b-04-28:free",
 
@@ -54,7 +53,6 @@ export const ModelProviderMapping = {
     [ModelName.GEMINI_2_0_FLASH_LITE]: ModelProvider.GOOGLE,
 
     [ModelName.LLAMA_3_3_8B]: ModelProvider.OPENROUTER,
-    [ModelName.PHI_4_REASONING_PLUS]: ModelProvider.OPENROUTER,
     [ModelName.DEEPSEEK_R1_0528]: ModelProvider.OPENROUTER,
     [ModelName.QWEN_3_30B_A3B]: ModelProvider.OPENROUTER,
 
@@ -68,7 +66,6 @@ export const models = [
         name: ModelName.GEMINI_2_0_FLASH_LITE,
         displayName: "Gemini 2.0 Flash Lite",
         provider: ModelProvider.GOOGLE,
-        default: true,
     },
     {
         name: ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20,
@@ -81,14 +78,10 @@ export const models = [
         provider: ModelProvider.OPENROUTER,
     },
     {
-        name: ModelName.PHI_4_REASONING_PLUS,
-        displayName: "Phi 4 Reasoning Plus",
-        provider: ModelProvider.OPENROUTER,
-    },
-    {
         name: ModelName.DEEPSEEK_R1_0528,
         displayName: "DeepSeek R1 0528",
         provider: ModelProvider.OPENROUTER,
+        default: true,
     },
     {
         name: ModelName.QWEN_3_30B_A3B,
