@@ -28,7 +28,7 @@ export async function generateChatTitle(model: ModelName, messages: any[]) {
     ] as Message[]
 
     const response = await generateObject({
-        model: getModel(model),
+        model: getModel(ModelName.GEMINI_2_0_FLASH_LITE),
         messages,
         schema: z.object({
             chatTitle: z.string(),
