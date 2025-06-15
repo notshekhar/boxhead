@@ -12,6 +12,22 @@ export const EmptyState: React.FC<EmptyStateProps> = React.memo(({
     // State to control animation
     const [isVisible, setIsVisible] = useState(false)
 
+    // Random subtitle options
+    const subtitles = [
+        "What's on the agenda today?",
+        "What's on your mind today?",
+        "What are you working on?",
+        "Where should we begin?"
+    ]
+
+    // Select a random subtitle (initialized after hydration to avoid mismatch)
+    const [randomSubtitle, setRandomSubtitle] = useState("")
+
+    // Set random subtitle after component mounts to avoid hydration mismatch
+    useEffect(() => {
+        setRandomSubtitle(subtitles[Math.floor(Math.random() * subtitles.length)])
+    }, [])
+
     // Trigger animation when component mounts
     useEffect(() => {
         setIsVisible(true)
@@ -30,6 +46,9 @@ export const EmptyState: React.FC<EmptyStateProps> = React.memo(({
                 <h3 className="text-gray-500 dark:text-gray-400 text-xl font-normal">
                     Hi {displayName}
                 </h3>
+                <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold">
+                    {randomSubtitle}
+                </p>
             </div>
         </div>
     )
