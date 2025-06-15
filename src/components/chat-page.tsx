@@ -95,7 +95,6 @@ export const ChatPage = React.memo(
         }, [])
 
         const handleNewChat = useCallback(() => {
-            setShowScrollToBottom(false)
             router.push(`/`)
         }, [router])
 
@@ -237,8 +236,8 @@ export const ChatPage = React.memo(
                             </div>
                         ) : messages.length === 0 ? (
                             <>
-                                <EmptyState username={user?.name || "Guest"} />
                                 <div ref={messagesEndRef} />
+                                <EmptyState username={user?.name || "Guest"} />
                             </>
                         ) : (
                             <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
