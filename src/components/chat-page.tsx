@@ -9,22 +9,11 @@ import { HeaderControls } from "@/components/header-controls"
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
-import { useChat } from "@ai-sdk/react"
-import { errorToast } from "@/hooks/error-toast"
 import { useAuth } from "./auth-context"
-import { useModels } from "./models-context"
-import { UIMessage } from "ai"
-import axios from "axios"
 import { redirect, useRouter } from "next/navigation"
 import { LoadingDot } from "@/components/loading-dots"
 import { useChatContext } from "./chat-context"
-
-interface Chat {
-    id: string
-    pubId: string
-    title: string
-    parentId?: string
-}
+import { useKeyboardShortcut } from "@/hooks/use-keyboard"
 
 interface ChatPageProps {
     initialSidebarVisible: boolean
@@ -37,14 +26,11 @@ export const ChatPage = React.memo(
             chats,
             isChatLoading,
             fetchChats,
-            chat,
-            setChat,
             messages,
             input,
             setInput,
             handleSubmit,
             isLoading,
-            setMessages,
         } = useChatContext()
 
         const { user, withAuth } = useAuth()
@@ -64,9 +50,15 @@ export const ChatPage = React.memo(
             setShowSearchPopup(true)
         }, [])
 
-        const handleDeleteChat = useCallback(() => {
-            fetchChats()
-        }, [])
+        const handleDeleteChat = useCallback(
+            (id: string) => {
+                fetchChats()
+                if (id === chatId) {
+                    router.push("/")
+                }
+            },
+            [chatId, router]
+        )
 
         const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -103,14 +95,9 @@ export const ChatPage = React.memo(
         }, [])
 
         const handleNewChat = useCallback(() => {
-            // clean the chat from useChat hook
-            setInput("")
-            setMessages([])
-            setChat(null)
             setShowScrollToBottom(false)
-
-            redirect(`/`)
-        }, [])
+            router.push(`/`)
+        }, [router])
 
         const scrollToBottom = () => {
             if (messagesEndRef.current) {
@@ -148,7 +135,10 @@ export const ChatPage = React.memo(
                     observer.unobserve(messagesEndRef.current)
                 }
             }
-        }, [messages.length]) // Re-run when messages change
+        }, [messages.length])
+
+        // Keyboard shortcut for new chat (Cmd+Shift+O on Mac, Ctrl+Shift+O on Windows/Linux)
+        useKeyboardShortcut("cmd+shift+o", handleNewChat)
 
         return (
             <div className="fixed inset-0 bg-[#F5F5F5] dark:bg-[#0F0F0F] text-text-light dark:text-text-dark">
@@ -246,7 +236,10 @@ export const ChatPage = React.memo(
                                 </div>
                             </div>
                         ) : messages.length === 0 ? (
-                            <EmptyState username={user?.name || "Guest"} />
+                            <>
+                                <EmptyState username={user?.name || "Guest"} />
+                                <div ref={messagesEndRef} />
+                            </>
                         ) : (
                             <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
                                 <div className="h-[50px]" />

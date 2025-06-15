@@ -13,6 +13,7 @@ import "prismjs/components/prism-c"
 import "prismjs/components/prism-go"
 import "prismjs/components/prism-jsx"
 import "prismjs/components/prism-typescript"
+import "prismjs/components/prism-tsx"
 
 /**
  * I have converted text-sm to text-base

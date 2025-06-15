@@ -5,7 +5,6 @@ import React, {
     useContext,
     ReactNode,
     useState,
-    ContextType,
     useEffect,
     useCallback,
 } from "react"
@@ -13,7 +12,7 @@ import { useModels } from "./models-context"
 import { UIMessage } from "ai"
 import { useChat } from "@ai-sdk/react"
 import { errorToast } from "@/hooks/error-toast"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 import axios from "axios"
 import { useAuth } from "./auth-context"
 
@@ -60,6 +59,8 @@ export const ChatProvider = React.memo(
         const { selectedModel } = useModels()
         const { user } = useAuth()
 
+        const router = useRouter()
+
         const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
@@ -68,8 +69,6 @@ export const ChatProvider = React.memo(
             chat: Chat
             messages: UIMessage[]
         } | null>(null)
-
-        console.log(chatId)
 
         async function getChat(chatId: string) {
             try {
@@ -102,9 +101,13 @@ export const ChatProvider = React.memo(
             setIsChatLoading(true)
             try {
                 const chat = await getChat(chatId)
-                if (!chat && window.location.pathname !== "/") {
-                    redirect("/")
+                if (
+                    (!chat || !chat?.chat) &&
+                    window.location.pathname !== "/"
+                ) {
+                    router.push("/")
                 }
+                console.log(chat)
                 setInitialChat(chat)
             } finally {
                 setIsChatLoading(false)
@@ -152,6 +155,13 @@ export const ChatProvider = React.memo(
             initialMessages: initialChat?.messages || [],
             credentials: "include",
         })
+
+        useEffect(() => {
+            if (window.location.pathname === "/") {
+                setMessages(initialChat?.messages || [])
+            }
+        }, [initialChat])
+
         const contextValue: ChatContextType = {
             chatId,
             chat: initialChat,

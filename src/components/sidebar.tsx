@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useState, useEffect } from "react"
 import { useAuth } from "./auth-context"
 import { useRouter, usePathname } from "next/navigation"
 import axios from "axios"
@@ -374,6 +374,14 @@ const NavigationSection = React.memo<{
     onNewChat: () => void
     onOpenSearch?: () => void
 }>(({ onNewChat, onOpenSearch }) => {
+    const [shortcutBadge, setShortcutBadge] = useState("⌘⇧O") // Default to Mac for initial render
+
+    // Detect platform after component mounts to avoid hydration mismatch
+    useEffect(() => {
+        const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
+        setShortcutBadge(isMac ? "⌘⇧O" : "Ctrl⇧O")
+    }, [])
+
     return (
         <>
             {/* Navigation items */}
@@ -398,6 +406,7 @@ const NavigationSection = React.memo<{
                     }
                     label="New chat"
                     onClick={onNewChat}
+                    badge={shortcutBadge}
                 />
 
                 {/* Libraries */}
@@ -417,7 +426,7 @@ const NavigationSection = React.memo<{
                         </svg>
                     }
                     label="Libraries"
-                    badge="Beta"
+                    badge="coming soon"
                 />
             </div>
 
