@@ -85,18 +85,20 @@ const ReasoningSection = React.memo(
                     </span>
                 </button>
 
-                {isExpanded && (
-                    <div
-                        id="reasoning-content"
-                        className="px-3 py-3 ml-6 animate-slide-up"
-                    >
-                        <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                            <MemoizedMarkdownReasoning>
-                                {reasoning}
-                            </MemoizedMarkdownReasoning>
-                        </div>
+                <div
+                    id="reasoning-content"
+                    className={`ml-6 transition-all duration-200 overflow-hidden ${
+                        isExpanded
+                            ? "max-h-screen opacity-100 px-3 py-3 animate-slide-up"
+                            : "max-h-0 opacity-0 py-0"
+                    }`}
+                >
+                    <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <MemoizedMarkdownReasoning>
+                            {reasoning}
+                        </MemoizedMarkdownReasoning>
                     </div>
-                )}
+                </div>
             </div>
         )
     }
