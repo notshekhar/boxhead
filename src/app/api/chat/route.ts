@@ -129,7 +129,7 @@ export async function POST(request: Request) {
             maxRetries: 3,
             experimental_transform: smoothStream({
                 delayInMs: 20,
-                chunking: "word",
+                chunking: "line",
             }),
             onError: (error) => {
                 console.error(error)
