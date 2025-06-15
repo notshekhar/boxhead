@@ -202,11 +202,7 @@ export const MemoizedMarkdown = React.memo(
             <>
                 {tokens.map((token: any, index: number) => {
                     return (
-                        <ReactMarkdownMemo
-                            components={MarkdownComponents}
-                            remarkPlugins={[remarkGfm]}
-                            key={index}
-                        >
+                        <ReactMarkdownMemo key={index}>
                             {token.raw}
                         </ReactMarkdownMemo>
                     )

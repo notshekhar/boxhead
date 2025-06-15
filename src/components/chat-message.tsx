@@ -2,6 +2,7 @@ import { UIMessage } from "ai"
 import React from "react"
 import { MemoizedMarkdown } from "./markdown-chunks"
 import { CopyButton, BranchOutButton } from "./common"
+import { ChatMessageParts } from "./chat-message-parts"
 
 export const ChatMessage: React.FC<{
     message: UIMessage
@@ -35,19 +36,12 @@ export const ChatMessage: React.FC<{
         }
 
         return (
-            <div className="flex mb-6 items-start">
-                <div className="max-w-[100%] px-1 min-w-0">
-                    <div className="text-base text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
-                        <MemoizedMarkdown>{message.content}</MemoizedMarkdown>
-                    </div>
-                    {!isLoading && (
-                        <div className="flex justify-start gap-2 mt-3">
-                            <CopyButton text={message.content} label="Copy" />
-                            <BranchOutButton messageIndex={messageIndex} />
-                        </div>
-                    )}
-                </div>
-            </div>
+            <ChatMessageParts
+                isLoading={isLoading}
+                message={message}
+                messageIndex={messageIndex}
+                key={messageIndex}
+            />
         )
     }
 )

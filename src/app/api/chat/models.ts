@@ -47,6 +47,30 @@ export enum ModelName {
     CLAUDE_3_5_SONNET = "claude-3.5-sonnet",
 }
 
+export const ModelProviderConfig: Record<ModelName, any> = {
+    [ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20]: {
+        google: {
+            thinkingConfig: {
+                thinkingBudget: 1000,
+                includeThoughts: true,
+            },
+        },
+    },
+    [ModelName.GEMINI_2_0_FLASH]: {
+        thinkingConfig: {},
+    },
+    [ModelName.GEMINI_2_0_FLASH_LITE]: {
+        thinkingConfig: {},
+    },
+    [ModelName.LLAMA_3_3_8B]: {},
+    [ModelName.DEEPSEEK_R1_0528]: {},
+    [ModelName.QWEN_3_30B_A3B]: {},
+
+    [ModelName.GPT_4O]: {},
+    [ModelName.GPT_4O_MINI]: {},
+    [ModelName.CLAUDE_3_5_SONNET]: {},
+}
+
 export const ModelProviderMapping = {
     [ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20]: ModelProvider.GOOGLE,
     [ModelName.GEMINI_2_0_FLASH]: ModelProvider.GOOGLE,
@@ -85,8 +109,8 @@ export const models = [
     {
         name: ModelName.QWEN_3_30B_A3B,
         displayName: "Qwen 3.30B A3B",
-        provider: ModelProvider.OPENROUTER,
         default: true,
+        provider: ModelProvider.OPENROUTER,
     },
     {
         name: ModelName.GEMINI_2_0_FLASH,
@@ -112,5 +136,8 @@ export const models = [
 
 export const getModel = (model: ModelName) => {
     const provider = ModelProviderMapping[model]
-    return (modelProviders[provider] as any)(model)
+    return {
+        providerConfig: ModelProviderConfig[model] || {},
+        provider: (modelProviders[provider] as any)(model),
+    }
 }

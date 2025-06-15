@@ -17,6 +17,8 @@ import {
     saveMessage,
 } from "@/lib/queries"
 import { generateChatTitle } from "@/helpers/ai"
+import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google"
+import { calculator } from "./tools"
 
 export async function GET(request: Request) {
     try {
@@ -122,11 +124,14 @@ export async function POST(request: Request) {
             ...validate.data.messages,
         ] as Message[]
 
+        const modelConfig = getModel(model)
+
         const stream = streamText({
-            model: getModel(model),
+            model: modelConfig.provider,
             messages,
             maxSteps: 5,
             maxRetries: 3,
+            providerOptions: modelConfig.providerConfig,
             experimental_transform: smoothStream({
                 delayInMs: 20,
                 chunking: "line",
@@ -134,7 +139,7 @@ export async function POST(request: Request) {
             onError: (error) => {
                 console.error(error)
             },
-            onFinish: async ({ response, text, steps }) => {
+            onFinish: async ({ response, text, steps, reasoning }) => {
                 try {
                     await saveMessage({
                         chatId: chat.id,
@@ -165,7 +170,9 @@ export async function POST(request: Request) {
             },
         })
 
-        return stream.toDataStreamResponse()
+        return stream.toDataStreamResponse({
+            sendReasoning: true,
+        })
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })

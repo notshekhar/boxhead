@@ -243,16 +243,18 @@ export const ChatPage = React.memo(
                             <div className="px-3 sm:px-4 md:px-8 lg:px-16 py-6 max-w-[850px] mx-auto w-full">
                                 <div className="h-[50px]" />
                                 {messages.map((message, index) => (
-                                    <ChatMessage
-                                        key={message.id}
-                                        message={message}
-                                        isLoading={
-                                            isLoading &&
-                                            message.role === "assistant" &&
-                                            index === messages.length - 1
-                                        }
-                                        messageIndex={index}
-                                    />
+                                    <>
+                                        <ChatMessage
+                                            key={message.id}
+                                            message={message}
+                                            isLoading={
+                                                isLoading &&
+                                                message.role === "assistant" &&
+                                                index === messages.length - 1
+                                            }
+                                            messageIndex={index}
+                                        />
+                                    </>
                                 ))}
                                 {isLoading && <LoadingDot />}
                                 <div ref={messagesEndRef} />

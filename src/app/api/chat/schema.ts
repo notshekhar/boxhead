@@ -1,10 +1,12 @@
 import { z } from "zod"
 import { ModelName, ModelProvider } from "./models"
 
-const textPartSchema = z.object({
-    type: z.string(),
-    text: z.string().optional(),
-})
+const textPartSchema = z
+    .object({
+        type: z.string(),
+        text: z.string().optional(),
+    })
+    .passthrough()
 
 const messageSchema = z.object({
     id: z.union([z.string(), z.number()]),
