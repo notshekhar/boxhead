@@ -51,7 +51,7 @@ export const ModelProviderConfig: Record<ModelName, any> = {
     [ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20]: {
         google: {
             thinkingConfig: {
-                thinkingBudget: 500,
+                thinkingBudget: 1000,
                 includeThoughts: true,
             },
         },
