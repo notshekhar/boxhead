@@ -81,12 +81,12 @@ export const models = [
         name: ModelName.DEEPSEEK_R1_0528,
         displayName: "DeepSeek R1 0528",
         provider: ModelProvider.OPENROUTER,
-        default: true,
     },
     {
         name: ModelName.QWEN_3_30B_A3B,
         displayName: "Qwen 3.30B A3B",
         provider: ModelProvider.OPENROUTER,
+        default: true,
     },
     {
         name: ModelName.GEMINI_2_0_FLASH,
