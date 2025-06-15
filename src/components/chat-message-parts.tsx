@@ -89,7 +89,7 @@ const ReasoningSection = React.memo(
                     id="reasoning-content"
                     className={`ml-6 transition-all duration-200 overflow-hidden ${
                         isExpanded
-                            ? "max-h-screen opacity-100 px-3 py-3 animate-slide-up"
+                            ? "opacity-100 px-3 py-3 animate-slide-up"
                             : "max-h-0 opacity-0 py-0"
                     }`}
                 >
