@@ -49,12 +49,12 @@ export enum ModelName {
 
 export const ModelProviderConfig: Record<ModelName, any> = {
     [ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20]: {
-        // google: {
-        // thinkingConfig: {
-        //     thinkingBudget: 1000,
-        //     includeThoughts: true,
-        // },
-        // },
+        google: {
+            thinkingConfig: {
+                thinkingBudget: 500,
+                includeThoughts: true,
+            },
+        },
     },
     [ModelName.GEMINI_2_0_FLASH]: {
         thinkingConfig: {},
