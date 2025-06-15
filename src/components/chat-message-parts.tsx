@@ -70,7 +70,7 @@ const ReasoningSection = React.memo(
             <div className="mb-4 border-l-2 border-blue-200 dark:border-blue-800">
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group cursor-pointer"
                     aria-expanded={isExpanded}
                     aria-controls="reasoning-content"
                 >
