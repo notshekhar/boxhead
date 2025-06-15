@@ -64,6 +64,20 @@
       "when": 1749968924459,
       "tag": "0008_dazzling_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1749991584472,
+      "tag": "0009_flippant_magma",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1749994456335,
+      "tag": "0010_little_komodo",
+      "breakpoints": true
     }
   ]
 }

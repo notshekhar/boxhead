@@ -90,6 +90,7 @@ export const models = [
         name: ModelName.GEMINI_2_0_FLASH_LITE,
         displayName: "Gemini 2.0 Flash Lite",
         provider: ModelProvider.GOOGLE,
+        default: true,
     },
     {
         name: ModelName.GEMINI_2_5_FLASH_PREVIEW_05_20,
@@ -109,7 +110,6 @@ export const models = [
     {
         name: ModelName.QWEN_3_30B_A3B,
         displayName: "Qwen 3.30B A3B",
-        default: true,
         provider: ModelProvider.OPENROUTER,
     },
     {
