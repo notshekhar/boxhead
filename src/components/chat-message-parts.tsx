@@ -133,7 +133,6 @@ export const ChatMessageParts = React.memo(
                                             {message?.content ?? ""}
                                         </MemoizedMarkdown>
                                     </div>
-                                    q
                                     {!isLoading && (
                                         <div className="flex justify-start gap-2 mt-3">
                                             <CopyButton
