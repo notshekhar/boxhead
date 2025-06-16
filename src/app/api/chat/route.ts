@@ -1,6 +1,6 @@
 import {
     appendResponseMessages,
-    CoreMessage,
+    createDataStream,
     Message,
     smoothStream,
     streamText,
@@ -17,8 +17,7 @@ import {
     saveMessage,
 } from "@/lib/queries"
 import { generateChatTitle } from "@/helpers/ai"
-import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google"
-import { calculator } from "./tools"
+import { getStreamContext } from "./stream"
 
 export async function GET(request: Request) {
     try {
@@ -119,6 +118,20 @@ export async function POST(request: Request) {
             }
         }
 
+        let lastUserMessageId = null
+
+        if (!validate.data.incognito && chat) {
+            const userMessage = await saveMessage({
+                chatId: chat.id,
+                userId: session.id,
+                role: lastMessage.role,
+                content: lastMessage.content,
+                parts: lastMessage.parts ?? [],
+                attachments: lastMessage.experimental_attachments ?? [],
+            })
+            lastUserMessageId = userMessage.id
+        }
+
         const messages = [
             assistantPrompt({
                 model,
@@ -128,56 +141,69 @@ export async function POST(request: Request) {
 
         const modelConfig = getModel(model)
 
-        const stream = streamText({
-            model: modelConfig.provider,
-            messages,
-            maxSteps: 5,
-            maxRetries: 3,
-            providerOptions: modelConfig.providerConfig,
-            experimental_transform: smoothStream({
-                delayInMs: 20,
-                chunking: "line",
-            }),
-            onError: (error) => {
-                console.error(error)
-            },
-            onFinish: async ({ response, text, steps, reasoning }) => {
-                try {
-                    if (validate.data.incognito || !chat) {
-                        return
-                    }
-                    await saveMessage({
-                        chatId: chat.id,
-                        userId: session.id,
-                        role: lastMessage.role,
-                        content: lastMessage.content,
-                        parts: lastMessage.parts ?? [],
-                        attachments: lastMessage.experimental_attachments ?? [],
-                    })
+        const stream = createDataStream({
+            execute: async (dataStream) => {
+                const result = streamText({
+                    model: modelConfig.provider,
+                    messages,
+                    maxSteps: 5,
+                    maxRetries: 3,
+                    providerOptions: modelConfig.providerConfig,
+                    experimental_transform: smoothStream({
+                        delayInMs: 20,
+                        chunking: "line",
+                    }),
+                    onError: (error) => {
+                        console.error(error)
+                    },
+                    onFinish: async ({ response, text, steps, reasoning }) => {
+                        try {
+                            if (validate.data.incognito || !chat) {
+                                return
+                            }
 
-                    const [_, assistantMessage] = appendResponseMessages({
-                        messages: [lastMessage],
-                        responseMessages: response.messages,
-                    })
+                            const [_, assistantMessage] =
+                                appendResponseMessages({
+                                    messages: [lastMessage],
+                                    responseMessages: response.messages,
+                                })
 
-                    await saveMessage({
-                        chatId: chat.id,
-                        userId: session.id,
-                        role: "assistant",
-                        content: text,
-                        parts: assistantMessage.parts ?? [],
-                        attachments:
-                            assistantMessage.experimental_attachments ?? [],
-                    })
-                } catch (error) {
-                    console.error(error)
-                }
+                            await saveMessage({
+                                chatId: chat.id,
+                                userId: session.id,
+                                role: "assistant",
+                                content: text,
+                                parts: assistantMessage.parts ?? [],
+                                attachments:
+                                    assistantMessage.experimental_attachments ??
+                                    [],
+                            })
+                        } catch (error) {
+                            console.error(error)
+                        }
+                    },
+                })
+
+                result.consumeStream()
+
+                result.mergeIntoDataStream(dataStream, {
+                    sendReasoning: true,
+                })
             },
         })
 
-        return stream.toDataStreamResponse({
-            sendReasoning: true,
-        })
+        const streamContext = getStreamContext()
+
+        if (streamContext && lastUserMessageId) {
+            return new Response(
+                await streamContext.resumableStream(
+                    `stream-${lastUserMessageId}`,
+                    () => stream
+                )
+            )
+        } else {
+            return new Response(stream)
+        }
     } catch (error) {
         console.error(error)
         return new Response("Internal Server Error", { status: 500 })
