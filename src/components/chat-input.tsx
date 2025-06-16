@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import { ModelSelectorPopup } from "./model-selector-popup"
 import { useModels } from "./models-context"
+import { useChatContext } from "./chat-context"
 
 interface ChatInputProps {
     onSendMessage: () => void
@@ -236,11 +237,15 @@ const ModelSelector: React.FC<{
     }
 
     return (
-        <button 
+        <button
             onClick={onClick}
             className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
         >
-            <div className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(selectedModel?.provider || "")}`}></div>
+            <div
+                className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(
+                    selectedModel?.provider || ""
+                )}`}
+            ></div>
             <span>{selectedModel?.displayName || "Select Model"}</span>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -259,6 +264,31 @@ const ModelSelector: React.FC<{
         </button>
     )
 })
+
+const IncognitoButton: React.FC<{
+    isIncognito: boolean
+    onClick: () => void
+}> = React.memo(({ isIncognito, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center gap-1.5 p-2 rounded-lg transition-all duration-200 cursor-pointer text-xs font-medium ${
+            isIncognito
+                ? "text-orange-500 bg-orange-500/10"
+                : "text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9]"
+        }`}
+        aria-label="Toggle incognito mode"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+        >
+            <path d="M17.5,11.75 C20.1233526,11.75 22.25,13.8766474 22.25,16.5 C22.25,19.1233526 20.1233526,21.25 17.5,21.25 C15.4019872,21.25 13.6216629,19.8898135 12.9927596,18.0031729 L11.0072404,18.0031729 C10.3783371,19.8898135 8.59801283,21.25 6.5,21.25 C3.87664744,21.25 1.75,19.1233526 1.75,16.5 C1.75,13.8766474 3.87664744,11.75 6.5,11.75 C8.9545808,11.75 10.9743111,13.6118164 11.224028,16.0002862 L12.775972,16.0002862 C13.0256889,13.6118164 15.0454192,11.75 17.5,11.75 Z M6.5,13.75 C4.98121694,13.75 3.75,14.9812169 3.75,16.5 C3.75,18.0187831 4.98121694,19.25 6.5,19.25 C8.01878306,19.25 9.25,18.0187831 9.25,16.5 C9.25,14.9812169 8.01878306,13.75 6.5,13.75 Z M17.5,13.75 C15.9812169,13.75 14.75,14.9812169 14.75,16.5 C14.75,18.0187831 15.9812169,19.25 17.5,19.25 C19.0187831,19.25 20.25,18.0187831 20.25,16.5 C20.25,14.9812169 19.0187831,13.75 17.5,13.75 Z M15.5119387,3 C16.7263613,3 17.7969992,3.79658742 18.145961,4.95979331 L19.1520701,8.31093387 C19.944619,8.44284508 20.7202794,8.59805108 21.4790393,8.77658283 C22.0166428,8.90307776 22.3499121,9.44143588 22.2234172,9.9790393 C22.0969222,10.5166428 21.5585641,10.8499121 21.0209607,10.7234172 C18.2654221,10.0750551 15.258662,9.75 12,9.75 C8.74133802,9.75 5.73457794,10.0750551 2.97903933,10.7234172 C2.44143588,10.8499121 1.90307776,10.5166428 1.77658283,9.9790393 C1.6500879,9.44143588 1.98335721,8.90307776 2.52096067,8.77658283 C3.27940206,8.59812603 4.05472975,8.4429754 4.8469317,8.31110002 L5.85403902,4.95979331 C6.20300079,3.79658742 7.2736387,3 8.4880613,3 L15.5119387,3 Z" />
+        </svg>
+        <span>Incognito</span>
+    </button>
+))
 
 const FileAttachButton: React.FC<{
     onClick: () => void
@@ -398,7 +428,8 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
     ({ onSendMessage, input, setInput, isLoading = false }) => {
         const [showModelPopup, setShowModelPopup] = useState(false)
         const { models, selectedModel, setSelectedModel } = useModels()
-        
+        const { isIncognito, setIsIncognito } = useChatContext()
+
         const {
             isDragging,
             attachedFiles,
@@ -424,13 +455,15 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                     onClose={() => setShowModelPopup(false)}
                     models={models}
                 />
-                
+
                 {/* Glass effect around the input - only in light mode */}
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
                 <div
                     className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
                         isDragging
                             ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20 shadow-glow-blue"
+                            : isIncognito
+                            ? "ring-2 ring-orange-500"
                             : ""
                     }`}
                     onDragOver={handleDragOver}
@@ -468,7 +501,7 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                             {/* Left aligned tools */}
                             <div className="flex items-center space-x-4">
                                 {/* Model selector */}
-                                <ModelSelector 
+                                <ModelSelector
                                     selectedModel={selectedModel}
                                     onClick={() => setShowModelPopup(true)}
                                 />
@@ -488,6 +521,12 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                                         fileInputRef.current?.click()
                                     }
                                 /> */}
+                            </div>
+                            <div className="flex items-center">
+                                <IncognitoButton
+                                    isIncognito={isIncognito}
+                                    onClick={() => setIsIncognito(!isIncognito)}
+                                />
                             </div>
                         </div>
 

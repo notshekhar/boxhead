@@ -44,6 +44,8 @@ interface ChatContextType {
     chats: Chat[]
     fetchChats: () => Promise<void>
     isChatLoading: boolean
+    isIncognito: boolean
+    setIsIncognito: (isIncognito: boolean) => void
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -62,6 +64,7 @@ export const ChatProvider = React.memo(
         const router = useRouter()
 
         const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
+        const [isIncognito, setIsIncognito] = useState<boolean>(false)
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
@@ -175,6 +178,8 @@ export const ChatProvider = React.memo(
             chats,
             isChatLoading,
             fetchChats,
+            isIncognito,
+            setIsIncognito,
         }
         return (
             <ChatContext.Provider value={contextValue}>
