@@ -456,8 +456,6 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                     models={models}
                 />
 
-                {/* Glass effect around the input - only in light mode */}
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] rounded-2xl border border-white/20 pointer-events-none dark:hidden"></div>
                 <div
                     className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
                         isDragging
