@@ -1,8 +1,8 @@
 import { getModel, ModelName } from "@/app/api/chat/models"
-import { generateObject, Message } from "ai"
+import { generateObject } from "ai"
 import { z } from "zod"
 
-export async function generateChatTitle(model: ModelName, messages: any[]) {
+export async function generateChatTitle(message: string) {
     const prompt = `
         You are a assistant that tells the title for the chat based on the user's query.
 
@@ -19,17 +19,15 @@ export async function generateChatTitle(model: ModelName, messages: any[]) {
         Assistant: Sky Poem
         `
 
-    messages = [
-        {
-            role: "system",
-            content: prompt,
-        },
-        ...messages,
-    ] as Message[]
-
     const response = await generateObject({
         model: getModel(ModelName.GEMINI_2_0_FLASH_LITE).provider,
-        messages,
+        system: prompt,
+        messages: [
+            {
+                role: "user",
+                content: message,
+            },
+        ],
         schema: z.object({
             chatTitle: z.string(),
         }),

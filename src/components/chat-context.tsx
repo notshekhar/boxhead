@@ -143,6 +143,7 @@ export const ChatProvider = React.memo(
                 return {
                     model: selectedModel?.name,
                     id: chatId,
+                    incognito: isIncognito,
                     messages,
                 }
             },
@@ -150,7 +151,7 @@ export const ChatProvider = React.memo(
                 errorToast(error)
             },
             onResponse: () => {
-                if (typeof window !== "undefined") {
+                if (typeof window !== "undefined" && !isIncognito) {
                     window.history.replaceState(null, "", `/chat/${chatId}`)
                     fetchChats()
                 }

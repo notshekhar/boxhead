@@ -28,4 +28,5 @@ export const bodyValidator = z.object({
     id: z.string().uuid("Invalid chat id"),
     messages: z.array(messageSchema).min(1, "At least one message is required"),
     model: z.nativeEnum(ModelName),
+    incognito: z.boolean().optional(),
 })

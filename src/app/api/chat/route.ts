@@ -96,25 +96,27 @@ export async function POST(request: Request) {
 
         const chatId = body.id
 
-        let chat = await getChat({
-            userId: session.id,
-            pubId: chatId,
-        })
+        let chat = null
 
-        if (!chat) {
-            const title = await generateChatTitle(model, validate.data.messages)
-
-            const newChat = await createChat({
+        if (!validate.data.incognito) {
+            chat = await getChat({
                 userId: session.id,
-                title,
                 pubId: chatId,
             })
 
-            chat = newChat
-        }
+            if (!chat) {
+                const title = await generateChatTitle(lastMessage.content)
 
-        if (!chat || !chat.id) {
-            return new Response("Chat not found", { status: 404 })
+                const newChat = await createChat({
+                    userId: session.id,
+                    title,
+                    pubId: chatId,
+                })
+                chat = newChat
+            }
+            if (!chat || !chat.id) {
+                return new Response("Chat not found", { status: 404 })
+            }
         }
 
         const messages = [
@@ -141,6 +143,9 @@ export async function POST(request: Request) {
             },
             onFinish: async ({ response, text, steps, reasoning }) => {
                 try {
+                    if (validate.data.incognito || !chat) {
+                        return
+                    }
                     await saveMessage({
                         chatId: chat.id,
                         userId: session.id,
