@@ -14,6 +14,9 @@ import "prismjs/components/prism-go"
 import "prismjs/components/prism-jsx"
 import "prismjs/components/prism-typescript"
 import "prismjs/components/prism-tsx"
+import "prismjs/components/prism-json"
+import "prismjs/components/prism-mermaid"
+import "prismjs/components/prism-sql"
 
 /**
  * I have converted text-sm to text-base
