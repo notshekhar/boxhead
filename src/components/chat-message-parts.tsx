@@ -130,9 +130,10 @@ export const ChatMessageParts = React.memo(
                                 <div className="max-w-[100%] px-1 min-w-0">
                                     <div className="text-base text-text-light dark:text-text-dark leading-relaxed break-words overflow-wrap-anywhere">
                                         <MemoizedMarkdown>
-                                            {message.content}
+                                            {message?.content ?? ""}
                                         </MemoizedMarkdown>
                                     </div>
+                                    q
                                     {!isLoading && (
                                         <div className="flex justify-start gap-2 mt-3">
                                             <CopyButton
@@ -151,7 +152,7 @@ export const ChatMessageParts = React.memo(
                         return (
                             <ReasoningSection
                                 key={index}
-                                reasoning={part.reasoning}
+                                reasoning={part?.reasoning ?? ""}
                                 isReasoningLoading={isReasoningLoading}
                             />
                         )
