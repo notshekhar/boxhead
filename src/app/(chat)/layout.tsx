@@ -8,6 +8,8 @@ import { getUser } from "@/lib/queries"
 import axios from "axios"
 import { cookies } from "next/headers"
 
+import { NuqsAdapter } from "nuqs/adapters/next"
+
 interface Model {
     name: string
     provider: string
@@ -62,14 +64,16 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-            <ModelsProvider
-                initialModels={models}
-                initialSelectedModel={initialSelectedModel}
-            >
-                {children}
-                <AuthPopup />
-            </ModelsProvider>
-            <Toaster position="bottom-right" />
+            <NuqsAdapter>
+                <ModelsProvider
+                    initialModels={models}
+                    initialSelectedModel={initialSelectedModel}
+                >
+                    {children}
+                    <AuthPopup />
+                </ModelsProvider>
+                <Toaster position="bottom-right" />
+            </NuqsAdapter>
         </ThemeProvider>
     )
 }

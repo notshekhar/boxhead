@@ -16,6 +16,8 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { useAuth } from "./auth-context"
 
+import { parseAsBoolean, useQueryState } from "nuqs"
+
 interface Chat {
     id: string
     pubId: string
@@ -44,8 +46,8 @@ interface ChatContextType {
     chats: Chat[]
     fetchChats: () => Promise<void>
     isChatLoading: boolean
-    isIncognito: boolean
-    setIsIncognito: (isIncognito: boolean) => void
+    incognito: boolean
+    setIncognito: (incognito: boolean) => void
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -64,7 +66,11 @@ export const ChatProvider = React.memo(
         const router = useRouter()
 
         const [isChatLoading, setIsChatLoading] = useState<boolean>(false)
-        const [isIncognito, setIsIncognito] = useState<boolean>(false)
+
+        const [incognito, setIncognito] = useQueryState(
+            "incognito",
+            parseAsBoolean.withDefault(false)
+        )
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
@@ -143,7 +149,7 @@ export const ChatProvider = React.memo(
                 return {
                     model: selectedModel?.name,
                     id: chatId,
-                    incognito: isIncognito,
+                    incognito,
                     messages,
                 }
             },
@@ -151,7 +157,7 @@ export const ChatProvider = React.memo(
                 errorToast(error)
             },
             onResponse: () => {
-                if (typeof window !== "undefined" && !isIncognito) {
+                if (typeof window !== "undefined" && !incognito) {
                     window.history.replaceState(null, "", `/chat/${chatId}`)
                     fetchChats()
                 }
@@ -179,8 +185,8 @@ export const ChatProvider = React.memo(
             chats,
             isChatLoading,
             fetchChats,
-            isIncognito,
-            setIsIncognito,
+            incognito,
+            setIncognito,
         }
         return (
             <ChatContext.Provider value={contextValue}>

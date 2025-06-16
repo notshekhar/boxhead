@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback } from "react"
 import { ModelSelectorPopup } from "./model-selector-popup"
 import { useModels } from "./models-context"
 import { useChatContext } from "./chat-context"
+import { useRouter } from "next/navigation"
 
 interface ChatInputProps {
     onSendMessage: () => void
@@ -428,7 +429,8 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
     ({ onSendMessage, input, setInput, isLoading = false }) => {
         const [showModelPopup, setShowModelPopup] = useState(false)
         const { models, selectedModel, setSelectedModel } = useModels()
-        const { isIncognito, setIsIncognito } = useChatContext()
+        const { incognito, setIncognito } = useChatContext()
+        const router = useRouter()
 
         const {
             isDragging,
@@ -445,6 +447,10 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
             handleKeyDown,
         } = useChatInput(onSendMessage, input, setInput)
 
+        const handleIncognito = useCallback(() => {
+            router.push(`/?incognito=${!incognito}`)
+        }, [incognito, router])
+
         return (
             <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
                 {/* Model Selector Popup */}
@@ -460,7 +466,7 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                     className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
                         isDragging
                             ? "ring-2 ring-[#2D7FF9] bg-blue-50 dark:bg-blue-900/20 shadow-glow-blue"
-                            : isIncognito
+                            : incognito
                             ? "ring-2 ring-orange-500"
                             : ""
                     }`}
@@ -522,8 +528,8 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                             </div>
                             <div className="flex items-center">
                                 <IncognitoButton
-                                    isIncognito={isIncognito}
-                                    onClick={() => setIsIncognito(!isIncognito)}
+                                    isIncognito={incognito}
+                                    onClick={handleIncognito}
                                 />
                             </div>
                         </div>
