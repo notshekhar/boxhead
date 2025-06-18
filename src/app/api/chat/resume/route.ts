@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         chatId: chat.id,
     })
 
-    const streamContext = await getStreamContext()
+    const streamContext = getStreamContext()
 
     if (!lastUserMessageId || !streamContext) {
         return new Response("Last user message not found", { status: 404 })
