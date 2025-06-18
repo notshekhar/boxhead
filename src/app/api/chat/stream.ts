@@ -8,16 +8,18 @@ import { createClient } from "redis"
 
 let globalStreamContext: ResumableStreamContext | null = null
 
-// Create Redis clients (you can reuse them app-wide)
-const redisPublisher = createClient({ url: process.env.REDIS_URL })
-const redisSubscriber = redisPublisher.duplicate()
+let redisPublisher: ReturnType<typeof createClient> | null = null
+let redisSubscriber: ReturnType<typeof createClient> | null = null
 
-await redisPublisher.connect()
-await redisSubscriber.connect()
-
-export function getStreamContext() {
+export async function getStreamContext() {
     if (!globalStreamContext) {
         try {
+            if (!redisPublisher) {
+                redisPublisher = createClient({ url: process.env.REDIS_URL })
+                redisSubscriber = redisPublisher.duplicate()
+                await redisPublisher.connect()
+                await redisSubscriber.connect()
+            }
             globalStreamContext = createResumableStreamContext({
                 waitUntil: after,
                 subscriber: redisSubscriber,

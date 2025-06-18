@@ -47,7 +47,7 @@ export async function GET(request: Request) {
         })
 
         if (!initialMessages && !lastUserMessageId) {
-            const streamContext = getStreamContext()
+            const streamContext = await getStreamContext()
 
             const emptyDataStream = createDataStream({
                 execute: () => {},
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
             }
         }
         if (lastUserMessageId && !initialMessages) {
-            const streamContext = getStreamContext()
+            const streamContext = await getStreamContext()
 
             if (!lastUserMessageId || !streamContext) {
                 return new Response("Last user message not found", {
@@ -256,7 +256,7 @@ export async function POST(request: Request) {
             },
         })
 
-        const streamContext = getStreamContext()
+        const streamContext = await getStreamContext()
 
         if (streamContext && lastUserMessageId) {
             return new Response(
