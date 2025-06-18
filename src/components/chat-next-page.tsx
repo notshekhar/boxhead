@@ -25,6 +25,24 @@ async function getChats(authToken: string) {
     }
 }
 
+async function getChat(chatId: string, authToken: string) {
+    try {
+        const response = await axios.get(`${process.env.BASE_URL}/api/chat`, {
+            params: {
+                chatId,
+                initialMessages: true,
+            },
+            headers: {
+                Cookie: `token=${authToken}`,
+            },
+        })
+        const data = response.data
+        return data
+    } catch (error) {
+        return null
+    }
+}
+
 export default async function ChatNextPage({ params }: ChatPageProps) {
     // Get cookies server-side
     const cookieStore = await cookies()
@@ -45,9 +63,16 @@ export default async function ChatNextPage({ params }: ChatPageProps) {
 
     // Fetch chats
     const chats = await getChats(authToken?.value || "")
+    const chat = await getChat(chatId, authToken?.value || "")
+
+    console.log(chat)
 
     return (
-        <ChatProvider chatId={chatId} initialChats={chats?.chats || []}>
+        <ChatProvider
+            chatId={chatId}
+            initialChats={chats?.chats || []}
+            initialMessages={chat?.messages || []}
+        >
             <ChatPage initialSidebarVisible={initialSidebarVisible} />
         </ChatProvider>
     )

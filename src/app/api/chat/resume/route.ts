@@ -34,14 +34,7 @@ export async function GET(request: Request) {
 
     const streamId = `stream-${lastUserMessageId}`
 
-    const emptyDataStream = createDataStream({
-        execute: () => {},
-    })
-
-    const stream = await streamContext.resumableStream(
-        streamId,
-        () => emptyDataStream
-    )
+    const stream = await streamContext.resumeExistingStream(streamId)
 
     if (!stream) {
         return new Response("Stream not found", { status: 404 })

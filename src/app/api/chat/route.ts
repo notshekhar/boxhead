@@ -14,10 +14,12 @@ import {
     deleteChat,
     getAllChatMessages,
     getChat,
+    getLastUserMessageId,
     saveMessage,
 } from "@/lib/queries"
 import { generateChatTitle } from "@/helpers/ai"
 import { getStreamContext } from "./stream"
+import { randomUUID } from "node:crypto"
 
 export async function GET(request: Request) {
     try {
@@ -29,6 +31,7 @@ export async function GET(request: Request) {
 
         const url = new URL(request.url)
         const chatId = url.searchParams.get("chatId")
+        const initialMessages = url.searchParams.get("initialMessages")
 
         if (!chatId) {
             return new Response("Chat ID is required", { status: 400 })
@@ -38,6 +41,67 @@ export async function GET(request: Request) {
             userId: authUser.id,
             pubId: chatId,
         })
+
+        const lastUserMessageId = await getLastUserMessageId({
+            chatId: chat?.id || null,
+        })
+
+        if (!initialMessages && !lastUserMessageId) {
+            const streamContext = getStreamContext()
+
+            const emptyDataStream = createDataStream({
+                execute: () => {},
+            })
+
+            if (!streamContext) {
+                return new Response("Stream context not found", {
+                    status: 500,
+                })
+            }
+
+            const stream = await streamContext.resumableStream(
+                `stream-${randomUUID()}`,
+                () => emptyDataStream
+            )
+
+            if (stream) {
+                return new Response(stream)
+            }
+        }
+        if (lastUserMessageId && !initialMessages) {
+            const streamContext = getStreamContext()
+
+            if (!lastUserMessageId || !streamContext) {
+                return new Response("Last user message not found", {
+                    status: 404,
+                })
+            }
+
+            const streamId = `stream-${lastUserMessageId}`
+
+            const stream = await streamContext.resumeExistingStream(streamId)
+
+            if (stream) {
+                return new Response(stream)
+            } else {
+                const emptyDataStream = createDataStream({
+                    execute: () => {},
+                })
+
+                const stream = await streamContext.resumableStream(
+                    `stream-${randomUUID()}`,
+                    () => emptyDataStream
+                )
+
+                if (stream) {
+                    return new Response(stream)
+                } else {
+                    return new Response("Stream not found", {
+                        status: 404,
+                    })
+                }
+            }
+        }
 
         if (!chat) {
             return new Response(

@@ -28,6 +28,21 @@ async function getModels() {
     }
 }
 
+async function getChat(chatId: string) {
+    try {
+        const response = await axios.get(`/api/chat`, {
+            params: {
+                chatId,
+            },
+            withCredentials: true,
+        })
+        const data = response.data
+        return data
+    } catch (error) {
+        return null
+    }
+}
+
 export default async function RootLayout({
     children,
 }: Readonly<{

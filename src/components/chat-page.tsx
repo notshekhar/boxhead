@@ -10,10 +10,11 @@ import { ScrollToBottomButton } from "@/components/scroll-to-bottom-button"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { SearchPopup } from "@/components/search-popup"
 import { useAuth } from "./auth-context"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { LoadingDot } from "@/components/loading-dots"
 import { useChatContext } from "./chat-context"
 import { useKeyboardShortcut } from "@/hooks/use-keyboard"
+import { UIMessage } from "ai"
 
 interface ChatPageProps {
     initialSidebarVisible: boolean

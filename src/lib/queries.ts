@@ -75,8 +75,12 @@ export async function getChat(data: { userId: number; pubId: string }) {
     }
 }
 
-export async function getLastUserMessageId(data: { chatId: number }) {
+export async function getLastUserMessageId(data: { chatId: number | null }) {
     try {
+        if (!data.chatId) {
+            return null
+        }
+
         const lastUserMessage = await db
             .select({ id: messages.id })
             .from(messages)
