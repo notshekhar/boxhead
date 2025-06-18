@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { chats, messages, users } from "@/db/schema"
-import { and, asc, eq } from "drizzle-orm"
+import { and, asc, desc, eq } from "drizzle-orm"
 
 export async function getUser(email: string) {
     try {
@@ -72,6 +72,28 @@ export async function getChat(data: { userId: number; pubId: string }) {
     } catch (error) {
         console.error(error)
         throw error
+    }
+}
+
+export async function getLastUserMessageId(data: { chatId: number | null }) {
+    try {
+        if (!data.chatId) {
+            return null
+        }
+
+        const lastUserMessage = await db
+            .select({ id: messages.id })
+            .from(messages)
+            .where(
+                and(eq(messages.chatId, data.chatId), eq(messages.role, "user"))
+            )
+            .orderBy(desc(messages.id))
+            .limit(1)
+
+        return lastUserMessage[0]?.id ?? null
+    } catch (error) {
+        console.error(error)
+        return null
     }
 }
 

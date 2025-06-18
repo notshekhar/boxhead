@@ -27,16 +27,16 @@ interface Chat {
 
 interface ChatContextType {
     chatId: string
-    chat: {
-        chat: Chat
-        messages: UIMessage[]
-    } | null
-    setChat: (
-        chat: {
-            chat: Chat
-            messages: UIMessage[]
-        } | null
-    ) => void
+    // chat: {
+    //     chat: Chat
+    //     messages: UIMessage[]
+    // } | null
+    // setChat: (
+    //     chat: {
+    //         chat: Chat
+    //         messages: UIMessage[]
+    //     } | null
+    // ) => void
     messages: UIMessage[]
     input: string
     setInput: (input: string) => void
@@ -56,10 +56,16 @@ interface ChatProviderProps {
     children: ReactNode
     chatId: string
     initialChats: Chat[] | null
+    initialMessages: UIMessage[]
 }
 
 export const ChatProvider = React.memo(
-    ({ children, chatId, initialChats }: ChatProviderProps) => {
+    ({
+        children,
+        chatId,
+        initialChats,
+        initialMessages,
+    }: ChatProviderProps) => {
         const { selectedModel } = useModels()
         const { user } = useAuth()
 
@@ -74,25 +80,25 @@ export const ChatProvider = React.memo(
 
         const [chats, setChats] = useState<Chat[]>(initialChats || [])
 
-        const [initialChat, setInitialChat] = useState<{
-            chat: Chat
-            messages: UIMessage[]
-        } | null>(null)
+        // const [initialChat, setInitialChat] = useState<{
+        //     chat: Chat
+        //     messages: UIMessage[]
+        // } | null>(null)
 
-        async function getChat(chatId: string) {
-            try {
-                const response = await axios.get(`/api/chat`, {
-                    params: {
-                        chatId,
-                    },
-                    withCredentials: true,
-                })
-                const data = response.data
-                return data
-            } catch (error) {
-                return null
-            }
-        }
+        // async function getChat(chatId: string) {
+        //     try {
+        //         const response = await axios.get(`/api/chat`, {
+        //             params: {
+        //                 chatId,
+        //             },
+        //             withCredentials: true,
+        //         })
+        //         const data = response.data
+        //         return data
+        //     } catch (error) {
+        //         return null
+        //     }
+        // }
 
         async function getChats() {
             try {
@@ -106,26 +112,26 @@ export const ChatProvider = React.memo(
             }
         }
 
-        const fetchChat = useCallback(async () => {
-            setIsChatLoading(true)
-            try {
-                const chat = await getChat(chatId)
-                if (
-                    (!chat || !chat?.chat) &&
-                    window.location.pathname !== "/"
-                ) {
-                    router.push("/")
-                }
-                console.log(chat)
-                setInitialChat(chat)
-            } finally {
-                setIsChatLoading(false)
-            }
-        }, [chatId])
+        // const fetchChat = useCallback(async () => {
+        //     setIsChatLoading(true)
+        //     try {
+        //         const chat = await getChat(chatId)
+        //         if (
+        //             (!chat || !chat?.chat) &&
+        //             window.location.pathname !== "/"
+        //         ) {
+        //             router.push("/")
+        //         }
+        //         console.log(chat)
+        //         setInitialChat(chat)
+        //     } finally {
+        //         setIsChatLoading(false)
+        //     }
+        // }, [chatId])
 
-        useEffect(() => {
-            fetchChat()
-        }, [chatId])
+        // useEffect(() => {
+        //     fetchChat()
+        // }, [chatId])
 
         const fetchChats = useCallback(async () => {
             const chats = await getChats()
@@ -143,6 +149,7 @@ export const ChatProvider = React.memo(
             handleSubmit,
             isLoading,
             setMessages,
+            experimental_resume,
         } = useChat({
             api: "/api/chat",
             experimental_prepareRequestBody: ({ messages }) => {
@@ -162,20 +169,24 @@ export const ChatProvider = React.memo(
                     fetchChats()
                 }
             },
-            initialMessages: initialChat?.messages || [],
+            // initialMessages: initialChat?.messages || [],
+            initialMessages: initialMessages,
             credentials: "include",
         })
 
         useEffect(() => {
-            if (window.location.pathname === "/") {
-                setMessages(initialChat?.messages || [])
+            if (initialMessages.length > 0) {
+                experimental_resume()
             }
-        }, [initialChat])
+            if (window.location.pathname === "/") {
+                setMessages(initialMessages)
+            }
+        }, [initialMessages])
 
         const contextValue: ChatContextType = {
             chatId,
-            chat: initialChat,
-            setChat: setInitialChat,
+            // chat: initialChat,
+            // setChat: setInitialChat,
             messages,
             input,
             setInput,
