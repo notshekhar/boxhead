@@ -117,21 +117,21 @@ export const models = [
         displayName: "Gemini 2.0 Flash",
         provider: ModelProvider.GOOGLE,
     },
-    {
-        name: ModelName.GPT_4O,
-        displayName: "GPT-4o",
-        provider: ModelProvider.OPENAI,
-    },
-    {
-        name: ModelName.GPT_4O_MINI,
-        displayName: "GPT-4o Mini",
-        provider: ModelProvider.OPENAI,
-    },
-    {
-        name: ModelName.CLAUDE_3_5_SONNET,
-        displayName: "Claude 3.5 Sonnet",
-        provider: ModelProvider.ANTHROPIC,
-    },
+    // {
+    //     name: ModelName.GPT_4O,
+    //     displayName: "GPT-4o",
+    //     provider: ModelProvider.OPENAI,
+    // },
+    // {
+    //     name: ModelName.GPT_4O_MINI,
+    //     displayName: "GPT-4o Mini",
+    //     provider: ModelProvider.OPENAI,
+    // },
+    // {
+    //     name: ModelName.CLAUDE_3_5_SONNET,
+    //     displayName: "Claude 3.5 Sonnet",
+    //     provider: ModelProvider.ANTHROPIC,
+    // },
 ]
 
 export const getModel = (model: ModelName) => {
