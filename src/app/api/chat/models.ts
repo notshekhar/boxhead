@@ -98,8 +98,8 @@ export const models = [
         provider: ModelProvider.GOOGLE,
     },
     {
-        name: ModelName.LLAMA_3_3_8B,
-        displayName: "Llama 3.3 8B",
+        name: ModelName.QWEN_3_30B_A3B,
+        displayName: "Qwen 3.30B A3B",
         provider: ModelProvider.OPENROUTER,
     },
     {
@@ -108,8 +108,8 @@ export const models = [
         provider: ModelProvider.OPENROUTER,
     },
     {
-        name: ModelName.QWEN_3_30B_A3B,
-        displayName: "Qwen 3.30B A3B",
+        name: ModelName.LLAMA_3_3_8B,
+        displayName: "Llama 3.3 8B",
         provider: ModelProvider.OPENROUTER,
     },
     {
