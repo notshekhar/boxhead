@@ -9,6 +9,8 @@ import { PostHogProvider } from "@/components/posthog-context"
 import { AuthProvider, User } from "@/components/auth-context"
 import { getUser } from "@/lib/queries"
 import { auth } from "@/helpers/auth"
+import { ThemeProvider } from "@/components/theme-provider"
+import { NextProgressBar } from "@/components/progress-bar"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -44,18 +46,26 @@ export default async function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <AuthProvider initialUser={user}>
-                    <PostHogProvider>
-                        <noscript>
-                            <div className="fixed top-0 left-0 w-full bg-primary-500 text-white p-4 text-center z-[1000]">
-                                JavaScript is disabled in your browser. Please
-                                enable JavaScript to use all features of this
-                                application.
-                            </div>
-                        </noscript>
-                        {children}
-                    </PostHogProvider>
-                </AuthProvider>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <AuthProvider initialUser={user}>
+                        <PostHogProvider>
+                            <noscript>
+                                <div className="fixed top-0 left-0 w-full bg-orange-500 text-foreground p-4 text-center z-[1000]">
+                                    JavaScript is disabled in your browser.
+                                    Please enable JavaScript to use all features
+                                    of this application.
+                                </div>
+                            </noscript>
+                            {children}
+                            <NextProgressBar />
+                        </PostHogProvider>
+                    </AuthProvider>
+                </ThemeProvider>
             </body>
         </html>
     )

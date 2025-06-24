@@ -1,10 +1,6 @@
-import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider, User } from "@/components/auth-context"
 import { AuthPopup } from "@/components/auth-popup"
 import { ModelsProvider } from "@/components/models-context"
 import { Toaster } from "react-hot-toast"
-import { auth } from "@/helpers/auth"
-import { getUser } from "@/lib/queries"
 import axios from "axios"
 import { cookies } from "next/headers"
 
@@ -58,22 +54,15 @@ export default async function RootLayout({
     }
 
     return (
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
-            <NuqsAdapter>
-                <ModelsProvider
-                    initialModels={models}
-                    initialSelectedModel={initialSelectedModel}
-                >
-                    {children}
-                    <AuthPopup />
-                </ModelsProvider>
-                <Toaster position="bottom-right" />
-            </NuqsAdapter>
-        </ThemeProvider>
+        <NuqsAdapter>
+            <ModelsProvider
+                initialModels={models}
+                initialSelectedModel={initialSelectedModel}
+            >
+                {children}
+                <AuthPopup />
+            </ModelsProvider>
+            <Toaster position="bottom-right" />
+        </NuqsAdapter>
     )
 }
