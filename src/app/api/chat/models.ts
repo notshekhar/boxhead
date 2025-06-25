@@ -19,11 +19,17 @@ const openrouter = createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
 })
 
+const minimax = createOpenAI({
+    baseURL: "https://api.minimax.io/v1",
+    apiKey: process.env.MINIMAX_API_KEY,
+})
+
 export enum ModelProvider {
     GOOGLE = "google",
     OPENAI = "openai",
     ANTHROPIC = "anthropic",
     OPENROUTER = "openrouter",
+    MINIMAX = "minimax",
 }
 
 export const modelProviders = {
@@ -31,6 +37,7 @@ export const modelProviders = {
     [ModelProvider.OPENAI]: openai,
     [ModelProvider.ANTHROPIC]: anthropic,
     [ModelProvider.OPENROUTER]: openrouter,
+    [ModelProvider.MINIMAX]: minimax,
 }
 
 export enum ModelName {
@@ -41,6 +48,8 @@ export enum ModelName {
     LLAMA_3_3_8B = "meta-llama/llama-3.3-8b-instruct:free",
     DEEPSEEK_R1_0528 = "deepseek/deepseek-r1-0528:free",
     QWEN_3_30B_A3B = "qwen/qwen3-30b-a3b-04-28:free",
+
+    MINIMAX_M1 = "MiniMax-M1",
 
     GPT_4O = "gpt-4o",
     GPT_4O_MINI = "gpt-4o-mini",
@@ -66,6 +75,8 @@ export const ModelProviderConfig: Record<ModelName, any> = {
     [ModelName.DEEPSEEK_R1_0528]: {},
     [ModelName.QWEN_3_30B_A3B]: {},
 
+    [ModelName.MINIMAX_M1]: {},
+
     [ModelName.GPT_4O]: {},
     [ModelName.GPT_4O_MINI]: {},
     [ModelName.CLAUDE_3_5_SONNET]: {},
@@ -79,6 +90,8 @@ export const ModelProviderMapping = {
     [ModelName.LLAMA_3_3_8B]: ModelProvider.OPENROUTER,
     [ModelName.DEEPSEEK_R1_0528]: ModelProvider.OPENROUTER,
     [ModelName.QWEN_3_30B_A3B]: ModelProvider.OPENROUTER,
+
+    [ModelName.MINIMAX_M1]: ModelProvider.MINIMAX,
 
     [ModelName.GPT_4O]: ModelProvider.OPENAI,
     [ModelName.GPT_4O_MINI]: ModelProvider.OPENAI,
@@ -102,6 +115,11 @@ export const models = [
         displayName: "Qwen 3.30B A3B",
         provider: ModelProvider.OPENROUTER,
     },
+    // {
+    //     name: ModelName.MINIMAX_M1,
+    //     displayName: "MiniMax M1",
+    //     provider: ModelProvider.MINIMAX,
+    // },
     {
         name: ModelName.DEEPSEEK_R1_0528,
         displayName: "DeepSeek R1 0528",
