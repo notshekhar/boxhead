@@ -26,6 +26,7 @@ const minimax = createOpenAI({
 
 export enum ModelName {
     GEMINI_2_5_FLASH = "gemini-2.5-flash",
+    GEMINI_2_5_PRO = "gemini-2.5-pro",
     GEMINI_2_0_FLASH = "gemini-2.0-flash",
     GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite",
 
@@ -45,6 +46,7 @@ const modelMapping: Record<
     ModelName,
     {
         model: any
+        usagePoint?: number
         providerOptions?: any
     }
 > = {
@@ -53,6 +55,19 @@ const modelMapping: Record<
     },
     [ModelName.GEMINI_2_5_FLASH]: {
         model: google("gemini-2.5-flash"),
+        usagePoint: 5,
+        providerOptions: {
+            google: {
+                thinkingConfig: {
+                    thinkingBudget: 8000,
+                    includeThoughts: true,
+                },
+            },
+        },
+    },
+    [ModelName.GEMINI_2_5_PRO]: {
+        model: google("gemini-2.5-pro-preview-05-06"),
+        usagePoint: 15,
         providerOptions: {
             google: {
                 thinkingConfig: {
@@ -63,30 +78,38 @@ const modelMapping: Record<
         },
     },
     [ModelName.QWEN_3_30B_A3B]: {
+        usagePoint: 1,
         model: openrouter("qwen/qwen3-30b-a3b-04-28:free"),
     },
     [ModelName.DEEPSEEK_R1_0528]: {
+        usagePoint: 1,
         model: openrouter("deepseek/deepseek-r1-0528:free"),
     },
     [ModelName.LLAMA_3_3_8B]: {
         model: openrouter("meta-llama/llama-3.3-8b-instruct:free"),
     },
     [ModelName.GEMINI_2_0_FLASH]: {
+        usagePoint: 1,
         model: google("gemini-2.0-flash"),
     },
     [ModelName.GPT_4O]: {
+        usagePoint: 15,
         model: openai("gpt-4o"),
     },
     [ModelName.GPT_4O_MINI]: {
+        usagePoint: 1,
         model: openai("gpt-4o-mini"),
     },
     [ModelName.CLAUDE_3_5_SONNET]: {
+        usagePoint: 25,
         model: anthropic("claude-3.5-sonnet"),
     },
     [ModelName.CLAUDE_4_SONNET]: {
+        usagePoint: 60,
         model: anthropic("claude-4-sonnet-20250514"),
     },
     [ModelName.MINIMAX_M1]: {
+        usagePoint: 5,
         model: minimax("MiniMax-M1"),
     },
 }

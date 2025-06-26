@@ -7,7 +7,7 @@ export const assistantPrompt = ({ model }: { model: ModelName }) => {
     You are currently in a chat with a user. 
 
     # Metadata
-    - current time: ${new Date().toLocaleTimeString()}
+    - current date: ${new Date().toLocaleDateString()}
     - model name: ${model}
 
     #Guidelines
