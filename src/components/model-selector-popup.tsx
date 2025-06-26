@@ -2,11 +2,12 @@
 
 import React from "react"
 import { CommonPopup } from "@/components/common-popup"
+import { getModelIcon } from "@/lib/utils"
 
 interface Model {
     name: string
     displayName: string
-    provider: string
+    icon: string
     default?: boolean
 }
 
@@ -26,19 +27,7 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
             onClose()
         }
 
-        // Get provider color
-        const getProviderColor = (provider: string) => {
-            switch (provider) {
-                case "google":
-                    return "bg-blue-500"
-                case "openai":
-                    return "bg-green-500"
-                case "anthropic":
-                    return "bg-orange-500"
-                default:
-                    return "bg-gray-500"
-            }
-        }
+
 
         return (
             <CommonPopup
@@ -65,27 +54,27 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                 >
-                                    {/* Provider indicator */}
-                                    <div
-                                        className={`w-2.5 h-2.5 rounded-full mr-2.5 flex-shrink-0 ${
-                                            selectedModel?.name === model.name
-                                                ? "bg-white"
-                                                : getProviderColor(model.provider)
-                                        }`}
-                                    />
+                                    {/* Model icon */}
+                                    <div className="w-4 h-4 mr-2.5 flex-shrink-0 flex items-center justify-center">
+                                        <img
+                                            src={getModelIcon(model.icon)}
+                                            alt={`${model.icon} icon`}
+                                            className={`w-4 h-4 object-contain ${
+                                                selectedModel?.name === model.name
+                                                    ? "brightness-0 invert"
+                                                    : ""
+                                            }`}
+                                            onError={(e) => {
+                                                // Fallback to a generic icon if specific icon fails to load
+                                                const target = e.target as HTMLImageElement;
+                                                target.src = "/model-icons/default.svg";
+                                            }}
+                                        />
+                                    </div>
                                     
                                     <div className="flex-1 text-left min-w-0">
                                         <div className="font-medium text-sm truncate">
                                             {model.displayName}
-                                        </div>
-                                        <div
-                                            className={`text-xs capitalize ${
-                                                selectedModel?.name === model.name
-                                                    ? "text-white/70"
-                                                    : "text-gray-500 dark:text-gray-400"
-                                            }`}
-                                        >
-                                            {model.provider}
                                         </div>
                                     </div>
 

@@ -20,7 +20,7 @@ export async function generateChatTitle(message: string) {
         `
 
     const response = await generateObject({
-        model: getModel(ModelName.GEMINI_2_0_FLASH_LITE).provider,
+        model: getModel(ModelName.GEMINI_2_0_FLASH_LITE).model,
         system: prompt,
         messages: [
             {

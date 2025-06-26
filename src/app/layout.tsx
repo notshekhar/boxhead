@@ -46,6 +46,7 @@ export default async function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
+                <NextProgressBar />
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -62,7 +63,6 @@ export default async function RootLayout({
                                 </div>
                             </noscript>
                             {children}
-                            <NextProgressBar />
                         </PostHogProvider>
                     </AuthProvider>
                 </ThemeProvider>

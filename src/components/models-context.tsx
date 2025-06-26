@@ -12,7 +12,7 @@ import axios from "axios"
 interface Model {
     name: string
     displayName: string
-    provider: string
+    icon: string
     default?: boolean
 }
 

@@ -129,11 +129,11 @@ export async function POST(request: Request) {
         const modelConfig = getModel(model)
 
         const stream = streamText({
-            model: modelConfig.provider,
+            model: modelConfig.model,
             messages,
             maxSteps: 5,
             maxRetries: 3,
-            providerOptions: modelConfig.providerConfig,
+            providerOptions: modelConfig.providerOptions,
             experimental_transform: smoothStream({
                 delayInMs: 20,
                 chunking: "line",

@@ -3,6 +3,7 @@ import { ModelSelectorPopup } from "./model-selector-popup"
 import { useModels } from "./models-context"
 import { useChatContext } from "./chat-context"
 import { useRouter } from "next/navigation"
+import { getModelIcon } from "@/lib/utils"
 
 interface ChatInputProps {
     onSendMessage: () => void
@@ -215,7 +216,7 @@ const SendButton: React.FC<{
 interface Model {
     name: string
     displayName: string
-    provider: string
+    icon: string
     default?: boolean
 }
 
@@ -223,30 +224,25 @@ const ModelSelector: React.FC<{
     selectedModel: Model | null
     onClick: () => void
 }> = React.memo(({ selectedModel, onClick }) => {
-    // Get provider color based on provider
-    const getProviderColor = (provider: string) => {
-        switch (provider) {
-            case "google":
-                return "bg-blue-500"
-            case "openai":
-                return "bg-green-500"
-            case "anthropic":
-                return "bg-orange-500"
-            default:
-                return "bg-[#2D7FF9]"
-        }
-    }
+
 
     return (
         <button
             onClick={onClick}
-            className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
+            className="group flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
         >
-            <div
-                className={`w-2.5 h-2.5 rounded-full mr-1.5 ${getProviderColor(
-                    selectedModel?.provider || ""
-                )}`}
-            ></div>
+            <div className="w-4 h-4 mr-1.5 flex items-center justify-center">
+                <img
+                    src={getModelIcon(selectedModel?.icon || "")}
+                    alt={`${selectedModel?.icon || "default"} icon`}
+                    className="w-4 h-4 object-contain transition-all duration-200 model-icon"
+                    onError={(e) => {
+                        // Fallback to a generic icon if specific icon fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/model-icons/default.svg";
+                    }}
+                />
+            </div>
             <span>{selectedModel?.displayName || "Select Model"}</span>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
