@@ -59,11 +59,7 @@ export const ModelSelectorPopup: React.FC<ModelSelectorPopupProps> = React.memo(
                                         <img
                                             src={getModelIcon(model.icon)}
                                             alt={`${model.icon} icon`}
-                                            className={`w-4 h-4 object-contain ${
-                                                selectedModel?.name === model.name
-                                                    ? "brightness-0 invert"
-                                                    : ""
-                                            }`}
+                                            className="w-4 h-4 object-contain"
                                             onError={(e) => {
                                                 // Fallback to a generic icon if specific icon fails to load
                                                 const target = e.target as HTMLImageElement;
