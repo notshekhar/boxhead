@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ModelName, ModelProvider } from "./models"
+import { ModelName } from "./models"
 
 const textPartSchema = z
     .object({

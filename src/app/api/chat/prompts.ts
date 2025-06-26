@@ -1,4 +1,4 @@
-import { ModelName, ModelProvider } from "./models"
+import { ModelName } from "./models"
 
 export const assistantPrompt = ({ model }: { model: ModelName }) => {
     return {
