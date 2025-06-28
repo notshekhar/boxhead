@@ -1,2 +1,0 @@
-ALTER TABLE "chats" ADD COLUMN "parent_id" integer;--> statement-breakpoint
-ALTER TABLE "chats" ADD CONSTRAINT "chats_parent_id_chats_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."chats"("id") ON DELETE no action ON UPDATE no action;

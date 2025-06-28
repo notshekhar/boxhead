@@ -30,9 +30,9 @@ export enum ModelName {
     GEMINI_2_0_FLASH = "gemini-2.0-flash",
     GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite",
 
-    LLAMA_3_3_8B = "llama-3.3-8b-instruct",
     DEEPSEEK_R1_0528 = "deepseek-r1-0528",
     QWEN_3_30B_A3B = "qwen3-30b-a3b-04-28",
+    MISTRAL_SMALL_3_2_24B = "mistral-small-3.2-24b",
 
     MINIMAX_M1 = "MiniMax-M1",
 
@@ -54,9 +54,15 @@ const modelMapping: Record<
         model: google("gemini-2.0-flash-lite"),
     },
     [ModelName.GEMINI_2_5_FLASH]: {
+        // model: openrouter("google/gemini-2.5-flash"),
         model: google("gemini-2.5-flash"),
         usagePoint: 5,
         providerOptions: {
+            // openrouter: {
+            //     reasoning: {
+            //         enabled: true,
+            //     },
+            // },
             google: {
                 thinkingConfig: {
                     thinkingBudget: 8000,
@@ -77,6 +83,10 @@ const modelMapping: Record<
             },
         },
     },
+    [ModelName.MISTRAL_SMALL_3_2_24B]: {
+        usagePoint: 1,
+        model: openrouter("mistralai/mistral-small-3.2-24b-instruct:free"),
+    },
     [ModelName.QWEN_3_30B_A3B]: {
         usagePoint: 1,
         model: openrouter("qwen/qwen3-30b-a3b-04-28:free"),
@@ -84,9 +94,6 @@ const modelMapping: Record<
     [ModelName.DEEPSEEK_R1_0528]: {
         usagePoint: 1,
         model: openrouter("deepseek/deepseek-r1-0528:free"),
-    },
-    [ModelName.LLAMA_3_3_8B]: {
-        model: openrouter("meta-llama/llama-3.3-8b-instruct:free"),
     },
     [ModelName.GEMINI_2_0_FLASH]: {
         usagePoint: 1,
@@ -127,6 +134,11 @@ export const models = [
         icon: "https://cdn.jsdelivr.net/gh/foyer-work/cdn-files@latest/models/gemini_2_5_flash_thinking.webp",
     },
     {
+        name: ModelName.MISTRAL_SMALL_3_2_24B,
+        displayName: "Mistral Small 3.2 24B",
+        icon: "mistral",
+    },
+    {
         name: ModelName.QWEN_3_30B_A3B,
         displayName: "Qwen 3.30B A3B",
         icon: "qwen",
@@ -135,11 +147,6 @@ export const models = [
         name: ModelName.DEEPSEEK_R1_0528,
         displayName: "DeepSeek R1 0528",
         icon: "deepseek",
-    },
-    {
-        name: ModelName.LLAMA_3_3_8B,
-        displayName: "Llama 3.3 8B",
-        icon: "meta",
     },
     {
         name: ModelName.GEMINI_2_0_FLASH,

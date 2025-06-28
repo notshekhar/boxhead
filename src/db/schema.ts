@@ -1,12 +1,14 @@
 import {
+    index,
     integer,
     jsonb,
+    pgEnum,
     pgTable,
     text,
     timestamp,
     uuid,
     varchar,
-} from "drizzle-orm/pg-core"
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -15,7 +17,7 @@ export const users = pgTable("users", {
     avatar: varchar({ length: 255 }),
     password: varchar({ length: 255 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+});
 
 export const chats = pgTable("chats", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -26,7 +28,7 @@ export const chats = pgTable("chats", {
     }),
     userId: integer("user_id").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+});
 
 export const messages = pgTable("messages", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -39,4 +41,60 @@ export const messages = pgTable("messages", {
     parts: jsonb("parts").notNull(),
     attachments: jsonb("attachments"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+});
+export const providers = pgTable("providers", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    pubId: varchar("pub_id", { length: 255 }).notNull().unique(),
+    name: varchar({ length: 255 }).notNull(),
+    description: text("description"),
+    icon: varchar("icon", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const models = pgTable("models", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    pubId: varchar("pub_id", { length: 255 }).notNull().unique(),
+    name: varchar({ length: 255 }).notNull(),
+    description: text("description"),
+    icon: varchar("icon", { length: 255 }),
+    inputTokenCost: integer("input_token_cost").notNull(),
+    outputTokenCost: integer("output_token_cost").notNull(),
+    providerId: integer("provider_id").references(() => providers.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const credits = pgTable("credits", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id").references(() => users.id),
+    amount: integer("amount").notNull(), // current credit balance of the user
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const creditLogs = pgTable("credit_logs", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id").references(() => users.id),
+    modelId: integer("model_id").references(() => models.id),
+    inputTokens: integer("input_tokens").notNull(), // input tokens used
+    outputTokens: integer("output_tokens").notNull(), // output tokens generated
+    speed: integer("speed").notNull(), // tokens per second
+    amount: integer("amount").notNull(), // amount added or deducted from the user's credit
+    fee: integer("fee").default(0).notNull(), // fee paid out platform from the amount deducted or added to the user's credit
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const transactions = pgTable(
+    "transactions",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        userId: integer("user_id").references(() => users.id),
+        method: varchar("method", { length: 255 }).notNull(), // credit, debit, giftcard
+        type: varchar("type", { length: 255 }).notNull(), // refund, credit
+        gateway: varchar("gateway", { length: 255 }).notNull(), // stripe, paypal, etc.
+        amount: integer("amount").notNull(), // amount paid or received from the user
+        fee: integer("fee").default(0).notNull(), // fee paid out platform from the amount paid or received from the user
+        refId: varchar("ref_id", { length: 255 }).unique().notNull(), // reference id of the transaction
+        status: varchar("status", { length: 255 }).notNull(), // pending, completed, failed
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => [index("idx_transactions_type").on(table.type)]
+);
