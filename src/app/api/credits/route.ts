@@ -12,11 +12,17 @@ export async function GET(request: Request) {
         const userId = session.id;
 
         const credit = await db
-            .select()
+            .select({
+                amount: credits.amount,
+            })
             .from(credits)
             .where(eq(credits.userId, userId));
 
-        return new Response(JSON.stringify(credit), { status: 200 });
+        const creditBalance = credit[0] ?? {
+            amount: 0,
+        };
+
+        return new Response(JSON.stringify(creditBalance), { status: 200 });
     } catch (error) {
         return new Response("Internal Server Error", { status: 500 });
     }

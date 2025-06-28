@@ -42,14 +42,6 @@ export const messages = pgTable("messages", {
     attachments: jsonb("attachments"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export const providers = pgTable("providers", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    pubId: varchar("pub_id", { length: 255 }).notNull().unique(),
-    name: varchar({ length: 255 }).notNull(),
-    description: text("description"),
-    icon: varchar("icon", { length: 255 }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-});
 
 export const models = pgTable("models", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -59,7 +51,6 @@ export const models = pgTable("models", {
     icon: varchar("icon", { length: 255 }),
     inputTokenCost: integer("input_token_cost").notNull(),
     outputTokenCost: integer("output_token_cost").notNull(),
-    providerId: integer("provider_id").references(() => providers.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
