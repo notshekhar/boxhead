@@ -1,4 +1,5 @@
 import {
+    decimal,
     index,
     integer,
     jsonb,
@@ -49,15 +50,22 @@ export const models = pgTable("models", {
     name: varchar({ length: 255 }).notNull(),
     description: text("description"),
     icon: varchar("icon", { length: 255 }),
-    inputTokenCost: integer("input_token_cost").notNull(),
-    outputTokenCost: integer("output_token_cost").notNull(),
+    inputTokenCost: decimal("input_token_cost", { precision: 30, scale: 15 })
+        .default("0")
+        .notNull(),
+    outputTokenCost: decimal("output_token_cost", { precision: 30, scale: 15 })
+        .default("0")
+        .notNull(),
+    status: varchar("status", { length: 255 }).notNull().default("active"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const credits = pgTable("credits", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("user_id").references(() => users.id),
-    amount: integer("amount").notNull(), // current credit balance of the user
+    amount: decimal("amount", { precision: 30, scale: 15 })
+        .default("0")
+        .notNull(), // current credit balance of the user
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -68,8 +76,8 @@ export const creditLogs = pgTable("credit_logs", {
     inputTokens: integer("input_tokens").notNull(), // input tokens used
     outputTokens: integer("output_tokens").notNull(), // output tokens generated
     speed: integer("speed").notNull(), // tokens per second
-    amount: integer("amount").notNull(), // amount added or deducted from the user's credit
-    fee: integer("fee").default(0).notNull(), // fee paid out platform from the amount deducted or added to the user's credit
+    amount: decimal("amount", { precision: 30, scale: 15 }).notNull(), // amount added or deducted from the user's credit
+    fee: decimal("fee", { precision: 30, scale: 15 }).default("0").notNull(), // fee paid out platform from the amount deducted or added to the user's credit
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

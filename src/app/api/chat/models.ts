@@ -1,53 +1,53 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { createOpenAI } from "@ai-sdk/openai"
-import { createAnthropic } from "@ai-sdk/anthropic"
-import { createOpenRouter } from "@openrouter/ai-sdk-provider"
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
-})
+});
 
 const openai = createOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-})
+});
 
 const anthropic = createAnthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
-})
+});
 
 const openrouter = createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
-})
+});
 
 const minimax = createOpenAI({
     baseURL: "https://api.minimax.io/v1",
     apiKey: process.env.MINIMAX_API_KEY,
-})
+});
 
 export enum ModelName {
-    GEMINI_2_5_FLASH = "gemini-2.5-flash",
-    GEMINI_2_5_PRO = "gemini-2.5-pro",
-    GEMINI_2_0_FLASH = "gemini-2.0-flash",
-    GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite",
+    GEMINI_2_5_FLASH = "google/gemini-2.5-flash",
+    GEMINI_2_5_PRO = "google/gemini-2.5-pro",
+    GEMINI_2_0_FLASH = "google/gemini-2.0-flash",
+    GEMINI_2_0_FLASH_LITE = "google/gemini-2.0-flash-lite",
 
-    DEEPSEEK_R1_0528 = "deepseek-r1-0528",
-    QWEN_3_30B_A3B = "qwen3-30b-a3b-04-28",
-    MISTRAL_SMALL_3_2_24B = "mistral-small-3.2-24b",
+    DEEPSEEK_R1_0528 = "deepseek/deepseek-r1-0528",
+    QWEN_3_30B_A3B = "qwen/qwen3-30b-a3b-04-28",
+    MISTRAL_SMALL_3_2_24B = "mistralai/mistral-small-3.2-24b-instruct",
 
-    MINIMAX_M1 = "MiniMax-M1",
+    MINIMAX_M1 = "minimax/MiniMax-M1",
 
-    GPT_4O = "gpt-4o",
-    GPT_4O_MINI = "gpt-4o-mini",
-    CLAUDE_3_5_SONNET = "claude-3.5-sonnet",
-    CLAUDE_4_SONNET = "claude-4-sonnet",
+    GPT_4O = "openai/gpt-4o",
+    GPT_4O_MINI = "openai/gpt-4o-mini",
+    CLAUDE_3_5_SONNET = "anthropic/claude-3.5-sonnet",
+    CLAUDE_4_SONNET = "anthropic/claude-4-sonnet",
 }
 
 const modelMapping: Record<
     ModelName,
     {
-        model: any
-        usagePoint?: number
-        providerOptions?: any
+        model: any;
+        usagePoint?: number;
+        providerOptions?: any;
     }
 > = {
     [ModelName.GEMINI_2_0_FLASH_LITE]: {
@@ -119,7 +119,7 @@ const modelMapping: Record<
         usagePoint: 5,
         model: minimax("MiniMax-M1"),
     },
-}
+};
 
 export const models = [
     {
@@ -178,8 +178,8 @@ export const models = [
     //     displayName: "Claude 4 Sonnet",
     //     icon: "https://cdn.jsdelivr.net/gh/foyer-work/cdn-files@latest/models/claude_4_sonnet_thinking.webp",
     // },
-]
+];
 
 export const getModel = (model: ModelName) => {
-    return modelMapping[model]
-}
+    return modelMapping[model];
+};
