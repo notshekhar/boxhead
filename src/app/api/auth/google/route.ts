@@ -1,4 +1,5 @@
 import { generateCodeVerifier, generateState, Google } from "arctic"
+import { checkBotId } from "botid/server";
 import { cookies } from "next/headers"
 
 const google = new Google(
@@ -8,6 +9,12 @@ const google = new Google(
 )
 
 export async function GET(): Promise<Response> {
+    const verification = await checkBotId();
+
+    if (verification.isBot) {
+        return new Response("Access denied", { status: 403 });
+    }
+
     const state = generateState()
 
     const codeVerifier = generateCodeVerifier()
