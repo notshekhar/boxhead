@@ -1,3 +1,5 @@
+import { checkBotId } from "botid/server";
+
 import { appendResponseMessages, Message, smoothStream, streamText } from "ai";
 import { assistantPrompt } from "./prompts";
 import { getModel } from "./models";
@@ -66,6 +68,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const verification = await checkBotId();
+
+        if (verification.isBot) {
+            return new Response("Access denied", { status: 403 });
+        }
+
         const session = await auth();
 
         if (!session) {

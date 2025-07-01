@@ -1,57 +1,61 @@
-import React, { useCallback, useState, useEffect } from "react"
-import { useAuth } from "./auth-context"
-import { useRouter, usePathname } from "next/navigation"
-import axios from "axios"
-import { errorToast } from "@/hooks/error-toast"
-import { CommonPopup } from "@/components/common-popup"
-import { BranchOutIcon } from "@/components/common"
+import React, { useCallback, useState, useEffect } from "react";
+import { useAuth } from "./auth-context";
+import { useRouter, usePathname } from "next/navigation";
+import axios from "axios";
+import { errorToast } from "@/hooks/error-toast";
+import { CommonPopup } from "@/components/common-popup";
+import { BranchOutIcon } from "@/components/common";
+
+interface CreditBalance {
+    amount: number;
+}
 
 interface ChatItem {
-    id: string
-    pubId: string
-    title: string
-    parentId?: string
-    createdAt?: string | Date
+    id: string;
+    pubId: string;
+    title: string;
+    parentId?: string;
+    createdAt?: string | Date;
 }
 
 interface SidebarProps {
-    chats: ChatItem[]
-    onNewChat: () => void
-    onDeleteChat?: (chatId: string) => void
-    onToggleSidebar: () => void
-    onOpenSearch?: () => void
-    isOpen?: boolean
+    chats: ChatItem[];
+    onNewChat: () => void;
+    onDeleteChat?: (chatId: string) => void;
+    onToggleSidebar: () => void;
+    onOpenSearch?: () => void;
+    isOpen?: boolean;
 }
 
 // Mobile Overlay Component
 const MobileOverlay = React.memo<{ isOpen: boolean; onClose: () => void }>(
     ({ isOpen, onClose }) => {
-        if (!isOpen) return null
+        if (!isOpen) return null;
 
         return (
             <div
                 className="fixed inset-0 bg-black/20 dark:bg-black/30 backdrop-blur-sm z-40 md:hidden"
                 onClick={onClose}
             />
-        )
+        );
     }
-)
+);
 
-MobileOverlay.displayName = "MobileOverlay"
+MobileOverlay.displayName = "MobileOverlay";
 
 // User Info Component
 const UserInfo = React.memo(() => {
-    const { user, openAuthPopup } = useAuth()
+    const { user, openAuthPopup } = useAuth();
 
     const handleLogout = async () => {
         try {
-            await axios.get("/api/auth/logout")
+            await axios.get("/api/auth/logout");
             // Reload the page to reset the auth state
-            window.location.reload()
+            window.location.reload();
         } catch (error: unknown) {
-            errorToast(error)
+            errorToast(error);
         }
-    }
+    };
 
     if (user) {
         return (
@@ -64,10 +68,10 @@ const UserInfo = React.memo(() => {
                         referrerPolicy="no-referrer"
                         crossOrigin="anonymous"
                         onError={(e) => {
-                            e.currentTarget.style.display = "none"
+                            e.currentTarget.style.display = "none";
                             const fallback = e.currentTarget
-                                .nextElementSibling as HTMLElement
-                            if (fallback) fallback.style.display = "flex"
+                                .nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = "flex";
                         }}
                     />
                 ) : null}
@@ -106,7 +110,7 @@ const UserInfo = React.memo(() => {
                     </svg>
                 </button>
             </div>
-        )
+        );
     }
 
     return (
@@ -131,23 +135,71 @@ const UserInfo = React.memo(() => {
                 Sign In
             </span>
         </button>
-    )
-})
+    );
+});
 
-UserInfo.displayName = "UserInfo"
+UserInfo.displayName = "UserInfo";
+
+// Credits Component
+const CreditsInfo = React.memo(() => {
+    const { user } = useAuth();
+    const [creditBalance, setCreditBalance] = useState<number | null>(null);
+
+    const fetchCredits = useCallback(async () => {
+        if (!user) return;
+        try {
+            const response = await axios.get<CreditBalance>("/api/credits");
+            setCreditBalance(response.data.amount);
+        } catch (error) {
+            errorToast(error);
+            setCreditBalance(0);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        fetchCredits();
+    }, [fetchCredits]);
+
+    if (!user) {
+        return null;
+    }
+
+    return (
+        <div className="flex items-center p-2 bg-white dark:bg-[#1E1F25] rounded-lg w-full border border-gray-200 dark:border-gray-700/30 mt-2">
+            <div className="flex-1">
+                <h2 className="text-sm font-medium text-gray-800 dark:text-white">
+                    Credits
+                </h2>
+                <p className="text-xs text-gray-400">
+                    {creditBalance !== null
+                        ? `${Math.round(creditBalance * 100) / 100} credits`
+                        : "Loading..."}
+                </p>
+            </div>
+            <button
+                onClick={() => {}}
+                className="px-3 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-md transition-colors cursor-pointer"
+            >
+                Add
+            </button>
+        </div>
+    );
+});
+
+CreditsInfo.displayName = "CreditsInfo";
 
 // Navigation Item Component
 const NavigationItem = React.memo<{
-    icon: React.ReactNode
-    label: string
-    onClick?: () => void
-    badge?: string
-    variant?: "default" | "accent"
+    icon: React.ReactNode;
+    label: string;
+    onClick?: () => void;
+    badge?: string;
+    variant?: "default" | "accent";
 }>(({ icon, label, onClick, badge, variant = "default" }) => {
     const textColor =
         variant === "accent"
             ? "text-accent-blue"
-            : "text-gray-800 dark:text-white"
+            : "text-gray-800 dark:text-white";
 
     return (
         <button
@@ -164,19 +216,19 @@ const NavigationItem = React.memo<{
                 </span>
             )}
         </button>
-    )
-})
+    );
+});
 
-NavigationItem.displayName = "NavigationItem"
+NavigationItem.displayName = "NavigationItem";
 
 // Search Button Component
 const SearchButton = React.memo<{ onOpenSearch?: () => void }>(
     ({ onOpenSearch }) => {
         const handleSearchClick = () => {
             if (onOpenSearch) {
-                onOpenSearch()
+                onOpenSearch();
             }
-        }
+        };
 
         return (
             <button
@@ -195,19 +247,19 @@ const SearchButton = React.memo<{ onOpenSearch?: () => void }>(
                 </svg>
                 Search
             </button>
-        )
+        );
     }
-)
+);
 
-SearchButton.displayName = "SearchButton"
+SearchButton.displayName = "SearchButton";
 
 // Delete Confirmation Modal Component
 const DeleteConfirmationModal = React.memo<{
-    isOpen: boolean
-    chatTitle: string
-    isDeleting: boolean
-    onConfirm: () => void
-    onCancel: () => void
+    isOpen: boolean;
+    chatTitle: string;
+    isDeleting: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
 }>(({ isOpen, chatTitle, isDeleting, onConfirm, onCancel }) => {
     return (
         <CommonPopup
@@ -266,23 +318,23 @@ const DeleteConfirmationModal = React.memo<{
                 </div>
             </div>
         </CommonPopup>
-    )
-})
+    );
+});
 
-DeleteConfirmationModal.displayName = "DeleteConfirmationModal"
+DeleteConfirmationModal.displayName = "DeleteConfirmationModal";
 
 // Chat Item Component
 const ChatItemComponent = React.memo<{
-    chat: ChatItem
-    isSelected: boolean
-    onSelect: (pubId: string) => void
-    onDelete: (pubId: string) => void
-    onDeleteClick: (chat: ChatItem) => void
+    chat: ChatItem;
+    isSelected: boolean;
+    onSelect: (pubId: string) => void;
+    onDelete: (pubId: string) => void;
+    onDeleteClick: (chat: ChatItem) => void;
 }>(({ chat, isSelected, onSelect, onDeleteClick }) => {
     const handleDeleteClick = (e: React.MouseEvent) => {
-        e.stopPropagation()
-        onDeleteClick(chat)
-    }
+        e.stopPropagation();
+        onDeleteClick(chat);
+    };
 
     return (
         <div
@@ -322,35 +374,35 @@ const ChatItemComponent = React.memo<{
                 </svg>
             </button>
         </div>
-    )
-})
+    );
+});
 
-ChatItemComponent.displayName = "ChatItemComponent"
+ChatItemComponent.displayName = "ChatItemComponent";
 
 // Chat List Component
 const ChatList = React.memo<{
-    chats: ChatItem[]
-    currentChatPubId: string | null
-    onDeleteChat?: (pubId: string) => void
-    onDeleteClick: (chat: ChatItem) => void
+    chats: ChatItem[];
+    currentChatPubId: string | null;
+    onDeleteChat?: (pubId: string) => void;
+    onDeleteClick: (chat: ChatItem) => void;
 }>(({ chats, currentChatPubId, onDeleteChat, onDeleteClick }) => {
-    const router = useRouter()
+    const router = useRouter();
 
     const handleChatClick = (pubId: string) => {
-        router.push(`/chat/${pubId}`)
-    }
+        router.push(`/chat/${pubId}`);
+    };
 
     const handleChatDelete = (pubId: string) => {
         if (onDeleteChat) {
-            onDeleteChat(pubId)
+            onDeleteChat(pubId);
         }
-    }
+    };
 
     return (
         <div className="flex-1 overflow-y-auto py-2 mt-2">
             <div className="px-3 space-y-0.5">
                 {chats.map((chat) => {
-                    const isSelected = currentChatPubId === chat.pubId
+                    const isSelected = currentChatPubId === chat.pubId;
                     return (
                         <ChatItemComponent
                             key={chat.id}
@@ -360,27 +412,27 @@ const ChatList = React.memo<{
                             onDelete={handleChatDelete}
                             onDeleteClick={onDeleteClick}
                         />
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
-})
+    );
+});
 
-ChatList.displayName = "ChatList"
+ChatList.displayName = "ChatList";
 
 // Navigation Section Component
 const NavigationSection = React.memo<{
-    onNewChat: () => void
-    onOpenSearch?: () => void
+    onNewChat: () => void;
+    onOpenSearch?: () => void;
 }>(({ onNewChat, onOpenSearch }) => {
-    const [shortcutBadge, setShortcutBadge] = useState("⌘⇧O") // Default to Mac for initial render
+    const [shortcutBadge, setShortcutBadge] = useState("⌘⇧O"); // Default to Mac for initial render
 
     // Detect platform after component mounts to avoid hydration mismatch
     useEffect(() => {
-        const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
-        setShortcutBadge(isMac ? "⌘⇧O" : "Ctrl⇧O")
-    }, [])
+        const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+        setShortcutBadge(isMac ? "⌘⇧O" : "Ctrl⇧O");
+    }, []);
 
     return (
         <>
@@ -435,34 +487,15 @@ const NavigationSection = React.memo<{
                 <SearchButton onOpenSearch={onOpenSearch} />
             </div>
 
-            {/* Upgrade button */}
+            {/* Credits Info */}
             <div className="px-3 py-1">
-                <NavigationItem
-                    icon={
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 mr-3"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M13 10V3L4 14h7v7l9-11h-7z"
-                            />
-                        </svg>
-                    }
-                    label="Upgrade to Pro"
-                    variant="accent"
-                />
+                <CreditsInfo />
             </div>
         </>
-    )
-})
+    );
+});
 
-NavigationSection.displayName = "NavigationSection"
+NavigationSection.displayName = "NavigationSection";
 
 // Main Sidebar Component
 export const Sidebar: React.FC<SidebarProps> = React.memo(
@@ -474,59 +507,59 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
         onOpenSearch,
         isOpen = true,
     }) => {
-        const pathname = usePathname()
+        const pathname = usePathname();
         const [deleteModalData, setDeleteModalData] = useState<{
-            isOpen: boolean
-            chat: ChatItem | null
-            isDeleting: boolean
+            isOpen: boolean;
+            chat: ChatItem | null;
+            isDeleting: boolean;
         }>({
             isOpen: false,
             chat: null,
             isDeleting: false,
-        })
+        });
 
         // Extract the current chat pubId from the URL
         const currentChatPubId = pathname.startsWith("/chat/")
             ? pathname.split("/chat/")[1]
-            : null
+            : null;
 
         const handleDeleteClick = useCallback((chat: ChatItem) => {
             setDeleteModalData({
                 isOpen: true,
                 chat: chat,
                 isDeleting: false,
-            })
-        }, [])
+            });
+        }, []);
 
         const handleConfirmDelete = async () => {
-            if (!deleteModalData.chat) return
+            if (!deleteModalData.chat) return;
 
-            setDeleteModalData((prev) => ({ ...prev, isDeleting: true }))
+            setDeleteModalData((prev) => ({ ...prev, isDeleting: true }));
             try {
                 await axios.delete("/api/chat", {
                     params: { chatId: deleteModalData.chat.pubId },
-                })
+                });
                 if (onDeleteChat) {
-                    onDeleteChat(deleteModalData.chat.pubId)
+                    onDeleteChat(deleteModalData.chat.pubId);
                 }
                 setDeleteModalData({
                     isOpen: false,
                     chat: null,
                     isDeleting: false,
-                })
+                });
             } catch (error: unknown) {
-                errorToast(error)
-                setDeleteModalData((prev) => ({ ...prev, isDeleting: false }))
+                errorToast(error);
+                setDeleteModalData((prev) => ({ ...prev, isDeleting: false }));
             }
-        }
+        };
 
         const handleCancelDelete = useCallback(() => {
             setDeleteModalData({
                 isOpen: false,
                 chat: null,
                 isDeleting: false,
-            })
-        }, [])
+            });
+        }, []);
 
         return (
             <>
@@ -587,8 +620,8 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
                     onCancel={handleCancelDelete}
                 />
             </>
-        )
+        );
     }
-)
+);
 
-Sidebar.displayName = "Sidebar"
+Sidebar.displayName = "Sidebar";
