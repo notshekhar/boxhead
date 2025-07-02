@@ -227,7 +227,7 @@ const ModelSelector: React.FC<{
     return (
         <button
             onClick={onClick}
-            className="group flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#1E1F25] text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all duration-200 cursor-pointer border border-gray-200 dark:border-gray-600"
+            className="group flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-gray-200 dark:bg-[#2A2A30] text-gray-700 dark:text-white rounded-md transition-all duration-200 cursor-pointer"
         >
             <div className="w-4 h-4 flex items-center justify-center">
                 <img
@@ -266,10 +266,10 @@ const IncognitoButton: React.FC<{
 }> = React.memo(({ isIncognito, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer text-xs font-medium border ${
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer text-xs font-medium${
             isIncognito
                 ? "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/30 hover:bg-orange-100 dark:hover:bg-orange-500/20"
-                : "text-gray-700 dark:text-white bg-white dark:bg-[#1E1F25] border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+            : "text-gray-700 dark:text-white bg-gray-200 dark:bg-[#2A2A30] border-gray-200 dark:border-gray-600"
         }`}
         aria-label="Toggle incognito mode"
     >
