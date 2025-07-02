@@ -1,8 +1,8 @@
-import { UIMessage } from "ai"
-import React, { useState } from "react"
-import { MemoizedMarkdown } from "./markdown-chunks"
-import { BranchOutButton, CopyButton } from "./common"
-import { MemoizedMarkdownReasoning } from "./markdown-reasoning-chunks"
+import { UIMessage } from "ai";
+import React, { useState } from "react";
+import { MemoizedMarkdown } from "./markdown-chunks";
+import { BranchOutButton, CopyButton } from "./common";
+import { MemoizedMarkdownReasoning } from "./markdown-reasoning-chunks";
 
 // Loading spinner component
 const LoadingSpinner = React.memo(() => (
@@ -25,7 +25,7 @@ const LoadingSpinner = React.memo(() => (
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         />
     </svg>
-))
+));
 
 // Chevron icon component for expand/collapse
 const ChevronIcon = React.memo(
@@ -33,8 +33,8 @@ const ChevronIcon = React.memo(
         isExpanded,
         className,
     }: {
-        isExpanded: boolean
-        className?: string
+        isExpanded: boolean;
+        className?: string;
     }) => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +53,7 @@ const ChevronIcon = React.memo(
             <polyline points="9,18 15,12 9,6" />
         </svg>
     )
-)
+);
 
 // Expandable reasoning component
 const ReasoningSection = React.memo(
@@ -61,10 +61,10 @@ const ReasoningSection = React.memo(
         reasoning,
         isReasoningLoading,
     }: {
-        reasoning: string
-        isReasoningLoading: boolean
+        reasoning: string;
+        isReasoningLoading: boolean;
     }) => {
-        const [isExpanded, setIsExpanded] = useState(false)
+        const [isExpanded, setIsExpanded] = useState(false);
 
         return (
             <div className="mb-4 border-l-2 border-blue-200 dark:border-blue-800">
@@ -100,9 +100,9 @@ const ReasoningSection = React.memo(
                     </div>
                 </div>
             </div>
-        )
+        );
     }
-)
+);
 
 export const ChatMessageParts = React.memo(
     ({
@@ -110,16 +110,17 @@ export const ChatMessageParts = React.memo(
         isLoading,
         messageIndex,
     }: {
-        message: UIMessage
-        isLoading: boolean
-        messageIndex: number
+        message: UIMessage;
+        isLoading: boolean;
+        messageIndex: number;
     }) => {
         const isReasoningLoading = React.useMemo(() => {
             return (
                 message.parts.length > 0 &&
-                message.parts[message.parts.length - 1].type === "reasoning"
-            )
-        }, [message.parts.length])
+                message.parts[message.parts.length - 1].type === "reasoning" &&
+                isLoading
+            );
+        }, [message.parts.length, isLoading]);
 
         return (
             <div>
@@ -146,7 +147,7 @@ export const ChatMessageParts = React.memo(
                                     )}
                                 </div>
                             </div>
-                        )
+                        );
                     } else if (part.type === "reasoning") {
                         return (
                             <ReasoningSection
@@ -154,10 +155,10 @@ export const ChatMessageParts = React.memo(
                                 reasoning={part?.reasoning ?? ""}
                                 isReasoningLoading={isReasoningLoading}
                             />
-                        )
+                        );
                     }
                 })}
             </div>
-        )
+        );
     }
-)
+);
