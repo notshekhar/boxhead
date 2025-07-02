@@ -39,7 +39,7 @@ const MobileOverlay = React.memo<{ isOpen: boolean; onClose: () => void }>(
 
         return (
             <div
-                className="fixed inset-0 bg-black/20 dark:bg-black/30 backdrop-blur-sm z-40 md:hidden"
+                className="fixed inset-0 bg-black/20 dark:bg-black/30 backdrop-blur-sm z-40 chat:hidden"
                 onClick={onClose}
             />
         )
@@ -541,7 +541,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
 
                 {/* Sidebar */}
                 <div
-                    className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#0F0F0F] fixed top-0 bottom-0 left-0 z-50 w-[260px] md:w-[260px] transition-transform duration-300 ease-out ${
+                    className={`flex flex-col border-r border-gray-light dark:border-gray-700/30 bg-white dark:bg-[#0F0F0F] fixed top-0 bottom-0 left-0 z-50 w-[260px] transition-transform duration-300 ease-out ${
                         isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
                 >

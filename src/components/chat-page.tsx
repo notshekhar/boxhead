@@ -163,7 +163,7 @@ export const ChatPage = React.memo(
                 {/* Main chat area */}
                 <div
                     className={`fixed h-full inset-0 flex flex-col backdrop-blur-[2px] z-10 transition-all duration-300 ease-out ${
-                        sidebarVisible ? "md:left-[260px] left-0" : "left-0"
+                        sidebarVisible ? "chat:left-[260px] left-0" : "left-0"
                     } pt-[60px] chat:pt-0`}
                 >
                     {/* Header controls - only show on desktop when sidebar is hidden */}
@@ -175,9 +175,7 @@ export const ChatPage = React.memo(
                                         key={`header-controls-${sidebarVisible}`}
                                         onToggleSidebar={handleToggleSidebar}
                                         onNewChat={handleNewChat}
-                                        onOpenSearch={() =>
-                                            setShowSearchPopup(true)
-                                        }
+                                        onOpenSearch={handleOpenSearch}
                                         isSidebarOpen={sidebarVisible}
                                     />
                                 </div>
@@ -227,6 +225,7 @@ export const ChatPage = React.memo(
                             </>
                         )}
                     </div>
+
                     {/* Messages container */}
                     <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded pb-32">
                         {isChatLoading ? (
