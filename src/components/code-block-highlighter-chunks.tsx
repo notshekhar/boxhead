@@ -102,10 +102,10 @@ const MemoizedCodeLine = React.memo(
 export const NoLanguageCodeBlock = React.memo(
     ({ children, className, language, ...props }: any) => {
         return (
-            <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
+            <div className="mt-4 mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                 <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
                     <span className="text-sm font-semibold text-text-light dark:text-text-dark">
-                        {getLanguageDisplayName(language)}
+                        {getLanguageDisplayName(language) || "CODE"}
                     </span>
                     <CopyButton text={children} />
                 </div>
@@ -119,7 +119,7 @@ export const NoLanguageCodeBlock = React.memo(
 
 export const MemoizedCodeBlock = React.memo(
     ({ children, className, ...props }: any) => {
-        const isInline = !className?.includes("language-")
+        const isInline = !className?.includes("language-") && !children.includes("\n")
         const codeContent = String(children).replace(/\n$/, "")
 
         const tokens = React.useMemo(() => {
@@ -151,7 +151,7 @@ export const MemoizedCodeBlock = React.memo(
 
         if (language) {
             return (
-                <div className="mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
+                <div className="mt-4 mb-4 border border-gray-light dark:border-gray-dark bg-gray-lighter dark:bg-gray-darker">
                     <div className="sticky top-0 z-5 flex items-center justify-between px-4 py-2 bg-gray-lighter/80 dark:bg-gray-darker/80 backdrop-blur-sm border-b border-gray-light dark:border-gray-dark">
                         <span className="text-sm font-semibold text-text-light dark:text-text-dark">
                             {getLanguageDisplayName(language)}
