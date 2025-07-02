@@ -88,13 +88,13 @@ export const ChatPage = React.memo(
             router.push(`/`);
         }, [router]);
 
-        const scrollToBottom = () => {
+        const scrollToBottom = useCallback(() => {
             if (messagesEndRef.current) {
                 messagesEndRef.current.scrollIntoView({
                     behavior: "smooth",
                 });
             }
-        };
+        }, []);
 
         useEffect(() => {
             if (isLoading) {

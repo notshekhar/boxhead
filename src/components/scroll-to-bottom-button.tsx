@@ -1,11 +1,13 @@
 "use client"
 
+import React from "react"
+
 interface ScrollToBottomButtonProps {
     onClick: () => void
     isVisible: boolean
 }
 
-export function ScrollToBottomButton({ onClick, isVisible }: ScrollToBottomButtonProps) {
+export const ScrollToBottomButton = React.memo(({ onClick, isVisible }: ScrollToBottomButtonProps) => {
     if (!isVisible) return null
 
     return (
@@ -41,4 +43,4 @@ export function ScrollToBottomButton({ onClick, isVisible }: ScrollToBottomButto
             </button>
         </div>
     )
-} 
+})
