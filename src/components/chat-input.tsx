@@ -1,21 +1,27 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
-import { useModels } from "./models-context"
-import { useChatContext } from "./chat-context"
-import { useRouter } from "next/navigation"
-import { getModelIcon } from "@/lib/utils"
-import { Combobox, ComboboxOption } from "@/components/ui/combobox"
+import React, {
+    useState,
+    useRef,
+    useEffect,
+    useCallback,
+    useMemo,
+} from "react";
+import { useModels } from "./models-context";
+import { useChatContext } from "./chat-context";
+import { useRouter } from "next/navigation";
+import { getModelIcon } from "@/lib/utils";
+import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 
 interface ChatInputProps {
-    onSendMessage: () => void
-    input: string
-    setInput: (input: string) => void
-    isLoading?: boolean
+    onSendMessage: () => void;
+    input: string;
+    setInput: (input: string) => void;
+    isLoading?: boolean;
 }
 
 interface FilePreview {
-    file: File
-    preview: string
-    isRemoving?: boolean
+    file: File;
+    preview: string;
+    isRemoving?: boolean;
 }
 
 // Custom hook for chat input logic
@@ -25,65 +31,65 @@ function useChatInput(
     setInput: (input: string) => void
 ) {
     // State
-    const [isDragging, setIsDragging] = useState(false)
-    const [attachedFiles, setAttachedFiles] = useState<FilePreview[]>([])
+    const [isDragging, setIsDragging] = useState(false);
+    const [attachedFiles, setAttachedFiles] = useState<FilePreview[]>([]);
 
     // Refs
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // State to track if textarea has expanded beyond its initial height
-    const [isExpanded, setIsExpanded] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Auto-resize textarea based on content
     useEffect(() => {
-        const textarea = textareaRef.current
+        const textarea = textareaRef.current;
         if (textarea) {
             // Save the current scroll position
-            const scrollPos = window.scrollY
+            const scrollPos = window.scrollY;
 
             // Reset height to auto to get the correct scrollHeight
-            textarea.style.height = "auto"
+            textarea.style.height = "auto";
 
             // Set the new height with a minimum of 24px and maximum of 150px
-            const initialHeight = 24 // Initial height in pixels
+            const initialHeight = 24; // Initial height in pixels
             const newHeight = Math.min(
                 Math.max(textarea.scrollHeight, initialHeight),
                 150
-            )
-            textarea.style.height = `${newHeight}px`
+            );
+            textarea.style.height = `${newHeight}px`;
 
             // Check if textarea has expanded beyond initial height
-            setIsExpanded(newHeight > initialHeight + 5) // +5 for a small buffer
+            setIsExpanded(newHeight > initialHeight + 5); // +5 for a small buffer
 
             // Restore the scroll position to prevent page jump
-            window.scrollTo(0, scrollPos)
+            window.scrollTo(0, scrollPos);
         }
-    }, [input])
+    }, [input]);
 
     // Clean up object URLs when component unmounts
     useEffect(() => {
         return () => {
-            attachedFiles.forEach((file) => URL.revokeObjectURL(file.preview))
-        }
-    }, [attachedFiles])
+            attachedFiles.forEach((file) => URL.revokeObjectURL(file.preview));
+        };
+    }, [attachedFiles]);
 
     // File handling methods
     const handleFiles = (files: File[]) => {
         // Process files one by one with a slight delay for staggered animation
         Array.from(files).forEach((file, index) => {
             setTimeout(() => {
-                const preview = URL.createObjectURL(file)
-                setAttachedFiles((prev) => [...prev, { file, preview }])
-            }, index * 80) // Stagger the appearance of each file
-        })
-    }
+                const preview = URL.createObjectURL(file);
+                setAttachedFiles((prev) => [...prev, { file, preview }]);
+            }, index * 80); // Stagger the appearance of each file
+        });
+    };
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            handleFiles(Array.from(event.target.files))
+            handleFiles(Array.from(event.target.files));
         }
-    }
+    };
 
     const removeFile = (index: number) => {
         // Mark the file as being removed in the state
@@ -92,12 +98,12 @@ function useChatInput(
             const newFiles = prev.map((file, i) => {
                 if (i === index) {
                     // Mark this file for removal animation
-                    return { ...file, isRemoving: true }
+                    return { ...file, isRemoving: true };
                 }
-                return file
-            })
-            return newFiles
-        })
+                return file;
+            });
+            return newFiles;
+        });
 
         // After animation completes, actually remove the file
         setTimeout(() => {
@@ -106,38 +112,38 @@ function useChatInput(
                 const newFiles = prev.filter((file, i) => {
                     if (i === index) {
                         // Clean up the object URL before removing
-                        URL.revokeObjectURL(file.preview)
-                        return false // Remove this file
+                        URL.revokeObjectURL(file.preview);
+                        return false; // Remove this file
                     }
-                    return true // Keep other files
-                })
-                return newFiles
-            })
-        }, 350) // Match with animation duration
-    }
+                    return true; // Keep other files
+                });
+                return newFiles;
+            });
+        }, 350); // Match with animation duration
+    };
 
     // Drag and drop handlers
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(true)
-    }
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
 
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(false)
-    }
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(false)
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            handleFiles(Array.from(e.dataTransfer.files))
+            handleFiles(Array.from(e.dataTransfer.files));
         }
-    }
+    };
 
     // Message handling
     const handleSendMessage = () => {
@@ -145,20 +151,20 @@ function useChatInput(
             onSendMessage(
                 input,
                 attachedFiles.map((f) => f.file)
-            )
-            setInput("")
+            );
+            setInput("");
             // Clean up previews and reset files
-            attachedFiles.forEach((file) => URL.revokeObjectURL(file.preview))
-            setAttachedFiles([])
+            attachedFiles.forEach((file) => URL.revokeObjectURL(file.preview));
+            setAttachedFiles([]);
         }
-    }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSendMessage()
+            e.preventDefault();
+            handleSendMessage();
         }
-    }
+    };
 
     // Return all the state and handlers needed by the UI
     return {
@@ -179,14 +185,14 @@ function useChatInput(
         removeFile,
         handleSendMessage,
         handleKeyDown,
-    }
+    };
 }
 
 // UI Components
 const SendButton: React.FC<{
-    onClick: () => void
-    disabled: boolean
-    isExpanded?: boolean
+    onClick: () => void;
+    disabled: boolean;
+    isExpanded?: boolean;
 }> = React.memo(({ onClick, disabled, isExpanded = false }) => (
     <button
         onClick={onClick}
@@ -211,27 +217,25 @@ const SendButton: React.FC<{
             />
         </svg>
     </button>
-))
+));
 
 interface Model {
-    name: string
-    displayName: string
-    icon: string
-    default?: boolean
+    name: string;
+    displayName: string;
+    icon: string;
+    default?: boolean;
 }
 
-
-
 const IncognitoButton: React.FC<{
-    isIncognito: boolean
-    onClick: () => void
+    isIncognito: boolean;
+    onClick: () => void;
 }> = React.memo(({ isIncognito, onClick }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer text-xs font-medium${
             isIncognito
                 ? "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/30 hover:bg-orange-100 dark:hover:bg-orange-500/20"
-            : "text-gray-700 dark:text-white bg-gray-200 dark:bg-[#2A2A30] border-gray-200 dark:border-gray-600"
+                : "text-gray-700 dark:text-white bg-gray-200 dark:bg-[#2A2A30] border-gray-200 dark:border-gray-600"
         }`}
         aria-label="Toggle incognito mode"
     >
@@ -245,10 +249,10 @@ const IncognitoButton: React.FC<{
         </svg>
         <span className="whitespace-nowrap">Incognito</span>
     </button>
-))
+));
 
 const FileAttachButton: React.FC<{
-    onClick: () => void
+    onClick: () => void;
 }> = React.memo(({ onClick }) => (
     <button
         className="flex items-center gap-1 p-1 text-gray-500 dark:text-gray-400 hover:text-[#2D7FF9] dark:hover:text-[#2D7FF9] transition-all duration-200 cursor-pointer"
@@ -270,20 +274,20 @@ const FileAttachButton: React.FC<{
         </svg>
         <span className="text-xs font-medium">Attach the file</span>
     </button>
-))
+));
 
 const FilePreviewItem: React.FC<{
-    file: FilePreview
-    index: number
-    onRemove: (index: number) => void
+    file: FilePreview;
+    index: number;
+    onRemove: (index: number) => void;
 }> = React.memo(({ file, index, onRemove }) => {
     // Animation delay based on index for staggered appearance
-    const animationDelay = `${index * 100}ms`
+    const animationDelay = `${index * 100}ms`;
 
     // Determine which animation class to use based on file state
     const animationClass = file.isRemoving
         ? "animate-scale-out"
-        : "animate-scale-in"
+        : "animate-scale-in";
 
     return (
         <div
@@ -342,8 +346,8 @@ const FilePreviewItem: React.FC<{
                 </svg>
             </button>
         </div>
-    )
-})
+    );
+});
 
 const DragOverlay: React.FC = React.memo(() => (
     <div
@@ -378,48 +382,53 @@ const DragOverlay: React.FC = React.memo(() => (
             Drop files here
         </div>
     </div>
-))
+));
 
-const ModelSelectedDisplay: React.FC<{ option?: ComboboxOption | null }> = React.memo(({ option }) => (
-    <div className="flex items-center gap-2 cursor-pointer">
-        <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
-            <img
-                src={getModelIcon(option?.icon || "")}
-                alt={`${option?.icon || "default"} icon`}
-                className="w-4 h-4 object-contain transition-all duration-200 model-icon cursor-pointer"
-                onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/model-icons/default.svg";
-                }}
-            />
+const ModelSelectedDisplay = React.memo(
+    ({ option }: { option?: ComboboxOption | null }) => (
+        <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+                <img
+                    src={getModelIcon(option?.icon || "")}
+                    alt={`${option?.icon || "default"} icon`}
+                    className="w-4 h-4 object-contain transition-all duration-200 model-icon cursor-pointer"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/model-icons/default.svg";
+                    }}
+                />
+            </div>
+            <span className="whitespace-nowrap cursor-pointer">
+                {option?.label}
+            </span>
         </div>
-        <span className="whitespace-nowrap cursor-pointer">{option?.label}</span>
-    </div>
-))
+    ));
 
-const ModelOptionDisplay: React.FC<{ option: ComboboxOption }> = React.memo(({ option }) => (
-    <div className="flex items-center gap-2 cursor-pointer">
-        <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
-            <img
-                src={getModelIcon(option.icon || "")}
-                alt={`${option.icon || "default"} icon`}
-                className="w-4 h-4 object-contain cursor-pointer"
-                onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/model-icons/default.svg";
-                }}
-            />
+const ModelOptionDisplay = React.memo(
+    ({ option }: { option: ComboboxOption }) => (
+        <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+                <img
+                    src={getModelIcon(option.icon || "")}
+                    alt={`${option.icon || "default"} icon`}
+                    className="w-4 h-4 object-contain cursor-pointer"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/model-icons/default.svg";
+                    }}
+                />
+            </div>
+            <span className="cursor-pointer">{option.label}</span>
         </div>
-        <span className="cursor-pointer">{option.label}</span>
-    </div>
-))
+    )
+);
 
 // Main component
-export const ChatInput: React.FC<ChatInputProps> = React.memo(
-    ({ onSendMessage, input, setInput, isLoading = false }) => {
-        const { models, selectedModel, setSelectedModel } = useModels()
-        const { incognito, setIncognito } = useChatContext()
-        const router = useRouter()
+export const ChatInput = React.memo(
+    ({ onSendMessage, input, setInput, isLoading = false }: ChatInputProps) => {
+        const { models, selectedModel, setSelectedModel } = useModels();
+        const { incognito, setIncognito } = useChatContext();
+        const router = useRouter();
 
         const {
             isDragging,
@@ -434,31 +443,33 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
             removeFile,
             handleSendMessage,
             handleKeyDown,
-        } = useChatInput(onSendMessage, input, setInput)
+        } = useChatInput(onSendMessage, input, setInput);
 
         const handleIncognito = useCallback(() => {
-            router.push(`/?incognito=${!incognito}`)
-        }, [incognito, router])
+            router.push(`/?incognito=${!incognito}`);
+        }, [incognito, router]);
 
         // Transform models into combobox options
         const modelOptions: ComboboxOption[] = useMemo(() => {
-            return models.map(model => ({
+            return models.map((model) => ({
                 value: model.name,
                 label: model.displayName,
-                icon: model.icon
-            }))
-        }, [models])
+                icon: model.icon,
+            }));
+        }, [models]);
 
-        const handleModelChange = useCallback((modelName: string) => {
-            const model = models.find(m => m.name === modelName)
-            if (model) {
-                setSelectedModel(model)
-            }
-        }, [models, setSelectedModel])
+        const handleModelChange = useCallback(
+            (modelName: string) => {
+                const model = models.find((m) => m.name === modelName);
+                if (model) {
+                    setSelectedModel(model);
+                }
+            },
+            [models, setSelectedModel]
+        );
 
         return (
             <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
-
                 <div
                     className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
                         isDragging
@@ -509,8 +520,12 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                                     placeholder="Select Model"
                                     searchPlaceholder="Search models..."
                                     emptyText="No models found"
-                                    renderSelected={(option) => <ModelSelectedDisplay option={option} />}
-                                    renderOption={(option) => <ModelOptionDisplay option={option} />}
+                                    renderSelected={(option) => (
+                                        <ModelSelectedDisplay option={option} />
+                                    )}
+                                    renderOption={(option) => (
+                                        <ModelOptionDisplay option={option} />
+                                    )}
                                 />
 
                                 {/* File input (hidden) */}
@@ -567,6 +582,6 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                     </div>
                 </div>
             </div>
-        )
+        );
     }
-)
+);

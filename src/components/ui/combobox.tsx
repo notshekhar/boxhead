@@ -77,7 +77,10 @@ export const Combobox = React.memo(
     }: ComboboxProps) => {
         const [open, setOpen] = React.useState(false);
         const isMobile = useIsMobile();
-        const selectedOption = options.find((option) => option.value === value);
+        const selectedOption = React.useMemo(
+            () => options.find((option) => option.value === value),
+            [options, value]
+        );
 
         const triggerButton = (
             <Button
