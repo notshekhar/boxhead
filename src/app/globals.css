@@ -126,6 +126,28 @@ body {
     overflow-x: hidden;
 }
 
+/* Interactive element cursor styles */
+button,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+[role="option"],
+.cursor-pointer,
+[data-slot="button"],
+[data-slot="dialog-trigger"],
+[data-slot="dialog-close"],
+[data-slot="popover-trigger"],
+[data-slot="command-item"],
+[data-slot="drawer-trigger"],
+[data-slot="drawer-close"] {
+    cursor: pointer;
+}
+
+button:disabled,
+[role="button"]:disabled {
+    cursor: not-allowed;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 6px;

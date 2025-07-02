@@ -3,8 +3,17 @@ import { useAuth } from "./auth-context"
 import { useRouter, usePathname } from "next/navigation"
 import axios from "axios"
 import { errorToast } from "@/hooks/error-toast"
-import { CommonPopup } from "@/components/common-popup"
+
 import { BranchOutIcon } from "@/components/common"
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogDescription, 
+    DialogFooter, 
+    DialogHeader, 
+    DialogTitle 
+} from "./ui/dialog"
+import { Button } from "./ui/button"
 
 interface ChatItem {
     id: string
@@ -210,31 +219,27 @@ const DeleteConfirmationModal = React.memo<{
     onCancel: () => void
 }>(({ isOpen, chatTitle, isDeleting, onConfirm, onCancel }) => {
     return (
-        <CommonPopup
-            isOpen={isOpen}
-            onClose={onCancel}
-            title="Delete Chat"
-            maxWidth="md"
-            showCloseButton={false}
-            closeOnBackdropClick={!isDeleting}
-        >
-            <div className="p-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                    Are you sure you want to delete "{chatTitle}"? This action
-                    cannot be undone.
-                </p>
-                <div className="flex space-x-3 justify-end">
-                    <button
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+            <DialogContent className="sm:max-w-md" showCloseButton={false}>
+                <DialogHeader>
+                    <DialogTitle>Delete Chat</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete "{chatTitle}"? This action
+                        cannot be undone.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2">
+                    <Button
+                        variant="outline"
                         onClick={onCancel}
                         disabled={isDeleting}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="destructive"
                         onClick={onConfirm}
                         disabled={isDeleting}
-                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         {isDeleting ? (
                             <>
@@ -262,10 +267,10 @@ const DeleteConfirmationModal = React.memo<{
                         ) : (
                             "Delete"
                         )}
-                    </button>
-                </div>
-            </div>
-        </CommonPopup>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 })
 
@@ -521,12 +526,14 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
         }
 
         const handleCancelDelete = useCallback(() => {
-            setDeleteModalData({
-                isOpen: false,
-                chat: null,
-                isDeleting: false,
-            })
-        }, [])
+            if (!deleteModalData.isDeleting) {
+                setDeleteModalData({
+                    isOpen: false,
+                    chat: null,
+                    isDeleting: false,
+                })
+            }
+        }, [deleteModalData.isDeleting])
 
         return (
             <>
