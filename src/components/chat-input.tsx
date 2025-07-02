@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from "react"
-import { ModelSelectorPopup } from "./model-selector-popup"
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { useModels } from "./models-context"
 import { useChatContext } from "./chat-context"
 import { useRouter } from "next/navigation"
 import { getModelIcon } from "@/lib/utils"
+import { Combobox, ComboboxOption } from "@/components/ui/combobox"
 
 interface ChatInputProps {
     onSendMessage: () => void
@@ -220,45 +220,7 @@ interface Model {
     default?: boolean
 }
 
-const ModelSelector: React.FC<{
-    selectedModel: Model | null
-    onClick: () => void
-}> = React.memo(({ selectedModel, onClick }) => {
-    return (
-        <button
-            onClick={onClick}
-            className="group flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-gray-200 dark:bg-[#2A2A30] text-gray-700 dark:text-white rounded-md transition-all duration-200 cursor-pointer"
-        >
-            <div className="w-4 h-4 flex items-center justify-center">
-                <img
-                    src={getModelIcon(selectedModel?.icon || "")}
-                    alt={`${selectedModel?.icon || "default"} icon`}
-                    className="w-4 h-4 object-contain transition-all duration-200 model-icon"
-                    onError={(e) => {
-                        // Fallback to a generic icon if specific icon fails to load
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/model-icons/default.svg";
-                    }}
-                />
-            </div>
-            <span className="whitespace-nowrap">{selectedModel?.displayName || "Select Model"}</span>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 group-hover:text-[#2D7FF9] transition-colors duration-200"
-                fill="none"
-                viewBox="0 0 25 25"
-                stroke="currentColor"
-                strokeWidth={2}
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                />
-            </svg>
-        </button>
-    )
-})
+
 
 const IncognitoButton: React.FC<{
     isIncognito: boolean
@@ -421,7 +383,6 @@ const DragOverlay: React.FC = React.memo(() => (
 // Main component
 export const ChatInput: React.FC<ChatInputProps> = React.memo(
     ({ onSendMessage, input, setInput, isLoading = false }) => {
-        const [showModelPopup, setShowModelPopup] = useState(false)
         const { models, selectedModel, setSelectedModel } = useModels()
         const { incognito, setIncognito } = useChatContext()
         const router = useRouter()
@@ -445,16 +406,24 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
             router.push(`/?incognito=${!incognito}`)
         }, [incognito, router])
 
+        // Transform models into combobox options
+        const modelOptions: ComboboxOption[] = useMemo(() => {
+            return models.map(model => ({
+                value: model.name,
+                label: model.displayName,
+                icon: model.icon
+            }))
+        }, [models])
+
+        const handleModelChange = useCallback((modelName: string) => {
+            const model = models.find(m => m.name === modelName)
+            if (model) {
+                setSelectedModel(model)
+            }
+        }, [models, setSelectedModel])
+
         return (
             <div className="z-50 px-3 sm:px-4 md:px-8 lg:px-16 py-4 mb-4 mx-auto w-full max-w-[850px] relative">
-                {/* Model Selector Popup */}
-                <ModelSelectorPopup
-                    selectedModel={selectedModel}
-                    onModelSelect={setSelectedModel}
-                    isOpen={showModelPopup}
-                    onClose={() => setShowModelPopup(false)}
-                    models={models}
-                />
 
                 <div
                     className={`relative overflow-hidden transition-all duration-300 bg-gray-200 dark:bg-[#2A2A30] rounded-xl ${
@@ -499,9 +468,45 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                             {/* Left aligned tools */}
                             <div className="flex items-center space-x-4">
                                 {/* Model selector */}
-                                <ModelSelector
-                                    selectedModel={selectedModel}
-                                    onClick={() => setShowModelPopup(true)}
+                                <Combobox
+                                    options={modelOptions}
+                                    value={selectedModel?.name}
+                                    onValueChange={handleModelChange}
+                                    placeholder="Select Model"
+                                    searchPlaceholder="Search models..."
+                                    emptyText="No models found"
+                                    renderSelected={(option) => (
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+                                                <img
+                                                    src={getModelIcon(option?.icon || "")}
+                                                    alt={`${option?.icon || "default"} icon`}
+                                                    className="w-4 h-4 object-contain transition-all duration-200 model-icon cursor-pointer"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.src = "/model-icons/default.svg";
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="whitespace-nowrap cursor-pointer">{option?.label}</span>
+                                        </div>
+                                    )}
+                                    renderOption={(option) => (
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+                                                <img
+                                                    src={getModelIcon(option.icon || "")}
+                                                    alt={`${option.icon || "default"} icon`}
+                                                    className="w-4 h-4 object-contain cursor-pointer"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.src = "/model-icons/default.svg";
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="cursor-pointer">{option.label}</span>
+                                        </div>
+                                    )}
                                 />
 
                                 {/* File input (hidden) */}
