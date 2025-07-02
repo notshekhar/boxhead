@@ -4,41 +4,41 @@ import {
     Message,
     smoothStream,
     streamText,
-} from "ai"
-import { assistantPrompt } from "./prompts"
-import { getModel } from "./models"
-import { bodyValidator } from "./schema"
-import { auth } from "@/helpers/auth"
+} from "ai";
+import { assistantPrompt } from "./prompts";
+import { getModel } from "./models";
+import { bodyValidator } from "./schema";
+import { auth } from "@/helpers/auth";
 import {
     createChat,
     deleteChat,
     getAllChatMessages,
     getChat,
     saveMessage,
-} from "@/lib/queries"
-import { generateChatTitle } from "@/helpers/ai"
-import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google"
-import { calculator } from "./tools"
+} from "@/lib/queries";
+import { generateChatTitle } from "@/helpers/ai";
+import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
+import { calculator } from "./tools";
 
 export async function GET(request: Request) {
     try {
-        const authUser = await auth()
+        const authUser = await auth();
 
         if (!authUser) {
-            return new Response("Unauthorized", { status: 401 })
+            return new Response("Unauthorized", { status: 401 });
         }
 
-        const url = new URL(request.url)
-        const chatId = url.searchParams.get("chatId")
+        const url = new URL(request.url);
+        const chatId = url.searchParams.get("chatId");
 
         if (!chatId) {
-            return new Response("Chat ID is required", { status: 400 })
+            return new Response("Chat ID is required", { status: 400 });
         }
 
         const chat = await getChat({
             userId: authUser.id,
             pubId: chatId,
-        })
+        });
 
         if (!chat) {
             return new Response(
@@ -47,13 +47,13 @@ export async function GET(request: Request) {
                     messages: [],
                 }),
                 { status: 200 }
-            )
+            );
         }
 
         const messages = await getAllChatMessages({
             chatId: chat.id,
             userId: authUser.id,
-        })
+        });
 
         return new Response(
             JSON.stringify({
@@ -61,61 +61,61 @@ export async function GET(request: Request) {
                 messages: messages,
             }),
             { status: 200 }
-        )
+        );
     } catch (error) {
-        console.error(error)
-        return new Response("Internal Server Error", { status: 500 })
+        console.error(error);
+        return new Response("Internal Server Error", { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const session = await auth()
+        const session = await auth();
 
         if (!session) {
-            return new Response("Unauthorized", { status: 401 })
+            return new Response("Unauthorized", { status: 401 });
         }
 
-        const body = await request.json()
+        const body = await request.json();
 
-        const validate = bodyValidator.safeParse(body)
+        const validate = bodyValidator.safeParse(body);
 
         if (!validate.success) {
-            return new Response(validate.error.message, { status: 400 })
+            return new Response(validate.error.message, { status: 400 });
         }
 
         const lastMessage = validate.data.messages[
             validate.data.messages.length - 1
-        ] as Message
+        ] as Message;
 
         if (lastMessage.role !== "user") {
-            return new Response("Invalid request", { status: 400 })
+            return new Response("Invalid request", { status: 400 });
         }
 
-        const { model } = validate.data
+        const { model } = validate.data;
 
-        const chatId = body.id
+        const chatId = body.id;
 
-        let chat = null
+        let chat = null;
 
         if (!validate.data.incognito) {
             chat = await getChat({
                 userId: session.id,
                 pubId: chatId,
-            })
+            });
 
             if (!chat) {
-                const title = await generateChatTitle(lastMessage.content)
+                const title = await generateChatTitle(lastMessage.content);
 
                 const newChat = await createChat({
                     userId: session.id,
                     title,
                     pubId: chatId,
-                })
-                chat = newChat
+                });
+                chat = newChat;
             }
             if (!chat || !chat.id) {
-                return new Response("Chat not found", { status: 404 })
+                return new Response("Chat not found", { status: 404 });
             }
         }
 
@@ -124,9 +124,9 @@ export async function POST(request: Request) {
                 model,
             }),
             ...validate.data.messages,
-        ] as Message[]
+        ] as Message[];
 
-        const modelConfig = getModel(model)
+        const modelConfig = getModel(model);
 
         const stream = streamText({
             model: modelConfig.model,
@@ -139,13 +139,17 @@ export async function POST(request: Request) {
                 chunking: "line",
             }),
             onError: (error) => {
-                console.error(error)
+                console.error(error);
             },
             onFinish: async ({ response, text, steps, reasoning }) => {
                 try {
                     if (validate.data.incognito || !chat) {
-                        return
+                        return;
                     }
+                    if (!text) {
+                        return;
+                    }
+
                     await saveMessage({
                         chatId: chat.id,
                         userId: session.id,
@@ -153,12 +157,12 @@ export async function POST(request: Request) {
                         content: lastMessage.content,
                         parts: lastMessage.parts ?? [],
                         attachments: lastMessage.experimental_attachments ?? [],
-                    })
+                    });
 
                     const [_, assistantMessage] = appendResponseMessages({
                         messages: [lastMessage],
                         responseMessages: response.messages,
-                    })
+                    });
 
                     await saveMessage({
                         chatId: chat.id,
@@ -168,54 +172,54 @@ export async function POST(request: Request) {
                         parts: assistantMessage.parts ?? [],
                         attachments:
                             assistantMessage.experimental_attachments ?? [],
-                    })
+                    });
                 } catch (error) {
-                    console.error(error)
+                    console.error(error);
                 }
             },
-        })
+        });
 
         return stream.toDataStreamResponse({
             sendReasoning: true,
-        })
+        });
     } catch (error) {
-        console.error(error)
-        return new Response("Internal Server Error", { status: 500 })
+        console.error(error);
+        return new Response("Internal Server Error", { status: 500 });
     }
 }
 
 export async function DELETE(request: Request) {
     try {
-        const authUser = await auth()
+        const authUser = await auth();
 
         if (!authUser) {
-            return new Response("Unauthorized", { status: 401 })
+            return new Response("Unauthorized", { status: 401 });
         }
 
-        const url = new URL(request.url)
-        const chatId = url.searchParams.get("chatId")
+        const url = new URL(request.url);
+        const chatId = url.searchParams.get("chatId");
 
         if (!chatId) {
-            return new Response("Chat ID is required", { status: 400 })
+            return new Response("Chat ID is required", { status: 400 });
         }
 
         const chat = await getChat({
             userId: authUser.id,
             pubId: chatId,
-        })
+        });
 
         if (!chat) {
-            return new Response("Chat not found", { status: 404 })
+            return new Response("Chat not found", { status: 404 });
         }
 
         await deleteChat({
             pubId: chatId,
             userId: authUser.id,
-        })
+        });
 
-        return new Response("Chat deleted", { status: 200 })
+        return new Response("Chat deleted", { status: 200 });
     } catch (error) {
-        console.error(error)
-        return new Response("Internal Server Error", { status: 500 })
+        console.error(error);
+        return new Response("Internal Server Error", { status: 500 });
     }
 }
