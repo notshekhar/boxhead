@@ -146,9 +146,6 @@ export async function POST(request: Request) {
                     if (validate.data.incognito || !chat) {
                         return;
                     }
-                    if (!text) {
-                        return;
-                    }
 
                     await saveMessage({
                         chatId: chat.id,
@@ -158,6 +155,10 @@ export async function POST(request: Request) {
                         parts: lastMessage.parts ?? [],
                         attachments: lastMessage.experimental_attachments ?? [],
                     });
+
+                    if (!text) {
+                        return;
+                    }
 
                     const [_, assistantMessage] = appendResponseMessages({
                         messages: [lastMessage],

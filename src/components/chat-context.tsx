@@ -135,6 +135,7 @@ export const ChatProvider = React.memo(
         useEffect(() => {
             fetchChats()
         }, [user])
+        
 
         const {
             messages,
@@ -165,6 +166,17 @@ export const ChatProvider = React.memo(
             initialMessages: initialChat?.messages || [],
             credentials: "include",
         })
+
+        useEffect(() => {
+            // if last message have no content, remove the last message from assistant and user and show a errorToast
+            if (messages.length > 0) {
+                const lastMessage = messages[messages.length - 1]
+                if (!lastMessage.content) {
+                    setMessages(messages.slice(0, -1))
+                    errorToast("Last message has no content")
+                }
+            }
+        }, [isLoading])
 
         useEffect(() => {
             if (window.location.pathname === "/") {
