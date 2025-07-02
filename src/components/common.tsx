@@ -3,10 +3,20 @@ import { UIMessage } from "ai"
 import { v4 as uuidv4, v4 } from "uuid"
 import axios from "axios"
 import { useRouter } from "next/navigation"
-import { CommonPopup } from "./common-popup"
+
 import { errorToast } from "@/hooks/error-toast"
 import { useChatContext } from "./chat-context"
 import { useModels } from "./models-context"
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogDescription, 
+    DialogFooter, 
+    DialogHeader, 
+    DialogTitle 
+} from "./ui/dialog"
+import { Button } from "./ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 // Copy icon component
 export const CopyIcon = React.memo(({ className }: { className?: string }) => (
@@ -99,24 +109,39 @@ const useCopyToClipboard = () => {
 
 // Copy button component
 export const CopyButton = React.memo(
-    ({ text, label = "Copy" }: { text: string; label?: string }) => {
+    ({ text, label = "Copy", iconOnly = false }: { text: string; label?: string; iconOnly?: boolean }) => {
         const { isCopied, copyToClipboard } = useCopyToClipboard()
 
-        return (
+        const buttonContent = (
             <button
                 onClick={() => copyToClipboard(text)}
-                className={`flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer ${
+                className={`flex items-center ${iconOnly ? 'gap-0 p-2' : 'gap-1.5 px-2 py-1'} text-sm rounded transition-colors cursor-pointer ${
                     isCopied
                         ? "text-green-600 dark:text-green-400"
                         : "text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark"
                 }`}
-                title={isCopied ? "Copied!" : `Copy ${label.toLowerCase()}`}
+                title={iconOnly ? undefined : (isCopied ? "Copied!" : `Copy ${label.toLowerCase()}`)}
                 disabled={isCopied}
             >
                 {isCopied ? <CheckIcon /> : <CopyIcon />}
-                {isCopied ? "Copied" : label}
+                {!iconOnly && (isCopied ? "Copied" : label)}
             </button>
         )
+
+        if (iconOnly) {
+            return (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {buttonContent}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{isCopied ? "Copied!" : "Copy"}</p>
+                    </TooltipContent>
+                </Tooltip>
+            )
+        }
+
+        return buttonContent
     }
 )
 
@@ -128,32 +153,27 @@ export const BranchConfirmationModal = React.memo<{
     onCancel: () => void
 }>(({ isOpen, isBranching, onConfirm, onCancel }) => {
     return (
-        <CommonPopup
-            isOpen={isOpen}
-            onClose={onCancel}
-            title="Branch Conversation"
-            maxWidth="md"
-            showCloseButton={false}
-            closeOnBackdropClick={!isBranching}
-        >
-            <div className="p-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                    This will create a new conversation branch from this point.
-                    You can continue the conversation from here in a separate
-                    thread.
-                </p>
-                <div className="flex space-x-3 justify-end">
-                    <button
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+            <DialogContent className="sm:max-w-md" showCloseButton={false}>
+                <DialogHeader>
+                    <DialogTitle>Branch Conversation</DialogTitle>
+                    <DialogDescription>
+                        This will create a new conversation branch from this point.
+                        You can continue the conversation from here in a separate
+                        thread.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2">
+                    <Button
+                        variant="outline"
                         onClick={onCancel}
                         disabled={isBranching}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={onConfirm}
                         disabled={isBranching}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         {isBranching ? (
                             <>
@@ -181,10 +201,10 @@ export const BranchConfirmationModal = React.memo<{
                         ) : (
                             "Create Branch"
                         )}
-                    </button>
-                </div>
-            </div>
-        </CommonPopup>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 })
 
@@ -195,9 +215,11 @@ export const BranchOutButton = React.memo(
     ({
         messageIndex,
         label = "Branch Off",
+        iconOnly = false,
     }: {
         messageIndex: number
         label?: string
+        iconOnly?: boolean
     }) => {
         const router = useRouter()
         const { messages, chatId } = useChatContext()
@@ -238,15 +260,28 @@ export const BranchOutButton = React.memo(
                 if (response.status === 200) {
                     // Redirect to the new branch chat
                     router.push(`/chat/${newChatId}`)
+                } else {
+                    setIsBranching(false)
                 }
             } catch (error) {
                 console.error("Failed to create branch:", error)
                 errorToast(error)
-            } finally {
                 setIsBranching(false)
-                setShowBranchConfirmationModal(false)
             }
         }, [])
+
+        const buttonContent = (
+            <button
+                onClick={() => {
+                    setShowBranchConfirmationModal(true)
+                }}
+                className={`flex items-center ${iconOnly ? 'gap-0 p-2' : 'gap-1.5 px-2 py-1'} text-sm rounded transition-colors cursor-pointer text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark disabled:opacity-50 disabled:cursor-not-allowed`}
+                title={iconOnly ? undefined : label}
+            >
+                <BranchOutIcon />
+                {!iconOnly && label}
+            </button>
+        )
 
         return (
             <>
@@ -255,20 +290,24 @@ export const BranchOutButton = React.memo(
                     isBranching={isBranching}
                     onConfirm={handleBranchOut}
                     onCancel={() => {
-                        setShowBranchConfirmationModal(false)
-                        setIsBranching(false)
+                        if (!isBranching) {
+                            setShowBranchConfirmationModal(false)
+                            setIsBranching(false)
+                        }
                     }}
                 />
-                <button
-                    onClick={() => {
-                        setShowBranchConfirmationModal(true)
-                    }}
-                    className="flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark disabled:opacity-50 disabled:cursor-not-allowed"
-                    title={label}
-                >
-                    <BranchOutIcon />
-                    {label}
-                </button>
+                {iconOnly ? (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            {buttonContent}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Branch off</p>
+                        </TooltipContent>
+                    </Tooltip>
+                ) : (
+                    buttonContent
+                )}
             </>
         )
     }

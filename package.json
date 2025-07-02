@@ -18,15 +18,24 @@
         "@libsql/client": "^0.15.8",
         "@neondatabase/serverless": "^1.0.1",
         "@openrouter/ai-sdk-provider": "^0.7.2",
+        "@radix-ui/react-dialog": "^1.1.14",
+        "@radix-ui/react-label": "^2.1.7",
+        "@radix-ui/react-popover": "^1.1.14",
+        "@radix-ui/react-slot": "^1.2.3",
+        "@radix-ui/react-tooltip": "^1.2.7",
         "ai": "^4.3.16",
         "arctic": "^3.7.0",
         "axios": "^1.9.0",
         "babel-plugin-react-compiler": "^19.1.0-rc.2",
         "botid": "^1.4.1",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "cmdk": "^1.1.1",
         "dexie": "^4.0.11",
         "dotenv": "^16.5.0",
         "drizzle-orm": "^0.44.2",
         "jsonwebtoken": "^9.0.2",
+        "lucide-react": "^0.525.0",
         "marked": "^15.0.12",
         "mysql2": "^3.14.0",
         "next": "15.2.4",
@@ -46,7 +55,9 @@
         "remark-math": "^6.0.0",
         "sequelize": "^6.37.7",
         "shiki": "^3.6.0",
+        "tailwind-merge": "^3.3.1",
         "uuid": "^11.1.0",
+        "vaul": "^1.1.2",
         "zod": "^3.25.42"
     },
     "devDependencies": {
@@ -65,6 +76,7 @@
         "eslint-config-next": "15.2.4",
         "tailwindcss": "^4",
         "tsx": "^4.19.4",
+        "tw-animate-css": "^1.3.4",
         "typescript": "^5"
     }
 }
