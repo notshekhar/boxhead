@@ -1,3 +1,10 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
+
 /**
  * Get the SVG icon path for a model icon/provider
  * If icon is a URL, return it directly. Otherwise, get from public folder.
@@ -13,7 +20,7 @@ const localIcons = new Set([
     "minimax",
     "mistral",
     "google",
-])
+]);
 
 export const getModelIcon = (icon: string): string => {
     // Check if icon is a URL (starts with http:// or https:// or //)
@@ -22,17 +29,17 @@ export const getModelIcon = (icon: string): string => {
         icon.startsWith("https://") ||
         icon.startsWith("//")
     ) {
-        return icon
+        return icon;
     }
 
     // Check if icon is an absolute path (starts with /)
     if (icon.startsWith("/")) {
-        return icon
+        return icon;
     }
 
     if (localIcons.has(icon)) {
-        return `/model-icons/${icon}.svg`
+        return `/model-icons/${icon}.svg`;
     }
 
-    return `/model-icons/default.svg`
-}
+    return `/model-icons/default.svg`;
+};
