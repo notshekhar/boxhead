@@ -46,10 +46,6 @@ export const ChatPage = React.memo(
         const [showScrollToBottom, setShowScrollToBottom] =
             useState<boolean>(false);
 
-        const [lastSidebarVisible, setLastSidebarVisible] = useState<boolean>(
-            initialSidebarVisible
-        );
-
         const handleOpenSearch = useCallback(() => {
             setShowSearchPopup(true);
         }, []);
@@ -71,7 +67,6 @@ export const ChatPage = React.memo(
             const handleResize = () => {
                 const mobile = window.innerWidth < 900;
                 if (mobile) {
-                    setLastSidebarVisible(sidebarVisible);
                     setSidebarVisible(false);
                 }
             };
@@ -80,7 +75,7 @@ export const ChatPage = React.memo(
 
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
-        }, [sidebarVisible]);
+        }, []);
 
         const handleToggleSidebar = useCallback(() => {
             setSidebarVisible((v) => !v);
