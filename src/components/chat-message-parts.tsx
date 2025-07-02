@@ -135,13 +135,14 @@ export const ChatMessageParts = React.memo(
                                         </MemoizedMarkdown>
                                     </div>
                                     {!isLoading && (
-                                        <div className="flex justify-start gap-2 mt-3">
+                                        <div className="flex justify-start  mt-3">
                                             <CopyButton
                                                 text={message.content}
-                                                label="Copy"
+                                                iconOnly={true}
                                             />
                                             <BranchOutButton
                                                 messageIndex={messageIndex}
+                                                iconOnly={true}
                                             />
                                         </div>
                                     )}

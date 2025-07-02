@@ -16,6 +16,7 @@ import {
     DialogTitle 
 } from "./ui/dialog"
 import { Button } from "./ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 // Copy icon component
 export const CopyIcon = React.memo(({ className }: { className?: string }) => (
@@ -108,24 +109,39 @@ const useCopyToClipboard = () => {
 
 // Copy button component
 export const CopyButton = React.memo(
-    ({ text, label = "Copy" }: { text: string; label?: string }) => {
+    ({ text, label = "Copy", iconOnly = false }: { text: string; label?: string; iconOnly?: boolean }) => {
         const { isCopied, copyToClipboard } = useCopyToClipboard()
 
-        return (
+        const buttonContent = (
             <button
                 onClick={() => copyToClipboard(text)}
-                className={`flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer ${
+                className={`flex items-center ${iconOnly ? 'gap-0 p-2' : 'gap-1.5 px-2 py-1'} text-sm rounded transition-colors cursor-pointer ${
                     isCopied
                         ? "text-green-600 dark:text-green-400"
                         : "text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark"
                 }`}
-                title={isCopied ? "Copied!" : `Copy ${label.toLowerCase()}`}
+                title={iconOnly ? undefined : (isCopied ? "Copied!" : `Copy ${label.toLowerCase()}`)}
                 disabled={isCopied}
             >
                 {isCopied ? <CheckIcon /> : <CopyIcon />}
-                {isCopied ? "Copied" : label}
+                {!iconOnly && (isCopied ? "Copied" : label)}
             </button>
         )
+
+        if (iconOnly) {
+            return (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {buttonContent}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{isCopied ? "Copied!" : "Copy"}</p>
+                    </TooltipContent>
+                </Tooltip>
+            )
+        }
+
+        return buttonContent
     }
 )
 
@@ -199,9 +215,11 @@ export const BranchOutButton = React.memo(
     ({
         messageIndex,
         label = "Branch Off",
+        iconOnly = false,
     }: {
         messageIndex: number
         label?: string
+        iconOnly?: boolean
     }) => {
         const router = useRouter()
         const { messages, chatId } = useChatContext()
@@ -252,6 +270,19 @@ export const BranchOutButton = React.memo(
             }
         }, [])
 
+        const buttonContent = (
+            <button
+                onClick={() => {
+                    setShowBranchConfirmationModal(true)
+                }}
+                className={`flex items-center ${iconOnly ? 'gap-0 p-2' : 'gap-1.5 px-2 py-1'} text-sm rounded transition-colors cursor-pointer text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark disabled:opacity-50 disabled:cursor-not-allowed`}
+                title={iconOnly ? undefined : label}
+            >
+                <BranchOutIcon />
+                {!iconOnly && label}
+            </button>
+        )
+
         return (
             <>
                 <BranchConfirmationModal
@@ -265,16 +296,18 @@ export const BranchOutButton = React.memo(
                         }
                     }}
                 />
-                <button
-                    onClick={() => {
-                        setShowBranchConfirmationModal(true)
-                    }}
-                    className="flex items-center gap-1.5 text-sm px-2 py-1 rounded transition-colors cursor-pointer text-text-muted-light dark:text-text-muted-dark hover:bg-gray-light dark:hover:bg-gray-darker hover:text-text-light dark:hover:text-text-dark disabled:opacity-50 disabled:cursor-not-allowed"
-                    title={label}
-                >
-                    <BranchOutIcon />
-                    {label}
-                </button>
+                {iconOnly ? (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            {buttonContent}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Branch off</p>
+                        </TooltipContent>
+                    </Tooltip>
+                ) : (
+                    buttonContent
+                )}
             </>
         )
     }
