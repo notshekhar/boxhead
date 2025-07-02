@@ -380,6 +380,40 @@ const DragOverlay: React.FC = React.memo(() => (
     </div>
 ))
 
+const ModelSelectedDisplay: React.FC<{ option?: ComboboxOption | null }> = React.memo(({ option }) => (
+    <div className="flex items-center gap-2 cursor-pointer">
+        <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+            <img
+                src={getModelIcon(option?.icon || "")}
+                alt={`${option?.icon || "default"} icon`}
+                className="w-4 h-4 object-contain transition-all duration-200 model-icon cursor-pointer"
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/model-icons/default.svg";
+                }}
+            />
+        </div>
+        <span className="whitespace-nowrap cursor-pointer">{option?.label}</span>
+    </div>
+))
+
+const ModelOptionDisplay: React.FC<{ option: ComboboxOption }> = React.memo(({ option }) => (
+    <div className="flex items-center gap-2 cursor-pointer">
+        <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
+            <img
+                src={getModelIcon(option.icon || "")}
+                alt={`${option.icon || "default"} icon`}
+                className="w-4 h-4 object-contain cursor-pointer"
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/model-icons/default.svg";
+                }}
+            />
+        </div>
+        <span className="cursor-pointer">{option.label}</span>
+    </div>
+))
+
 // Main component
 export const ChatInput: React.FC<ChatInputProps> = React.memo(
     ({ onSendMessage, input, setInput, isLoading = false }) => {
@@ -475,38 +509,8 @@ export const ChatInput: React.FC<ChatInputProps> = React.memo(
                                     placeholder="Select Model"
                                     searchPlaceholder="Search models..."
                                     emptyText="No models found"
-                                    renderSelected={(option) => (
-                                        <div className="flex items-center gap-2 cursor-pointer">
-                                            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
-                                                <img
-                                                    src={getModelIcon(option?.icon || "")}
-                                                    alt={`${option?.icon || "default"} icon`}
-                                                    className="w-4 h-4 object-contain transition-all duration-200 model-icon cursor-pointer"
-                                                    onError={(e) => {
-                                                        const target = e.target as HTMLImageElement;
-                                                        target.src = "/model-icons/default.svg";
-                                                    }}
-                                                />
-                                            </div>
-                                            <span className="whitespace-nowrap cursor-pointer">{option?.label}</span>
-                                        </div>
-                                    )}
-                                    renderOption={(option) => (
-                                        <div className="flex items-center gap-2 cursor-pointer">
-                                            <div className="w-4 h-4 flex items-center justify-center cursor-pointer">
-                                                <img
-                                                    src={getModelIcon(option.icon || "")}
-                                                    alt={`${option.icon || "default"} icon`}
-                                                    className="w-4 h-4 object-contain cursor-pointer"
-                                                    onError={(e) => {
-                                                        const target = e.target as HTMLImageElement;
-                                                        target.src = "/model-icons/default.svg";
-                                                    }}
-                                                />
-                                            </div>
-                                            <span className="cursor-pointer">{option.label}</span>
-                                        </div>
-                                    )}
+                                    renderSelected={(option) => <ModelSelectedDisplay option={option} />}
+                                    renderOption={(option) => <ModelOptionDisplay option={option} />}
                                 />
 
                                 {/* File input (hidden) */}

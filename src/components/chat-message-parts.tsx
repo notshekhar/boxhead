@@ -142,7 +142,7 @@ export const ChatMessageParts = React.memo(
                                             />
                                             <BranchOutButton
                                                 messageIndex={messageIndex}
-                                                iconOnly={true}
+                                                // iconOnly={true}
                                             />
                                         </div>
                                     )}

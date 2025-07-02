@@ -1,7 +1,7 @@
 import { UIMessage } from "ai"
 import React from "react"
 import { MemoizedMarkdown } from "./markdown-chunks"
-import { CopyButton, BranchOutButton } from "./common"
+import { CopyButton } from "./common"
 import { ChatMessageParts } from "./chat-message-parts"
 
 export const ChatMessage: React.FC<{
