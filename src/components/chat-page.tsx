@@ -76,6 +76,8 @@ export const ChatPage = React.memo(
                 }
             };
 
+            handleResize();
+
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }, [sidebarVisible]);
