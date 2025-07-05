@@ -88,7 +88,7 @@ export const Combobox = React.memo(
                 role="combobox"
                 aria-expanded={open}
                 className={cn(
-                    "w-full justify-between bg-gray-200 dark:bg-[#2A2A30] text-gray-700 dark:text-white border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs font-medium h-auto px-3 py-1.5 cursor-pointer",
+                    "w-full justify-between bg-gray-200 dark:bg-[#2A2A30] text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 text-xs font-medium h-auto px-3 py-1.5 cursor-pointer",
                     !value && "text-gray-500 dark:text-gray-400",
                     className
                 )}
